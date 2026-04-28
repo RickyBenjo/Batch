@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 1 — Platform Foundation · Batch Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0F0C0C;
+    --white: #F0F1F4;
+    --sunset: #FF5F00;
+    --ocean: #4F97FC;
+    --cosmo: #FF93D3;
+    --lime: #00DF00;
+    --gold: #FFCA00;
+    --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF;
+    --cosmo-tint: #FFE0F3;
+    --lime-tint: #C8FFB0;
+    --sunset-tint: #FFD9C0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Mulish', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* TOP NAV */
+  .topnav {
+    background: var(--black);
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--gold);
+  }
+  .topnav a {
+    color: rgba(240,241,244,0.5);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: color 0.15s;
+  }
+  .topnav a:hover { color: var(--gold); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--gold); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+
+  .tab-nav {
+    background: var(--black);
+    padding: 0 40px;
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .tab-btn {
+    padding: 12px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(240,241,244,0.45);
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    font-family: 'Mulish', sans-serif;
+    letter-spacing: 0.3px;
+  }
+  .tab-btn:hover { color: rgba(240,241,244,0.8); }
+  .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* HERO */
+  .hero {
+    background: var(--black);
+    padding: 52px 40px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.08;
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--black);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    padding: 5px 14px;
+    border-radius: 30px;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); margin-bottom: 24px; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    font-size: 11px; font-weight: 700;
+    padding: 5px 14px; border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(240,241,244,0.7);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* LAYOUT */
+  .page-body { max-width: 900px; margin: 0 auto; padding: 36px 40px 80px; }
+
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  /* SECTION HEADING */
+  .sec-head {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    border-bottom: 3px solid;
+  }
+  .sec-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .sec-head h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+
+  /* CARDS */
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid rgba(15,12,12,0.09);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 13.5px; color: #555; line-height: 1.65; }
+  .card ul { padding-left: 18px; }
+  .card li { margin-bottom: 4px; }
+
+  /* CALLOUTS */
+  .callout { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; border-left: 4px solid; }
+  .callout.gold { background: var(--gold-tint); border-color: var(--gold); }
+  .callout.blue { background: var(--ocean-tint); border-color: var(--ocean); }
+  .callout.pink { background: var(--cosmo-tint); border-color: var(--cosmo); }
+  .callout.green { background: var(--lime-tint); border-color: #00b800; }
+  .callout.orange { background: var(--sunset-tint); border-color: var(--sunset); }
+  .callout strong { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+  .callout p, .callout li { font-size: 13.5px; line-height: 1.6; }
+  .callout ul { padding-left: 16px; }
+  .callout li { margin-bottom: 3px; }
+
+  /* GRID */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+
+  /* TABLES */
+  .ctable { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; border-radius: 12px; overflow: hidden; }
+  .ctable th { background: var(--black); color: var(--white); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .ctable td { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+  .ctable tr:last-child td { border-bottom: none; }
+  .ctable tr:nth-child(even) td { background: rgba(240,241,244,0.5); }
+  .check { color: #00aa00; font-weight: 700; }
+  .cross { color: #cc2200; font-weight: 700; }
+
+  /* STEPS */
+  .steps { }
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--black); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-body { flex: 1; }
+  .step-body strong { font-size: 13.5px; display: block; margin-bottom: 2px; }
+  .step-body span { font-size: 12.5px; color: #666; }
+
+  /* TIER CARDS */
+  .tier-card { border-radius: 14px; padding: 16px; border: 2px solid; margin-bottom: 6px; }
+  .tier-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .tier-card ul { padding-left: 16px; }
+  .tier-card li { font-size: 12.5px; line-height: 1.65; }
+
+  /* SIGNAL BOXES */
+  .signal-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .signal-box { flex: 1; min-width: 90px; border-radius: 12px; padding: 12px 14px; text-align: center; }
+  .signal-box .s-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .signal-box .s-range { font-size: 22px; font-weight: 900; font-family: 'Playfair Display', serif; }
+  .signal-box .s-desc { font-size: 11px; margin-top: 3px; }
+
+  /* TOOL GRID */
+  .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .tool-item { background: #fff; border: 1.5px solid rgba(15,12,12,0.09); border-radius: 12px; padding: 14px 16px; }
+  .tool-icon { font-size: 20px; margin-bottom: 6px; }
+  .tool-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .tool-desc { font-size: 12px; color: #666; line-height: 1.5; }
+
+  /* WARNING */
+  .warning { background: #fff3e0; border: 2px solid var(--sunset); border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; }
+  .warning .w-title { font-weight: 800; color: var(--sunset); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .warning p { font-size: 13px; }
+
+  /* TAGS */
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .tag.gold { background: var(--gold); color: var(--black); }
+  .tag.blue { background: var(--ocean); color: #fff; }
+  .tag.orange { background: var(--sunset); color: #fff; }
+  .tag.green { background: var(--lime); color: var(--black); }
+  .tag.pink { background: var(--cosmo); color: var(--black); }
+
+  /* SCHEDULE */
+  .schedule { display: flex; gap: 0; margin-bottom: 14px; overflow: hidden; border-radius: 12px; border: 1.5px solid rgba(0,0,0,0.08); flex-wrap: wrap; }
+  .sched-item { flex: 1; min-width: 140px; padding: 14px 16px; }
+  .sched-time { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .sched-act { font-size: 13.5px; font-weight: 700; }
+  .sched-detail { font-size: 12px; color: #666; margin-top: 3px; }
+
+  /* STATUS GRID */
+  .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .status-box { border-radius: 12px; padding: 16px 18px; }
+  .status-box h4 { font-size: 13px; font-weight: 800; margin-bottom: 10px; }
+  .status-box ul { padding-left: 16px; }
+  .status-box li { font-size: 13px; line-height: 1.7; }
+  @media (max-width: 600px) { .status-grid { grid-template-columns: 1fr; } }
+
+  hr { border: none; border-top: 2px dashed rgba(0,0,0,0.07); margin: 20px 0; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    border-top: 2px solid rgba(15,12,12,0.08);
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .bottom-nav a {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; color: var(--black);
+    text-decoration: none; padding: 10px 20px;
+    border: 2px solid rgba(15,12,12,0.15); border-radius: 30px;
+    transition: all 0.15s;
+  }
+  .bottom-nav a:hover { background: var(--black); color: var(--gold); border-color: var(--black); }
+  .bottom-nav .disabled { opacity: 0.35; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html">Training Hub</a>
+  <span class="sep">›</span>
+  <span class="current">Day 1 — Platform Foundation</span>
+</nav>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="show('overview', this)">Platform Overview</button>
+  <button class="tab-btn" onclick="show('partners', this)">Partners & Roles</button>
+  <button class="tab-btn" onclick="show('tiers', this)">Subscription Tiers</button>
+  <button class="tab-btn" onclick="show('listings', this)">Listing Models</button>
+  <button class="tab-btn" onclick="show('value', this)">Value Props</button>
+  <button class="tab-btn" onclick="show('retention', this)">Retention Strategy</button>
+  <button class="tab-btn" onclick="show('tools', this)">Tools & Systems</button>
+  <button class="tab-btn" onclick="show('workflows', this)">Workflows</button>
+  <button class="tab-btn" onclick="show('team', this)">Team Structure</button>
+  <button class="tab-btn" onclick="show('access', this)">System Access</button>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Day 1 · April 27, 2026</div>
+    <h1>Platform Foundation</h1>
+    <p class="hero-sub">What Batch is, how it works, all the tools, partner lifecycle, and your role as Partner Engagement Specialist.</p>
+    <div class="hero-chips">
+      <div class="chip">Supervised by Cliff</div>
+      <div class="chip">Parts 1–4 covered</div>
+      <div class="chip">~7 hours of training</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- OVERVIEW -->
+  <div class="section visible" id="sec-overview">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Platform Overview</h2>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>What is Batch?</h3>
+        <ul>
+          <li>Booking platform in <strong>30+ US cities</strong></li>
+          <li><strong>3+ million customers</strong></li>
+          <li>Customers book experiences: parties, events, activities</li>
+          <li>Business partners post listings to gain visibility</li>
+          <li>Two interfaces: <strong>Let's Batch app</strong> and <strong>website</strong> (identical content)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>What Batch Actually Sells</h3>
+        <ul>
+          <li><strong>NOT guaranteed bookings</strong></li>
+          <li>Visibility, SEO optimization, and traffic</li>
+          <li>Access to 3M+ customer audience</li>
+          <li>Marketing tools and analytics</li>
+        </ul>
+        <p style="margin-top: 10px; font-size: 12px; background: var(--gold-tint); padding: 8px 12px; border-radius: 8px; font-weight: 700;">"We're not just another marketplace — we're a marketing machine."</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>How Customers Use Batch</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Search & Discover</strong><span>Search for experiences by city, type, or occasion</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Like & Favorite</strong><span>Save listings they're interested in</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Add to Itinerary</strong><span>Build event plans using multiple listings</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Click Referral Link</strong><span>Directed to partner's own website to book directly</span></div></div>
+      </div>
+    </div>
+
+    <div class="callout orange">
+      <strong>Why Batch Lost 50% of Partners</strong>
+      <ul>
+        <li>Declined from <strong>3,800 → 1,500 partners</strong></li>
+        <li>Over-promises and under-delivery on bookings</li>
+        <li>Poor onboarding — no follow-up or education</li>
+        <li>Partners promised bookings but received only visibility</li>
+        <li>Previous management gatekeeping processes and blocking improvements</li>
+        <li><strong>Estefan's arrival</strong> is reversing this — better leadership, process transparency</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PARTNERS -->
+  <div class="section" id="sec-partners">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Partners vs Customers</h2>
+    </div>
+
+    <table class="ctable">
+      <tr><th>Aspect</th><th>Partners (Business)</th><th>Customers (End Users)</th></tr>
+      <tr><td><strong>Role</strong></td><td>Provide experiences, post listings</td><td>Search and book experiences</td></tr>
+      <tr><td><strong>Pay Batch</strong></td><td class="check">✓ Monthly subscription</td><td class="cross">✗ Free to use</td></tr>
+      <tr><td><strong>Dashboard Access</strong></td><td class="check">✓ Analytics + performance</td><td class="cross">✗ N/A</td></tr>
+      <tr><td><strong>Who Rick supports</strong></td><td class="check">✓ Primary focus</td><td class="cross">✗ Minimal (Felix/Irvin handle)</td></tr>
+      <tr><td><strong>Commission</strong></td><td>0% on Batch Direct; 10–30% on higher-tier bookings</td><td>N/A</td></tr>
+    </table>
+
+    <div class="callout blue">
+      <strong>Critical Misconception to Address in Every Churn Call</strong>
+      <p>Partners believe they're paying for <strong>guaranteed bookings</strong>. They're actually paying for <strong>visibility, SEO, and traffic</strong>. This single misunderstanding drives the majority of cancellation requests. Always clarify this confidently.</p>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>What Counts as "Value" for Partners</h3>
+        <ul>
+          <li>Page views on their listing</li>
+          <li>Favorites (hearts)</li>
+          <li>Itinerary additions</li>
+          <li>Referral link clicks to their website</li>
+        </ul>
+        <p style="margin-top: 8px; font-size: 12px; color: #888;">All visible in analytics dashboard — even without direct bookings on Batch</p>
+      </div>
+      <div class="card">
+        <h3>SEO: The 3-Month Rule</h3>
+        <ul>
+          <li>SEO is a <strong>compounding investment</strong></li>
+          <li>Requires 3 months to show meaningful results</li>
+          <li>Lock-in period exists specifically for this reason</li>
+          <li>First 3 months: optimization phase</li>
+          <li>After 3 months: itinerary adds and referrals increase</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Rick's Core Responsibilities</h3>
+      <ul>
+        <li>Act as <strong>account manager</strong> for Core/Basic tier partners (~1,100 partners)</li>
+        <li>Educate partners on the value they receive</li>
+        <li>Proactively send performance emails with metrics</li>
+        <li>Help optimize listings (keywords, tags, descriptions)</li>
+        <li>Manage cancellation/churn requests</li>
+        <li>Handle disputes and subscription updates</li>
+        <li>Offer retention packages to save at-risk accounts</li>
+        <li>Two main daily tasks: <strong>(1) support emails</strong> about listing improvements, <strong>(2) phone calls</strong> via meeting links</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TIERS -->
+  <div class="section" id="sec-tiers">
+    <div class="sec-head" style="border-color: var(--lime);">
+      <div class="sec-dot" style="background: var(--lime);"></div>
+      <h2>Subscription Tiers</h2>
+    </div>
+
+    <div class="callout gold">
+      <strong>Pricing Overview</strong>
+      <p>Basic/Core: <strong>$99–$300/month</strong> depending on location. Higher tiers significantly more expensive and include commission-based revenue sharing.</p>
+    </div>
+
+    <div class="three-col">
+      <div class="tier-card" style="background: var(--lime-tint); border-color: #00b800;">
+        <h4>🟢 Basic / Core</h4>
+        <p style="font-size: 11px; color: #555; margin-bottom: 8px;">(Same tier, different naming)</p>
+        <ul>
+          <li>Listing creation</li>
+          <li>UGC collection tool</li>
+          <li>Basic performance dashboard</li>
+          <li>Support access</li>
+          <li>Up to 3 listings (Basic) / 5 listings (Core)</li>
+        </ul>
+        <p style="font-size: 11px; margin-top: 10px; font-weight: 700; color: #337733;">Rick's primary focus. ~1,100 of 1,500 partners.</p>
+      </div>
+      <div class="tier-card" style="background: var(--ocean-tint); border-color: var(--ocean);">
+        <h4>🔵 Boost</h4>
+        <ul>
+          <li>Everything in Basic/Core</li>
+          <li>Dedicated account manager</li>
+          <li>Strategy insights</li>
+          <li>Advanced analytics</li>
+          <li>Quarterly marketing promotions</li>
+          <li>Commission-based revenue sharing</li>
+        </ul>
+        <p style="font-size: 11px; margin-top: 10px; font-weight: 700; color: #2255aa;">Handled by separate onshore AMs. Not Rick.</p>
+      </div>
+      <div class="tier-card" style="background: var(--cosmo-tint); border-color: var(--cosmo);">
+        <h4>🩷 Party Pro</h4>
+        <p style="font-size: 11px; color: #555; margin-bottom: 8px;">(Invite-only, top performers)</p>
+        <ul>
+          <li>Priority content placements</li>
+          <li>More email marketing</li>
+          <li>Dedicated support</li>
+          <li>3 features activated in portal</li>
+        </ul>
+        <p style="font-size: 11px; margin-top: 10px; font-weight: 700; color: #993388;">Escalate to Batch Partner Support channel. Tag the AM.</p>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Optimization is NOT included in Basic/Core</div>
+      <p>Optimization, blog posts, and keyword additions are <strong>excluded</strong> from the base subscription. This is intentional — these become <strong>retention leverage</strong>. Offer them as add-ons when trying to save a churning partner.</p>
+    </div>
+  </div>
+
+  <!-- LISTING MODELS -->
+  <div class="section" id="sec-listings">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Four Listing Model Types</h2>
+    </div>
+
+    <table class="ctable">
+      <tr><th>Model</th><th>% of Rick's Partners</th><th>How Booking Works</th><th>Commission</th><th>Who Handles</th></tr>
+      <tr>
+        <td><span class="tag gold">Batch Direct</span></td>
+        <td><strong>99%</strong></td>
+        <td>Customer directed to partner's website. No booking on Batch.</td>
+        <td class="check">0%</td>
+        <td>Rick's team</td>
+      </tr>
+      <tr>
+        <td><span class="tag blue">Email Partner</span></td>
+        <td>Small %</td>
+        <td>Booking calendar requires manual confirmation or team intervention</td>
+        <td>10–30%</td>
+        <td>Irvin / Felix</td>
+      </tr>
+      <tr>
+        <td><span class="tag blue">Web Partner</span></td>
+        <td>Small %</td>
+        <td>Booking calendar; team may need to assist</td>
+        <td>10–30%</td>
+        <td>Irvin / Felix</td>
+      </tr>
+      <tr>
+        <td><span class="tag pink">API Partner</span></td>
+        <td>Rare</td>
+        <td>Fully automated instant booking integration</td>
+        <td>Varies</td>
+        <td>Automated</td>
+      </tr>
+    </table>
+
+    <div class="callout blue">
+      <strong>Key Point for Batch Direct Partners</strong>
+      <p>Batch Direct partners get <strong>zero direct bookings through Batch</strong>. They receive <strong>referral clicks to their own website</strong>. Always show page views, itinerary adds, and referrals as proof of value — not bookings.</p>
+    </div>
+
+    <div class="card">
+      <h3>Partner Journey: Listing Creation to Performance Tracking</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Partner creates listing</strong><span>Can make it live immediately via partner portal</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Batch optimizes within 2 days</strong><span>Adds keywords, improves titles, enhances descriptions</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Customers discover listing</strong><span>Via search, SEO, and Batch marketing</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Customers engage</strong><span>Favorites, itinerary adds, referral clicks</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Partner tracks performance via dashboard</strong><span>Page views, favorites, itinerary additions, referrals</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Optional upgrades available</strong><span>Boost visibility, get featured in marketing campaigns</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUE PROPS -->
+  <div class="section" id="sec-value">
+    <div class="sec-head" style="border-color: var(--cosmo);">
+      <div class="sec-dot" style="background: var(--cosmo);"></div>
+      <h2>Six Core Value Propositions</h2>
+    </div>
+
+    <div class="two-col">
+      <div class="card"><h3>1. Direct Traffic</h3><p>Access to Batch's <strong>3+ million customers</strong> actively searching for experiences. Partners tap into an existing, large audience immediately.</p></div>
+      <div class="card"><h3>2. Zero Commission (Batch Direct)</h3><p>Referral-based subscription model means <strong>no commission</strong> on bookings for basic partners — unlike typical marketplaces at 15–30%.</p></div>
+      <div class="card"><h3>3. SEO Optimization</h3><p>Batch optimizes titles, descriptions, and keywords. Direct backlinks to partner websites. SEO compounds over time — long-term traffic value.</p></div>
+      <div class="card"><h3>4. Targeted Exposure via Tags</h3><p>Category matching drives <strong>relevant audience targeting</strong>. The right customers find the right experiences based on tags applied to listings.</p></div>
+      <div class="card"><h3>5. Analytics Dashboard</h3><p>Performance insights: page views, favorites, itinerary additions, referral clicks — all trackable and reportable. Shows ROI even without direct bookings.</p></div>
+      <div class="card"><h3>6. Marketing Tools</h3><p>UGC collection (free customer photos/videos via QR code), blog posts, content creator connections — all included in Basic/Core.</p></div>
+    </div>
+
+    <div class="card">
+      <h3>Batch vs Typical Marketplace</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Feature</th><th>Batch</th><th>Typical Marketplace</th></tr>
+        <tr><td>Direct backlinks to partner site</td><td class="check">✓ Yes</td><td class="cross">✗ No</td></tr>
+        <tr><td>Commission on bookings</td><td class="check">✓ 0% (Basic/Core)</td><td class="cross">✗ 15–30%</td></tr>
+        <tr><td>UGC collection tool</td><td class="check">✓ Included</td><td class="cross">✗ Rarely offered</td></tr>
+        <tr><td>Full analytics dashboard</td><td class="check">✓ Included</td><td class="cross">✗ Often limited</td></tr>
+        <tr><td>Focus on small businesses</td><td class="check">✓ Core mission</td><td class="cross">✗ Mixed</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Premium Add-ons for Strong Performers (5+ itinerary adds / 30 days)</h3>
+      <ul>
+        <li><strong>Partner-to-Partner Connect:</strong> B2B collaboration introductions — Batch facilitates but doesn't mediate payments</li>
+        <li><strong>Content Creator Network:</strong> Connect partners with content creators for free high-quality content</li>
+        <li><strong>Batch City Data:</strong> Market demand intel (e.g., "312 upcoming parties in Hamptons — 91% bachelorette parties")</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- RETENTION -->
+  <div class="section" id="sec-retention">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Retention Strategy</h2>
+    </div>
+
+    <div class="callout orange">
+      <strong>Golden Rule</strong>
+      <p>When a partner requests cancellation, <strong>show performance metrics first</strong>. Only offer retention packages after demonstrating value. Never lead with discounts.</p>
+    </div>
+
+    <div class="card">
+      <h3>Signal Strength Tiers (measured within 3 months)</h3>
+      <div class="signal-row">
+        <div class="signal-box" style="background: #ffe0e0; border: 2px solid #cc2200;">
+          <div class="s-label" style="color: #cc2200;">Weak</div>
+          <div class="s-range" style="color: #cc2200;">0–1</div>
+          <div class="s-desc" style="color: #994400;">Itinerary adds</div>
+        </div>
+        <div class="signal-box" style="background: var(--gold-tint); border: 2px solid #cc8800;">
+          <div class="s-label" style="color: #885500;">Medium</div>
+          <div class="s-range" style="color: #885500;">1–4</div>
+          <div class="s-desc" style="color: #885500;">Itinerary adds</div>
+        </div>
+        <div class="signal-box" style="background: var(--lime-tint); border: 2px solid #008800;">
+          <div class="s-label" style="color: #005500;">Strong</div>
+          <div class="s-range" style="color: #005500;">5+</div>
+          <div class="s-desc" style="color: #005500;">Itinerary adds</div>
+        </div>
+        <div class="signal-box" style="background: var(--ocean-tint); border: 2px solid var(--ocean);">
+          <div class="s-label" style="color: #003d80;">Super Strong</div>
+          <div class="s-range" style="color: #003d80;">10+</div>
+          <div class="s-desc" style="color: #003d80;">Itinerary adds</div>
+        </div>
+      </div>
+      <p style="font-size: 12px; color: #888;">Framing tip for strong signals: <em>"You're in the top performers in your area."</em></p>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Retention Packages</h3>
+        <ul>
+          <li><strong>25% discount</strong> for 3 months</li>
+          <li><strong>Free month</strong> (pause subscription)</li>
+          <li><strong>Monthly billing</strong> instead of quarterly</li>
+          <li><strong>Blog post</strong> creation (normally excluded)</li>
+          <li><strong>Listing optimization</strong> (normally excluded)</li>
+          <li><strong>Keyword additions</strong> (normally excluded)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Refund Policy</h3>
+        <p style="margin-bottom: 8px; font-size: 13px;"><strong>Standard: No refunds.</strong></p>
+        <p style="margin-bottom: 8px; font-size: 13px;">Two exceptions only:</p>
+        <ul>
+          <li><strong>Exception 1:</strong> No listing was ever published</li>
+          <li><strong>Exception 2:</strong> Charged again after a documented cancellation request</li>
+        </ul>
+        <p style="margin-top: 8px; font-size: 12px; color: #888;">After 3-month lock-in: refund last 2 months but NOT the first (optimization resources were invested)</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>The "Delay" Strategy — Most Effective Retention Approach</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Pause subscription (1 free month)</strong><span>Buys time without immediate pressure to decide</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Create blog post, optimize listing, add reviews</strong><span>Tangible improvements during the free period — show you're working for them</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Schedule follow-up meeting</strong><span>One week before the free month ends</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Review improved metrics together</strong><span>Let the data make the case — partner often chooses to stay</span></div></div>
+      </div>
+    </div>
+
+    <div class="callout pink">
+      <strong>Case Study: Las Vegas ATV Tours</strong>
+      <ul>
+        <li>1.5+ year partner requested cancellation</li>
+        <li>Two issues: couldn't reach phone support + wrong name in blog post</li>
+        <li>Solution: 1 free month pause + follow-up meeting May 29 + new phone support commitment</li>
+        <li>Lesson: <strong>Internal improvements (like Rick joining) can be leveraged</strong> to save accounts</li>
+      </ul>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Dispute Win Rate Problem</div>
+      <p>Currently winning only <strong>6% of disputes</strong> despite being legally in the right. Reason: partners only have a policy acceptance <em>timestamp</em>, not a signed document — making disputes hard to defend. Stefan is implementing DocuSign/PandaDoc to fix this. Until then, build strong evidence files with timestamps for each dispute.</p>
+    </div>
+  </div>
+
+  <!-- TOOLS -->
+  <div class="section" id="sec-tools">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Tools & Systems</h2>
+    </div>
+
+    <div class="tool-grid">
+      <div class="tool-item"><div class="tool-icon">📊</div><div class="tool-name">Airtable</div><div class="tool-desc">Central database. Partner info, tiers, pricing, commitment periods, churn requests. Two versions: internal + external.</div></div>
+      <div class="tool-item"><div class="tool-icon">💳</div><div class="tool-name">Stripe</div><div class="tool-desc">Billing. Actions: cancel, pause, refund, update. Access via partner directory — not directly.</div></div>
+      <div class="tool-item"><div class="tool-icon">🤝</div><div class="tool-name">HubSpot</div><div class="tool-desc">CRM. Auto-records and AI-summarizes calls. Full communication history. Use for pre-call research.</div></div>
+      <div class="tool-item"><div class="tool-icon">💬</div><div class="tool-name">Intercom</div><div class="tool-desc">Partner messaging. Review history before calls. Partners sometimes contact here instead of proper channels.</div></div>
+      <div class="tool-item"><div class="tool-icon">📞</div><div class="tool-name">Aircall</div><div class="tool-desc">Soft phone for outbound calls + SMS. Stay "unavailable" — all calls are pre-scheduled. Tag every call after.</div></div>
+      <div class="tool-item"><div class="tool-icon">🤖</div><div class="tool-name">Claude AI</div><div class="tool-desc">Batchification (SEO) + Batch Data (performance emails). Batch work only. Always review outputs before sending.</div></div>
+      <div class="tool-item"><div class="tool-icon">🗂️</div><div class="tool-name">Old BAT</div><div class="tool-desc">Legacy admin. Manual booking edits, promo codes, experience tags. Use when new admin portal is broken.</div></div>
+      <div class="tool-item"><div class="tool-icon">🔐</div><div class="tool-name">1Password</div><div class="tool-desc">Password manager for team credentials. Invite pending from admin team.</div></div>
+      <div class="tool-item"><div class="tool-icon">💼</div><div class="tool-name">Partner Portal</div><div class="tool-desc">admin.letsmatch.com — shows exactly what partners see. Features vary by tier. Access via green button.</div></div>
+      <div class="tool-item"><div class="tool-icon">📱</div><div class="tool-name">Let's Batch App</div><div class="tool-desc">Bug testing only. Replicate partner issues on both app + website. Report with screenshots via Share Bugs channel.</div></div>
+      <div class="tool-item"><div class="tool-icon">💬</div><div class="tool-name">Slack</div><div class="tool-desc">Team comms. 5 primary channels: New Work Daily, New Work Batch, Batch Partner Support, PX Team, Share Bugs.</div></div>
+      <div class="tool-item"><div class="tool-icon">📧</div><div class="tool-name">Let's Batch Email</div><div class="tool-desc">Two uses only: directives from leadership + calendar requests for email/web partners. Check at shift start and end.</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Claude AI — Two Key Projects</h3>
+      <div class="two-col" style="margin-top: 10px;">
+        <div class="callout blue" style="margin-bottom: 0;">
+          <strong>Batch Specification (Batchification)</strong>
+          <p>SEO optimization. Input listing info → Claude generates optimized titles, descriptions, keywords. Works in Claude, ChatGPT, or Gemini with Cliff's prompt. <strong>Always review before sending.</strong></p>
+        </div>
+        <div class="callout green" style="margin-bottom: 0;">
+          <strong>Churn Playbook / Partner Outreach Studio</strong>
+          <p>Input partner name, time period, improvements → generates performance email. <strong>Must customize</strong>: remove claims that aren't true (e.g., don't say "20 reviews" if they have none).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout gold">
+      <strong>Two Separate Claude Accounts — Keep Them Separate</strong>
+      <p><strong>Batch Claude</strong> (Let's Batch email, from Lewis) → Batch work only &nbsp;|&nbsp; <strong>Newark Claude Enterprise</strong> (New Work email, from Simeon) → Primary daily work, more capacity, learns your preferences over time. Test on New Work Claude before using Batch Claude for live partner work.</p>
+    </div>
+
+    <div class="card">
+      <h3>Stripe Actions Reference</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Action</th><th>When to Use</th><th>Important Notes</th></tr>
+        <tr><td><strong>Cancel (scheduled)</strong></td><td>Partner wants to stop</td><td>Ends at billing cycle end — preferred over immediate cancel</td></tr>
+        <tr><td><strong>Pause</strong></td><td>Retention — delay strategy</td><td>1 free month; sets scheduled resume date</td></tr>
+        <tr><td><strong>Refund</strong></td><td>Exception cases only</td><td>No active listings OR charged after documented cancellation</td></tr>
+        <tr><td><strong>Update</strong></td><td>Applying discounts</td><td>E.g., 25% off for 3 months promotional</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- WORKFLOWS -->
+  <div class="section" id="sec-workflows">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Daily Workflows</h2>
+    </div>
+
+    <div class="schedule">
+      <div class="sched-item" style="background: var(--ocean-tint);">
+        <div class="sched-time" style="color: #1a5fc8;">10 AM – 5 PM</div>
+        <div class="sched-act">Phone Calls</div>
+        <div class="sched-detail">13–15 calls, 5–15 mins each</div>
+      </div>
+      <div class="sched-item" style="background: var(--lime-tint);">
+        <div class="sched-time" style="color: #007700;">5 PM – 7 PM</div>
+        <div class="sched-act">Optimization Work</div>
+        <div class="sched-detail">5–30 mins per partner</div>
+      </div>
+      <div class="sched-item" style="background: var(--gold-tint);">
+        <div class="sched-time" style="color: #886600;">Mon – Wed</div>
+        <div class="sched-act">Most Phone Calls</div>
+        <div class="sched-detail">Churn + retention</div>
+      </div>
+      <div class="sched-item" style="background: var(--sunset-tint);">
+        <div class="sched-time" style="color: var(--sunset);">Thu – Fri</div>
+        <div class="sched-act">Past Due + Disputes</div>
+        <div class="sched-detail">Billing and legal</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Pre-Call Checklist (Batch Turn Calls Playbook)</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Find partner in Airtable</strong><span>Check: subscription tier, pricing, commitment period, publish date of first listing</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Verify in Stripe</strong><span>Confirm actual charge (may differ from quoted — e.g., $250 quoted vs $297.50 with tax)</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Review partner profile and listings</strong><span>Check listing status: active, draft, completeness</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Check HubSpot for communication history</strong><span>Previous calls, AI summaries, Intercom messages</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Prepare call plan</strong><span>Ask reason for contact → build rapport → lay out facts → offer solutions</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Post-Call Process</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Tag the interaction in Aircall</strong><span>Options: churn call / no answer / left voicemail / past due call / disputes / wrong number</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Add notes using Stefan's template</strong><span>Turn result + signal type + outcome</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>HubSpot auto-records and AI-summarizes</strong><span>No manual transcription needed — AI handles it</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Update tracker</strong><span>Manage multiple partners to avoid tab confusion</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Listing Optimization Standards</h3>
+      <ul>
+        <li>Minimum <strong>10 reviews</strong> to start (more is better)</li>
+        <li>High-quality media — <strong>no watermarks from other platforms</strong></li>
+        <li>Relevant tags directly connected to experience type</li>
+        <li>FAQs sourced from partner's own website</li>
+        <li>Review and improve: title, description, reviews, FAQs, videos, and tags</li>
+        <li>Always <strong>communicate improvements back to the partner</strong> to demonstrate value</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Bug Reporting Process</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Replicate bug on both app AND website</strong><span>Functionality may differ between platforms — test both</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Go to Share Bugs Slack channel</strong><span>Click "Report Bug" → fill the form → submit</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Attach screenshots or screen recordings</strong><span>Far more helpful than text descriptions alone</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Comment on the report if more detail needed</strong><span>Include pictures/videos showing exact replication steps</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEAM -->
+  <div class="section" id="sec-team">
+    <div class="sec-head" style="border-color: var(--cosmo);">
+      <div class="sec-dot" style="background: var(--cosmo);"></div>
+      <h2>Team Structure</h2>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Batch Onshore Leadership</h3>
+        <ul>
+          <li><strong>Joshua</strong> — CEO</li>
+          <li><strong>Dulcy/Dulce</strong> — Director of Operations</li>
+          <li><strong>Estefan (Stefan)</strong> — New Leader, driving process improvements and system overhauls</li>
+          <li><strong>Luis/Lewis</strong> — Dev team contact (system builder; historically resistant to changes, but Stefan is pushing through)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Partner Support Team</h3>
+        <ul>
+          <li><strong>Cliff</strong> — Supervisor (4 yrs at Batch, 2 yrs supervising)</li>
+          <li><strong>Kring</strong> — Senior Agent</li>
+          <li><strong>Rick</strong> — New Partner Engagement Specialist (you!)</li>
+          <li><strong>Irvin</strong> — Email/Web partner bookings + customer support</li>
+          <li><strong>Felix</strong> — Email/Web partner bookings + customer support</li>
+          <li><strong>New Work offshore team</strong> — 8 people, partner support</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Escalation Path</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Core/Basic partner issues</strong><span>Rick handles directly → PX Team Slack channel</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Need team help</strong><span>New Work Batch Slack → ask Felix or Irvin</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Boost / Party Pro accounts</strong><span>Batch Partner Support Slack → tag the relevant account manager</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Major decisions or complex cases</strong><span>Escalate to Estefan via Batch Partner Support channel</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Rick's 5 Primary Slack Channels</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Channel</th><th>Purpose</th></tr>
+        <tr><td><strong>New Work Daily</strong></td><td>Login/logout, breaks, schedule. 15-min check-ins help track hours if system fails.</td></tr>
+        <tr><td><strong>New Work Batch</strong></td><td>Customer support requests — get help from Felix/Irvin when needed.</td></tr>
+        <tr><td><strong>Batch Partner Support</strong></td><td>Boost/PartyPro escalations + anything needing Stefan's attention.</td></tr>
+        <tr><td><strong>PX Team</strong></td><td>Core/Basic partner work — Rick's main working channel.</td></tr>
+        <tr><td><strong>Share Bugs</strong></td><td>Bug reports with screenshots/recordings for dev team.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ACCESS -->
+  <div class="section" id="sec-access">
+    <div class="sec-head" style="border-color: var(--lime);">
+      <div class="sec-dot" style="background: var(--lime);"></div>
+      <h2>System Access Status</h2>
+    </div>
+
+    <div class="status-grid">
+      <div class="status-box" style="background: var(--lime-tint); border: 2px solid #00b800;">
+        <h4 style="color: #005500;">✅ Confirmed (Day 1)</h4>
+        <ul>
+          <li>Let's Batch email (Mework)</li>
+          <li>New Work email</li>
+          <li>Airtable — Vendor/Partner Directory</li>
+          <li>Airtable — Internal Data (editor)</li>
+          <li>Let's Batch App (phone)</li>
+          <li>Slack (all 5 channels)</li>
+          <li>Mework Academy training channel</li>
+          <li>Claude AI (via Arjan)</li>
+        </ul>
+      </div>
+      <div class="status-box" style="background: var(--sunset-tint); border: 2px solid var(--sunset);">
+        <h4 style="color: #993300;">⏳ Pending (Follow up with Lewis)</h4>
+        <ul>
+          <li>Partner Portal Admin (admin.letsmatch.com)</li>
+          <li>Old BAT legacy admin</li>
+          <li>HubSpot CRM</li>
+          <li>Aircall phone system</li>
+          <li>1Password vault</li>
+          <li>Stripe (requires authenticator app)</li>
+          <li>Intercom messaging</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Setup Notes & Important Details</h3>
+      <ul>
+        <li><strong>Chrome profiles:</strong> Need 3 separate profiles — calendar, main, Let's Batch admin. Create desktop shortcuts for one-click access.</li>
+        <li><strong>Batch App location:</strong> Use <strong>Philadelphia</strong> as your US address (Philippines not accepted by the system).</li>
+        <li><strong>Stripe 2FA:</strong> Requires an authenticator app before you can access.</li>
+        <li><strong>Two Claude accounts:</strong> Keep Batch Claude and Newark Enterprise Claude separate — different purposes, different capacities.</li>
+        <li><strong>Slack cleanup:</strong> Keep only the new Let's Batch Slack account — old account has been removed.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Training Deadlines & Next Steps</h3>
+      <ul>
+        <li><strong>Today (EOD):</strong> Send training summary to Dulce via email (cc Stefan) — not Slack. Avoid negative commentary about management.</li>
+        <li><strong>May 1:</strong> Pragmatico training due — 1.5 hours of video + assignment</li>
+        <li><strong>May 22:</strong> Advanced AI training</li>
+        <li><strong>Tomorrow:</strong> Recap meeting before 11pm shift → Day 2 training</li>
+        <li><strong>Week 2:</strong> Start handling real tickets and emails</li>
+        <li><strong>Ramp-up calls:</strong> Start with 5/day (2 churn, 2 past due, 1 dispute) → scale to 10–20/day</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <a href="index.html">← Back to Hub</a>
+  <a href="#" class="disabled">Day 2 — Coming Soon →</a>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('visible');
+  btn.classList.add('active');
+  window.scrollTo({ top: document.querySelector('.page-body').offsetTop - 60, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
