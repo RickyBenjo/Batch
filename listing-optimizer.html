@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Listing Optimizer · Batch Tools</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://js.puter.com/v2/"></script>
 <style>
   :root {
     --black: #0F0C0C;
@@ -129,6 +130,24 @@
   }
   .card-tag.required { background: var(--sunset-tint); color: #993300; }
   .card-tag.optional { background: var(--ocean-tint); color: #1a4d8f; }
+
+  /* puter-powered badge */
+  .puter-badge {
+    background: var(--lime-tint);
+    border: 2px solid var(--lime);
+    border-radius: 16px;
+    padding: 14px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .puter-badge-icon { font-size: 22px; flex-shrink: 0; }
+  .puter-badge-text { flex: 1; min-width: 200px; }
+  .puter-badge-text strong { font-size: 13px; font-weight: 800; display: block; margin-bottom: 3px; color: var(--black); }
+  .puter-badge-text p { font-size: 12px; color: #336600; line-height: 1.5; }
+  .puter-badge-text a { color: #226600; font-weight: 700; }
 
   .api-card {
     background: var(--gold-tint);
@@ -470,7 +489,7 @@
       <p class="hero-sub">Paste any partner listing and get SEO keywords, an optimized title & description, a partner email, a rewritten profile, and recommended tags — all in one shot.</p>
       <div class="hero-chips">
         <div class="chip">6 tasks automated</div>
-        <div class="chip">Claude AI powered</div>
+        <div class="chip">Puter.js · No API key</div>
         <div class="chip">~5 min per listing</div>
       </div>
     </div>
@@ -487,14 +506,11 @@
 
 <div class="container">
 
-  <div class="api-card">
-    <div class="api-icon">🔑</div>
-    <div class="api-text">
-      <strong>Anthropic API Key</strong>
-      <p>Paste your key below — it's never stored and clears when you close this tab. Get yours at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
-    </div>
-    <div class="api-input-wrap">
-      <input type="password" id="apiKey" placeholder="sk-ant-api03-...">
+  <div class="puter-badge">
+    <div class="puter-badge-icon">⚡</div>
+    <div class="puter-badge-text">
+      <strong>Powered by Puter.js — No API Key Needed</strong>
+      <p>This tool runs Claude AI for free via <a href="https://developer.puter.com" target="_blank">Puter.js</a>. No API key or account required — just fill in the form and hit Generate. You may be asked to sign in to Puter on first use (it's free).</p>
     </div>
   </div>
 
@@ -1115,12 +1131,6 @@ RULES:
 }
 
 async function runOptimizer() {
-  const apiKey = document.getElementById('apiKey').value.trim();
-  if (!apiKey || !apiKey.startsWith('sk-')) {
-    showError('Please enter your Anthropic API key first.');
-    return;
-  }
-
   const required = ['partnerName','category','title','city','description'];
   for (const id of required) {
     if (!document.getElementById(id).value.trim()) {
@@ -1151,55 +1161,20 @@ async function runOptimizer() {
   const prompt = buildPrompt();
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 8000,
-        stream: true,
-        messages: [{ role: 'user', content: prompt }]
-      })
+    const response = await puter.ai.chat(prompt, {
+      model: 'claude-sonnet-4-6',
+      stream: true
     });
 
-    if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.error?.message || 'API error ' + response.status);
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
     let fullText = '';
-    let buffer = '';
-
     setProgress(15);
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop();
-
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
-        const data = line.slice(6).trim();
-        if (data === '[DONE]') continue;
-        try {
-          const parsed = JSON.parse(data);
-          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
-            fullText += parsed.delta.text;
-            parseAndDisplay(fullText);
-            const approxPct = Math.min(90, 15 + (fullText.length / 180));
-            setProgress(approxPct);
-          }
-        } catch {}
+    for await (const part of response) {
+      if (part?.text) {
+        fullText += part.text;
+        parseAndDisplay(fullText);
+        const approxPct = Math.min(90, 15 + (fullText.length / 180));
+        setProgress(approxPct);
       }
     }
 
@@ -1212,7 +1187,7 @@ async function runOptimizer() {
     }, 800);
 
   } catch (err) {
-    showError('Error: ' + err.message);
+    showError('Error: ' + (err.message || String(err)));
     document.getElementById('progressWrap').classList.remove('visible');
   } finally {
     btn.classList.remove('loading');
