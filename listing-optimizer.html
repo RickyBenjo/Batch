@@ -131,7 +131,6 @@
   .card-tag.required { background: var(--sunset-tint); color: #993300; }
   .card-tag.optional { background: var(--ocean-tint); color: #1a4d8f; }
 
-  /* puter-powered badge */
   .puter-badge {
     background: var(--lime-tint);
     border: 2px solid var(--lime);
@@ -148,39 +147,6 @@
   .puter-badge-text strong { font-size: 13px; font-weight: 800; display: block; margin-bottom: 3px; color: var(--black); }
   .puter-badge-text p { font-size: 12px; color: #336600; line-height: 1.5; }
   .puter-badge-text a { color: #226600; font-weight: 700; }
-
-  .api-card {
-    background: var(--gold-tint);
-    border: 2px solid var(--gold);
-    border-radius: 16px;
-    padding: 18px 22px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-  .api-icon { font-size: 24px; flex-shrink: 0; }
-  .api-text { flex: 1; min-width: 200px; }
-  .api-text strong { font-size: 13px; font-weight: 800; display: block; margin-bottom: 3px; }
-  .api-text p { font-size: 12px; color: #665500; line-height: 1.5; }
-  .api-text a { color: #444400; font-weight: 700; }
-  .api-input-wrap { flex: 2; min-width: 240px; }
-  .api-input-wrap input {
-    width: 100%;
-    border: 2px solid rgba(15,12,12,0.15);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-family: 'Mulish', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    background: rgba(255,255,255,0.7);
-    color: var(--black);
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .api-input-wrap input:focus { border-color: var(--gold); background: #fff; }
-  .api-input-wrap input::placeholder { font-weight: 400; color: #aaa; }
 
   .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .field-full { grid-column: 1 / -1; }
@@ -293,7 +259,6 @@
   .output-area { display: none; }
   .output-area.visible { display: block; }
 
-  /* DOWNLOAD BANNER */
   .download-banner {
     background: var(--lime-tint);
     border: 2px solid var(--lime);
@@ -393,7 +358,6 @@
     font-family: 'Mulish', sans-serif;
   }
 
-  /* Tag pills for Task 6 */
   .tag-pills-wrap {
     display: flex;
     flex-wrap: wrap;
@@ -597,7 +561,6 @@
 
     <div class="sec-label">Optimization Results</div>
 
-    <!-- DOWNLOAD BANNER -->
     <div class="download-banner">
       <div class="download-banner-left">
         <div class="download-icon">📄</div>
@@ -701,7 +664,6 @@
       </div>
     </div>
 
-    <!-- TASK 6 — RECOMMENDED TAGS -->
     <div class="output-section task-5">
       <div class="output-header" onclick="toggleSection(5)">
         <div class="output-header-left">
@@ -740,7 +702,6 @@ const TASK_LABELS = [
   'Recommended Tags'
 ];
 
-// Full tag list from Batch system
 const BATCH_TAGS = [
   '#trending','#100% that Batch','#Adults Only','#adventure','#afternoons','#Afternoons',
   '#Anaheim','#Animal Lovers','#Arrival & Departure Days','#Asbury Park','#Asheville',
@@ -823,7 +784,6 @@ function openSection(idx) {
 async function copySection(idx) {
   let text;
   if (idx === 5) {
-    // For tags, copy the raw text stored in hidden content5
     text = document.getElementById('content5').textContent;
   } else {
     text = document.getElementById('content' + idx).textContent;
@@ -844,9 +804,7 @@ async function copyTagPill(pill, tag) {
 }
 
 function renderTagPills(tagsText) {
-  // Extract hashtags from the AI output
   const matches = tagsText.match(/#[\w&'%!.\- ]+/g) || [];
-  // Normalize and deduplicate
   const seen = new Set();
   const tags = [];
   for (const raw of matches) {
@@ -862,12 +820,12 @@ function renderTagPills(tagsText) {
   wrap.innerHTML = '';
 
   if (tags.length === 0) {
-    note.textContent = 'No matching tags found — see raw output below.';
+    note.textContent = 'No matching tags found. See raw output below.';
     document.getElementById('content5').style.display = 'block';
     return;
   }
 
-  note.textContent = `${tags.length} tags recommended — click any tag to copy it individually, or use "Copy All Tags" below.`;
+  note.textContent = `${tags.length} tags recommended. Click any tag to copy it individually, or use "Copy All Tags" below.`;
 
   for (const tag of tags) {
     const pill = document.createElement('span');
@@ -878,7 +836,6 @@ function renderTagPills(tagsText) {
     wrap.appendChild(pill);
   }
 
-  // Store plain text in hidden element for "copy all"
   document.getElementById('content5').textContent = tags.join(' ');
 }
 
@@ -887,36 +844,35 @@ function downloadOutput() {
   const city = document.getElementById('city').value.trim();
   const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  const divider = '═'.repeat(55);
-  const thinDivider = '─'.repeat(55);
+  const divider = '='.repeat(55);
+  const thinDivider = '-'.repeat(55);
 
-  let output = `BATCH LISTING OPTIMIZER — FULL OUTPUT\n`;
+  let output = `BATCH LISTING OPTIMIZER - FULL OUTPUT\n`;
   output += `${divider}\n`;
-  output += `Partner: ${partnerName}${city ? ' · ' + city : ''}\n`;
+  output += `Partner: ${partnerName}${city ? ' | ' + city : ''}\n`;
   output += `Generated: ${dateStr}\n`;
   output += `${divider}\n\n`;
 
   for (let i = 0; i < 5; i++) {
     const content = document.getElementById('content' + i).textContent.trim();
     if (content) {
-      output += `TASK ${i + 1} — ${TASK_LABELS[i].toUpperCase()}\n`;
+      output += `TASK ${i + 1} - ${TASK_LABELS[i].toUpperCase()}\n`;
       output += `${thinDivider}\n\n`;
       output += content;
       output += '\n\n\n';
     }
   }
 
-  // Task 6 — tags
   const tagContent = document.getElementById('content5').textContent.trim();
   if (tagContent) {
-    output += `TASK 6 — ${TASK_LABELS[5].toUpperCase()}\n`;
+    output += `TASK 6 - ${TASK_LABELS[5].toUpperCase()}\n`;
     output += `${thinDivider}\n\n`;
     output += tagContent;
     output += '\n\n\n';
   }
 
   output += `${divider}\n`;
-  output += `Generated by Batch Listing Optimizer · letsbatch.com\n`;
+  output += `Generated by Batch Listing Optimizer - letsbatch.com\n`;
   output += `Always review AI output before sending to partners.\n`;
 
   const blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
@@ -955,9 +911,19 @@ function hideError() {
 
 function buildPrompt() {
   const g = id => document.getElementById(id).value.trim() || 'none';
-  return `You are an SEO strategist, conversion copywriter, and partner communications manager for Batch, a marketplace for local experiences and activities (letsbatch.com). Your job is to fully optimize a listing for visibility on both the Batch platform and Google search — then communicate those changes to the experience partner in a clear, outcome-focused email.
+  return `You are an SEO strategist, conversion copywriter, and partner communications manager for Batch, a marketplace for local experiences and activities (letsbatch.com). Your job is to fully optimize a listing for visibility on both the Batch platform and Google search, then communicate those changes to the experience partner in a clear, outcome-focused email.
 
 Complete all six tasks below in order.
+
+WRITING RULES - apply to every word across all six tasks without exception:
+- No em dashes anywhere. Not in bullets, not in sentences, not in labels, not in rationale. If you would use an em dash, use a colon, a comma, or rewrite the sentence instead.
+- No filler phrases. Cut: "in today's competitive landscape," "look no further," "it's worth noting," "at the end of the day," "we are excited to," "this is a great opportunity."
+- No AI-sounding openers. Do not begin any section or paragraph with "Certainly," "Absolutely," "Great news," "Of course," or anything similar.
+- No exclamation marks except inside Batch bullet labels where brand voice calls for energy.
+- No clichés. Cut: "unforgettable," "one-of-a-kind," "world-class," "amazing," "seamless," "elevate," "journey," "experience like no other," "perfect for," "take your [x] to the next level."
+- Write short, direct sentences. Active voice. Every word earns its spot.
+- Bullet labels use a colon, not a dash. Example: "Open bar: guests get two hours of included drinks."
+- Sound like a sharp human editor wrote this, not a content generator.
 
 ═══════════════════════════════════════
 LISTING INFORMATION
@@ -982,152 +948,147 @@ Additional Info / What's Included:
 ${g('additionalInfo')}
 
 ═══════════════════════════════════════
-TASK 1 — SEO KEYWORD RESEARCH
+TASK 1 - SEO KEYWORD RESEARCH
 ═══════════════════════════════════════
 
 Based on the listing above, identify:
 
 1. PRIMARY KEYWORD (1 term)
-   - The single most important search term this listing should rank for
-   - Include search intent (transactional, informational, navigational)
+   The single most important search term this listing should rank for.
+   Include search intent: transactional, informational, or navigational.
 
-2. SECONDARY KEYWORDS (4–6 terms)
-   - Mix of location-based, activity-based, and audience-based terms
+2. SECONDARY KEYWORDS (4-6 terms)
+   Mix of location-based, activity-based, and audience-based terms.
 
-3. LONG-TAIL KEYWORDS (3–5 phrases, 4+ words each)
-   - High intent, lower competition — people searching these are ready to book
+3. LONG-TAIL KEYWORDS (3-5 phrases, 4+ words each)
+   High intent, lower competition. People searching these are ready to book.
 
 4. KEYWORDS TO AVOID
-   - Too broad, too competitive, or off-target for this listing
+   Terms that are too broad, too competitive, or off-target for this listing.
 
-Use these keywords in Tasks 2, 3, and 5 below.
+Use these keywords when writing Tasks 2, 3, and 5.
 
 ═══════════════════════════════════════
-TASK 2 — OPTIMIZED TITLE
+TASK 2 - OPTIMIZED TITLE
 ═══════════════════════════════════════
 
-Using the keywords from Task 1, rewrite the listing title.
+Rewrite the listing title using keywords from Task 1.
 
 Rules:
-- 50–70 characters (including spaces)
+- 50-70 characters including spaces
 - Include the city or a location-based modifier
 - Lead with the most compelling aspect
-- Title Case — no emojis, exclamation marks, or all-caps
-- Specific and clickable — not interchangeable with any other listing
-- Natural language — no keyword stuffing
+- Title Case, no emojis, no exclamation marks, no all-caps
+- Specific enough that it could not describe any other listing
+- No keyword stuffing, no em dashes
 
 Output:
 - 3 title options ranked by SEO strength
-- 1-line rationale for each
-- Single best recommendation with a brief reason
+- One-line rationale for each option (no em dashes)
+- Your single best recommendation with a brief reason
 
 ═══════════════════════════════════════
-TASK 3 — OPTIMIZED DESCRIPTION
+TASK 3 - OPTIMIZED DESCRIPTION
 ═══════════════════════════════════════
 
-Using the keywords from Task 1, rewrite the full "About This Experience" section. Follow the exact Batch format below. Do not skip, rename, or reorder any section.
+Rewrite the full "About This Experience" section using keywords from Task 1. Follow the exact Batch format below. Do not skip, rename, or reorder any section.
 
----
-FORMAT TO FOLLOW:
+FORMAT:
 
 About This Experience
 
 What you'll do:
-[Hook sentence — vivid, specific, written in second person. No clichés.]
+[Hook sentence. Vivid, specific, second person. No em dashes. No clichés.]
 
-* [Action bullet 1] – [1 sentence]
-* [Action bullet 2] – [1 sentence]
-* [Action bullet 3] – [1 sentence]
-* [Action bullet 4] – [1 sentence]
-* [Action bullet 5] – [1 sentence]
+* [Label]: [One sentence describing what happens and why it matters.]
+* [Label]: [One sentence.]
+* [Label]: [One sentence.]
+* [Label]: [One sentence.]
+* [Label]: [One sentence.]
 
-[1–2 closing sentences capturing the overall vibe.]
+[1-2 closing sentences that capture the overall feeling. No em dashes.]
 
 Why we love it for your [group type]:
 
-* [Feature 1] – [Why it matters to the guest]
-* [Feature 2] – [Why it matters]
-* [Feature 3] – [Why it matters]
-* [Feature 4] – [Why it matters]
-* [Feature 5] – [Why it matters]
+* [Label]: [Why this feature matters to the guest, one sentence.]
+* [Label]: [One sentence.]
+* [Label]: [One sentence.]
+* [Label]: [One sentence.]
+* [Label]: [One sentence.]
 
 About this experience partner:
-[2–3 sentences in third person about the partner.]
+[2-3 sentences in third person. Specific, no fluff, no em dashes.]
 
 Additional information:
 * [Practical detail]
 * [Practical detail]
 * [Practical detail]
 * [Practical detail]
----
 
-DESCRIPTION RULES:
-- Second person throughout except "About this experience partner" (third person)
-- Naturally weave in primary keyword and 1–2 secondary keywords
-- Avoid clichés: "unforgettable," "one-of-a-kind," "world-class," "amazing"
-- Each bullet: label + dash + benefit
-- SEO Notes at end: (a) primary keyword placed, (b) secondary keywords used, (c) one readability note
+END OF DESCRIPTION. Then add:
+SEO Notes:
+(a) Where the primary keyword appears
+(b) Which secondary keywords were used and where
+(c) One readability note
 
 ═══════════════════════════════════════
-TASK 4 — PARTNER UPDATE EMAIL
+TASK 4 - PARTNER UPDATE EMAIL
 ═══════════════════════════════════════
 
-Write a short, scannable partner-facing email covering exactly four changes:
+Write a short partner-facing email covering exactly four changes. Keep it scannable and under 90 seconds to read. No em dashes anywhere.
 
-CHANGE 1 — LISTING TITLE: old title → new title, why it gets found by more of the right people
-CHANGE 2 — DESCRIPTION: what specifically improved and what that means for how quickly a visitor decides to book
-CHANGE 3 — KEYWORD STRATEGY: name the primary keyword and 1–2 secondary keywords, explain in plain language how they help
-CHANGE 4 — PARTNER PROFILE "ABOUT": old text → new text, why the rewrite works harder
+CHANGE 1 - LISTING TITLE: show old title vs. new title, explain why it reaches more of the right searchers
+CHANGE 2 - DESCRIPTION: name what specifically changed and how that helps a visitor decide to book faster
+CHANGE 3 - KEYWORD STRATEGY: name the primary keyword and 1-2 secondary keywords, explain in plain language what they do
+CHANGE 4 - PARTNER PROFILE "ABOUT": show old text vs. new text, explain why the rewrite is more effective
 
-STYLE: Warm, confident, peer to peer. Plain-spoken. Under 90 seconds to read.
+Tone: warm, direct, peer to peer. Write the way a knowledgeable colleague would talk, not a corporate newsletter.
 
 FORMAT:
-✅ Subject line — 2 options (Option A: Direct, Option B: Curiosity-driven)
-✅ Greeting
-✅ Opening (2–3 lines max)
-✅ Body (4 labeled changes — 2–4 lines each)
-✅ Closing (1 line CTA)
-✅ Sign-off: [Your Name], [Your Title], Batch
+Subject line: 2 options
+  Option A: Direct
+  Option B: Curiosity-driven
+Greeting
+Opening: 2-3 lines
+Body: 4 labeled changes, 2-4 lines each
+Closing: 1 line CTA
+Sign-off: [Your Name], [Your Title], Batch
 
 ═══════════════════════════════════════
-TASK 5 — OPTIMIZED PARTNER PROFILE "ABOUT"
+TASK 5 - OPTIMIZED PARTNER PROFILE "ABOUT"
 ═══════════════════════════════════════
 
-Rewrite the partner's "About" section so it:
-1. Answers: what they do, what makes them unique, and who they serve
-2. Weaves in primary keyword and 1–2 secondary keywords naturally
-3. Is specific enough that a first-time visitor immediately understands the offer
-4. Builds trust and curiosity so the visitor scrolls down to book
+Rewrite the partner's "About" section. It should answer three things clearly: what they do, what makes them different, and who they serve. Weave in the primary keyword and 1-2 secondary keywords without forcing them. Make it specific enough that a first-time visitor immediately understands what they're booking.
 
-STYLE: Third person, present tense, 3–5 sentences, single flowing paragraph, no headers or bullets.
-RULES: No clichés, no first person, no exclamation marks or emojis.
+Style: third person, present tense, 3-5 sentences, single flowing paragraph, no headers, no bullets, no em dashes, no exclamation marks, no clichés, no first person.
 
-OUTPUT 1 — RECOMMENDED "ABOUT" PARAGRAPH (ready to paste, no label or commentary)
+OUTPUT 1 - RECOMMENDED "ABOUT" PARAGRAPH
+Paste-ready. No label, no commentary above or below.
 
-OUTPUT 2 — 3 ALTERNATIVE VERSIONS:
-  Version A — Lead with the unique venue or landmark differentiator
-  Version B — Lead with the occasions served
-  Version C — Lead with the private/exclusive angle
+OUTPUT 2 - 3 ALTERNATIVE VERSIONS:
+  Version A: Lead with the unique venue or physical setting
+  Version B: Lead with the occasions or group types this serves
+  Version C: Lead with the private or exclusive nature of the experience
 
-OUTPUT 3 — SEO + CONVERSION NOTES:
+OUTPUT 3 - SEO + CONVERSION NOTES:
   (a) Where and how the primary keyword appears
   (b) Which secondary keywords were used and where
   (c) One specific reason this version converts better than the original
 
 ═══════════════════════════════════════
-TASK 6 — RECOMMENDED TAGS
+TASK 6 - RECOMMENDED TAGS
 ═══════════════════════════════════════
 
-Below is the complete list of available tags in the Batch system. Your job is to select ONLY tags from this exact list that are genuinely relevant to this experience.
+Select only tags from the list below that genuinely fit this experience. Do not invent or modify any tag.
 
 AVAILABLE TAGS:
 #trending, #100% that Batch, #Adults Only, #adventure, #afternoons, #Afternoons, #Anaheim, #Animal Lovers, #Arrival & Departure Days, #Asbury Park, #Asheville, #Aspen, #at home, #atlanta, #Atlanta, #Atlantic City, #Attraction, #ATV/UTV, #Austin, #bachelor, #bachelorette, #ballin, #Bar Crawl, #Batch Favorite, #Batch Nights, #Batch of a Lifetime, #Batch+, #Beaches, #Beer Me!, #Beer Tour, #Best of Batch, #Big Spender, #Bike Rental, #Bike Tour, #Boat Cruise, #Boat Rental, #Boat Tour, #Boston, #Boulder, #Brewery, #Bride Vibe, #Budget-friendly, #Bus Tour, #BYOB Parties, #Cabo, #Cancun, #Cape Cod, #Cape May, #Car Rental, #Catskills, #Charleston, #Charlotte, #Cheap Eats, #Cheeky, #cheers! let's drink, #Chicago, #Chill Vibes, #Chocolate Tour, #City Tour, #Classes, #clearwater, #Close to the Action, #Cocktail Tour, #Creative & Crafty, #Cruise, #Cruise / Large Boat, #Customizable for the Batch, #Customizable for the Bride, #Dallas, #Deal Drop, #Decorations and Supplies, #Denver, #Destin, #Detox, #Distillery, #DIY, #Dolphin, #Drag, #Drink Pouch, #Driving Tour, #E-Bike, #Eco Tour, #Escape Room, #Evening Cruise, #Event, #Events, #Exclusive, #Fall Favorites, #Family Friendly, #Fanny Packs, #Farm, #Ferry, #Festival, #Fitness Freaks, #Food, #Food and Wine Tour, #Food Tour, #Foodies Will Love, #For the Bride, #For the Extreme BACHer, #For the Extreme Batch, #For the Girls, #Fort Lauderdale, #Fort Myers, #Fredericksburg, #Ft. Lauderdale, #Galentine, #Galentines, #Games & Challenges, #Gatlinburg, #Get Pampered, #Get Wild, #Getting Frisky, #Ghost Tour, #Good For Bachelors, #Good for College, #Good for Under 21, #Great For Fall, #Great for Large Groups, #Group Activities, #Group Adventures, #Group Classes, #Guided Tour, #Guided Tours, #Gulf Coast, #Gulf Shores, #Hamptons, #Hangover, #Happy Hour Tour, #Health & Fitness, #Health & Wellness, #Hello Brunch, #Hiking, #Hilton Head, #History, #History Tour, #Honolulu, #Houston, #Hudson Valley, #Industry, #insta-worthy, #Insta-Worthy, #instant, #Joshua Tree, #Kansas City, #Kayak, #Key Largo, #Key West, #Lake Ozark, #Lake Tahoe, #Las Vegas, #Let's Hibachi, #life of the party, #Life of the Party, #Live Music, #Local Activities, #Long Beach Island, #Long Island, #Los Angeles, #Los Cabos, #Male Revue & Services, #Marina, #Miami, #Miami Beach, #mornings, #Mornings, #most popular, #Museum, #Music Tour, #Must Add-on, #Nantucket, #Nashville, #New Orleans, #New York, #Newport, #Newport Beach, #Nightlife, #Ocean City, #On Sale, #On the Water, #orlando, #Orlando, #outdoor adventure, #Outdoor Adventures, #Outdoor Seating, #Outdoors, #Package, #Palm Beach, #Palm Springs, #Parasail, #Park City, #party, #party at home, #Party at Home, #Party Boat, #Party Bus, #Party Buses, #party supplies, #Party Tours & Buses, #Perfect Packages, #Perfect Pregame, #Philadelphia, #Phoenix, #Photography Tour, #Picnic Party, #Playa del Carmen, #Pocono Mountains, #Pontoon Boat Rental, #Popular for Bachelorettes, #Popular for Bachelors, #Popular for the Bachelorette, #Popular for the Bachelorettes, #Portland, #Private, #Private Boat Charter, #Private Reservations Available, #Private Tour, #Private Wine Tour, #Protocol Friendly, #Pub Crawl, #Puff Party, #Rentals, #Retail, #Retail Therapy, #River Cruise, #Romantic, #Rooftop Views, #Sailing, #San Diego, #San Francisco, #Santa Barbara, #Santa Fe, #Sarasota, #Savannah, #Scooter, #scottsdale, #Scottsdale, #Scuba, #Seattle, #Segway, #Shooting Range, #Shows, #Sightseeing Tour, #Small Plates, #Smoky Mountain Tour, #Snorkel, #So Sophisticated, #Something for Everyone, #Soothe, #Sternwheeler/Riverboat, #Summer Kickoff, #Summer Splash, #Sunday Brunch, #Sunset Cruise, #Sunset Sail, #SUP, #Swim with Dolphins, #Swingers, #Tampa, #Tiki Time, #Top Booked Activity, #Top Restaurant, #Top-Activity, #Tourist Time, #Transportation, #trending, #Under 21, #unique finds, #Unique Finds, #UTV Rentals, #Vail, #Vegas Girls Night Out, #Vegas Vibes, #Vegetarian Friendly, #Vice, #Virtual, #Wakeboarding, #Walking Tour, #Walking Tours, #Washington, #Water Activities, #Water Park, #Wellness, #Westchester County, #Wheelchair Accessible, #Where to Eat, #Wildlife, #Wine, #Wine Not?, #Wine Tour, #Winery, #Workshop, #Yoga, #Your Birthday Your Way
 
 RULES:
-- ONLY use tags from the list above — do not invent or modify any tag
-- Select 8–15 tags that best match the experience type, audience, city, vibe, and occasion
-- Prioritize: activity type, city/location, audience (bachelor/bachelorette/group), occasion, and vibe tags
-- Output ONLY the selected tags as a space-separated list of hashtags, nothing else — no explanation, no numbering, no headers`;
+- Only use tags from the list above
+- Select 8-15 tags that fit the experience type, audience, city, vibe, and occasion
+- Prioritize: activity type, city/location, audience, occasion, vibe
+- Output only the selected tags as a space-separated list of hashtags, nothing else`;
 }
 
 async function runOptimizer() {
@@ -1197,7 +1158,7 @@ async function runOptimizer() {
 }
 
 function parseAndDisplay(text, final = false) {
-  const taskPattern = /(?:^|\n)(?:#+\s*)?(?:\*{1,2})?(?:TASK|Task)\s+([1-6])(?:\*{1,2})?[\s\-—:]+([^\n]*)/g;
+  const taskPattern = /(?:^|\n)(?:#+\s*)?(?:\*{1,2})?(?:TASK|Task)\s+([1-6])(?:\*{1,2})?[\s\-:]+([^\n]*)/g;
 
   const matches = [];
   let m;
@@ -1226,7 +1187,6 @@ function parseAndDisplay(text, final = false) {
       document.getElementById('content' + task).textContent = body;
       openSection(task);
     } else if (task === 5) {
-      // Task 6 — render as tag pills
       document.getElementById('content5').textContent = body;
       renderTagPills(body);
       openSection(5);
