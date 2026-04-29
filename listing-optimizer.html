@@ -136,6 +136,40 @@
   .card-tag.required { background: var(--sunset-tint); color: #993300; }
   .card-tag.optional { background: var(--ocean-tint); color: #1a4d8f; }
 
+  /* API KEY CARD */
+  .api-card {
+    background: var(--gold-tint);
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 18px 22px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .api-icon { font-size: 24px; flex-shrink: 0; }
+  .api-text { flex: 1; min-width: 200px; }
+  .api-text strong { font-size: 13px; font-weight: 800; display: block; margin-bottom: 3px; }
+  .api-text p { font-size: 12px; color: #665500; line-height: 1.5; }
+  .api-text a { color: #444400; font-weight: 700; }
+  .api-input-wrap { flex: 2; min-width: 240px; }
+  .api-input-wrap input {
+    width: 100%;
+    border: 2px solid rgba(15,12,12,0.15);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: 'Mulish', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.7);
+    color: var(--black);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .api-input-wrap input:focus { border-color: var(--gold); background: #fff; }
+  .api-input-wrap input::placeholder { font-weight: 400; color: #aaa; }
+
   /* FIELDS */
   .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .field-full { grid-column: 1 / -1; }
@@ -400,6 +434,18 @@
 </div>
 
 <div class="container">
+
+  <!-- API KEY -->
+  <div class="api-card">
+    <div class="api-icon">🔑</div>
+    <div class="api-text">
+      <strong>Anthropic API Key</strong>
+      <p>Paste your key below — it's never stored and clears when you close this tab. Get yours at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+    </div>
+    <div class="api-input-wrap">
+      <input type="password" id="apiKey" placeholder="sk-ant-api03-...">
+    </div>
+  </div>
 
   <div class="hint-box">
     <strong>Always review AI output before sending.</strong> The optimizer generates suggestions — you must verify accuracy. If a claim doesn't match reality (e.g., claiming reviews exist when they don't), edit it before sending to the partner.
@@ -788,7 +834,11 @@ OUTPUT 3 — SEO + CONVERSION NOTES:
 }
 
 async function runOptimizer() {
-  const apiKey = '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';
+  const apiKey = document.getElementById('apiKey').value.trim();
+  if (!apiKey || !apiKey.startsWith('sk-')) {
+    showError('Please enter your Anthropic API key first.');
+    return;
+  }
 
   const required = ['partnerName','category','title','city','description'];
   for (const id of required) {
