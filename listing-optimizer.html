@@ -357,6 +357,7 @@
   .task-2 .output-num { background: var(--cosmo); color: var(--black); }
   .task-3 .output-num { background: var(--gold); color: var(--black); }
   .task-4 .output-num { background: var(--sunset); }
+  .task-5 .output-num { background: var(--black); color: var(--lime); border: 2px solid var(--lime); }
 
   .output-label { font-weight: 700; font-size: 14px; }
   .output-sublabel { font-size: 11px; color: rgba(15,12,12,0.4); font-weight: 600; margin-top: 1px; }
@@ -371,6 +372,39 @@
     font-size: 13.5px; line-height: 1.75;
     color: #333;
     font-family: 'Mulish', sans-serif;
+  }
+
+  /* Tag pills for Task 6 */
+  .tag-pills-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--black);
+    color: var(--lime);
+    font-size: 12px;
+    font-weight: 800;
+    padding: 5px 13px;
+    border-radius: 30px;
+    border: 1.5px solid var(--lime);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+    letter-spacing: 0.2px;
+  }
+  .tag-pill:hover { background: var(--lime); color: var(--black); }
+  .tag-pill.copied-pill { background: var(--lime); color: var(--black); }
+  .tag-note {
+    font-size: 12px;
+    color: rgba(15,12,12,0.45);
+    font-weight: 600;
+    margin-bottom: 14px;
+    line-height: 1.5;
   }
 
   .copy-btn {
@@ -433,9 +467,9 @@
         Batch Tool · CoStar Powered
       </div>
       <h1>Listing<br><span>Optimizer</span></h1>
-      <p class="hero-sub">Paste any partner listing and get SEO keywords, an optimized title & description, a partner email, and a rewritten profile — all in one shot.</p>
+      <p class="hero-sub">Paste any partner listing and get SEO keywords, an optimized title & description, a partner email, a rewritten profile, and recommended tags — all in one shot.</p>
       <div class="hero-chips">
-        <div class="chip">5 tasks automated</div>
+        <div class="chip">6 tasks automated</div>
         <div class="chip">Claude AI powered</div>
         <div class="chip">~5 min per listing</div>
       </div>
@@ -446,6 +480,7 @@
       <div class="hero-step"><div class="hero-step-num">3</div><div class="hero-step-label">Optimized Description</div></div>
       <div class="hero-step"><div class="hero-step-num">4</div><div class="hero-step-label">Partner Update Email</div></div>
       <div class="hero-step"><div class="hero-step-num">5</div><div class="hero-step-label">Partner Profile "About"</div></div>
+      <div class="hero-step"><div class="hero-step-num">6</div><div class="hero-step-label">Recommended Tags</div></div>
     </div>
   </div>
 </div>
@@ -552,7 +587,7 @@
         <div class="download-icon">📄</div>
         <div class="download-text">
           <strong>Take it with you</strong>
-          <p>All 5 sections in one tidy text file — perfect for sharing with your team or dropping into a doc.</p>
+          <p>All 6 sections in one tidy text file — perfect for sharing with your team or dropping into a doc.</p>
         </div>
       </div>
       <button class="download-btn" id="downloadBtn" onclick="downloadOutput()">
@@ -650,6 +685,27 @@
       </div>
     </div>
 
+    <!-- TASK 6 — RECOMMENDED TAGS -->
+    <div class="output-section task-5">
+      <div class="output-header" onclick="toggleSection(5)">
+        <div class="output-header-left">
+          <div class="output-num">6</div>
+          <div>
+            <div class="output-label">Recommended Tags</div>
+            <div class="output-sublabel">Click any tag to copy it · Copy all at once below</div>
+          </div>
+        </div>
+        <div class="output-toggle" id="toggle5">▼</div>
+      </div>
+      <div class="output-body" id="body5">
+        <div class="output-divider"></div>
+        <p class="tag-note" id="tagNote"></p>
+        <div class="tag-pills-wrap" id="tagPills"></div>
+        <div class="output-content" id="content5" style="display:none;"></div>
+        <button class="copy-btn" onclick="copySection(5)" style="margin-top:16px;">⎘ Copy All Tags</button>
+      </div>
+    </div>
+
   </div>
 
 </div>
@@ -664,7 +720,75 @@ const TASK_LABELS = [
   'Optimized Title',
   'Optimized Description',
   'Partner Update Email',
-  'Partner Profile "About"'
+  'Partner Profile "About"',
+  'Recommended Tags'
+];
+
+// Full tag list from Batch system
+const BATCH_TAGS = [
+  '#trending','#100% that Batch','#Adults Only','#adventure','#afternoons','#Afternoons',
+  '#Anaheim','#Animal Lovers','#Arrival & Departure Days','#Asbury Park','#Asheville',
+  '#Aspen','#at home','#atlanta','#Atlanta','#Atlantic City','#Attraction','#ATV/UTV',
+  '#Austin','#bachelor','#bachelorette','#ballin','#Bar Crawl','#Batch Favorite',
+  '#Batch Nights','#Batch of a Lifetime','#Batch+','#Beaches','#Beer Me!','#Beer Tour',
+  '#Best of Batch','#Big Spender','#Bike Rental','#Bike Tour','#Boat Cruise','#Boat Rental',
+  '#Boat Tour','#Boston','#Boulder','#Brewery','#Bride Vibe','#Budget-friendly','#Bus Tour',
+  '#BYOB Parties','#BYOB Party','#Cabo','#Cancun','#Cape Cod','#Cape May','#Car Rental',
+  '#Catskills','#Charleston','#Charlotte','#Cheap Eats','#Cheeky','#cheers! let\'s drink',
+  '#Chicago','#Chill Vibes','#Chocolate Tour','#City Tour','#Classes','#clearwater',
+  '#Close to the Action','#Cocktail Tour','#Creative & Crafty','#Cruise',
+  '#Cruise / Large Boat','#Customizable for the Batch','#Customizable for the Bride',
+  '#Dallas','#Deal Drop','#Decorations and Supplies','#Denver','#Destin','#Detox',
+  '#Distillery','#DIY','#Dolphin','#Drag','#Drink Pouch','#Driving Tour','#E-Bike',
+  '#Eco Tour','#Escape Room','#Evening Cruise','#Event','#Events','#Exclusive',
+  '#Fall Favorites','#Family Friendly','#Fanny Packs','#Farm','#Ferry','#Festival',
+  '#Fitness Freaks','#Food','#Food and Wine Tour','#Food Tour','#Foodies Will Love',
+  '#For the Bride','#For the Extreme BACHer','#For the Extreme Batch','#For the Girls',
+  '#Fort Lauderdale','#Fort Myers','#Fredericksburg','#Ft. Lauderdale','#Galentine',
+  '#Galentines','#Games & Challenges','#Gatlinburg','#Get Pampered','#Get Wild',
+  '#Getting Frisky','#Ghost Tour','#Good For Bachelors','#Good for College',
+  '#Good for Under 21','#Great For Fall','#Great for Large Groups','#Group Activities',
+  '#Group Adventures','#Group Classes','#Guided Tour','#Guided Tours','#Gulf Coast',
+  '#Gulf Shores','#Hamptons','#Hangover','#Happy Hour Tour','#Health & Fitness',
+  '#Health & Wellness','#Hello Brunch','#Hiking','#Hilton Head','#History','#History Tour',
+  '#Honolulu','#Houston','#Hudson Valley','#Industry','#insta-worthy','#Insta-Worthy',
+  '#instant','#Joshua Tree','#Kansas City','#Kayak','#Key Largo','#Key West',
+  '#Lake Ozark','#Lake Tahoe','#Las Vegas','#Let\'s Hibachi','#life of the party',
+  '#Life of the Party','#Live Music','#Local Activities','#Long Beach Island','#Long Island',
+  '#Los Angeles','#Los Cabos','#Male Revue & Services','#Marina','#Miami','#Miami Beach',
+  '#Mike\'s Picks','#mornings','#Mornings','#most popular','#Museum','#Music Tour',
+  '#Must Add-on','#Nantucket','#Nashville','#New Orleans','#New York','#Newport',
+  '#Newport Beach','#Nightlife','#Ocean City','#On Sale','#On the Water','#orlando',
+  '#Orlando','#outdoor adventure','#Outdoor Adventures','#Outdoor Seating','#Outdoors',
+  '#Package','#Palm Beach','#Palm Springs','#Parasail','#Park City','#party',
+  '#party at home','#Party at Home','#Party Boat','#Party Bus','#Party Buses',
+  '#party supplies','#Party Tours & Buses','#Perfect Packages','#Perfect Pregame',
+  '#Philadelphia','#Phoenix','#Photography Tour','#Picnic Party','#Playa del Carmen',
+  '#Pocono Mountains','#Pontoon Boat Rental','#Popular for Bachelorettes',
+  '#Popular for Bachelors','#Popular for the Bachelorette','#Popular for the Bachelorettes',
+  '#Portland','#Private','#Private Boat Charter','#Private Reservations Available',
+  '#Private Tour','#Private Wine Tour','#Protocol Friendly','#Pub Crawl','#Puff Party',
+  '#Rentals','#Retail','#Retail Therapy','#River Cruise','#Romantic','#Rooftop Views',
+  '#Sailing','#San Diego','#San Francisco','#Santa Barbara','#Santa Fe','#Sarasota',
+  '#Savannah','#Scooter','#scottsdale','#Scottsdale','#Scuba','#Seattle','#Segway',
+  '#Shooting Range','#Shows','#Sightseeing Tour','#Small Plates','#Smoky Mountain Tour',
+  '#Snorkel','#So Sophisticated','#Something for Everyone','#Soothe','#Sternwheeler/Riverboat',
+  '#Summer Kickoff','#Summer Splash','#Sunday Brunch','#Sunset Cruise','#Sunset Sail',
+  '#SUP','#Swim with Dolphins','#Swingers','#Tampa','#Tiki Time','#Top Booked Activity',
+  '#Top Restaurant','#Top-Activity','#Tourist Time','#Transportation','#trending',
+  '#Trending Asheville','#Trending Atlanta','#Trending Austin','#Trending Boston',
+  '#Trending Charleston','#Trending Chicago','#Trending Dallas','#Trending Denver',
+  '#Trending Destin','#Trending Fort Lauderdale','#Trending Fredericksburg',
+  '#Trending Gatlinburg','#Trending Houston','#Trending Kansas City','#Trending Las Vegas',
+  '#Trending Los Angeles','#Trending Miami','#Trending Nashville','#Trending New Orleans',
+  '#Trending New York','#Trending Ocean City','#Trending Orlando','#Trending Palm Springs',
+  '#Trending San Diego','#Trending San Francisco','#Trending Savannah','#Trending Scottsdale',
+  '#Trending Tampa','#Turnt Down','#Under 21','#unique finds','#Unique Finds','#Upsell',
+  '#UTV Rentals','#Vail','#Vegas Girls Night Out','#Vegas Vibes','#Vegetarian Friendly',
+  '#Vice','#Virtual','#Wakeboarding','#Walking Tour','#Walking Tours','#Washington',
+  '#Water Activities','#Water Activity\'s','#Water Park','#Wellness','#Westchester County',
+  '#Wheelchair Accessible','#Where to Eat','#Wildlife','#Wine','#Wine Not?','#Wine Tour',
+  '#Winery','#Workshop','#Yoga','#Your Birthday Your Way'
 ];
 
 function toggleSection(idx) {
@@ -681,13 +805,65 @@ function openSection(idx) {
 }
 
 async function copySection(idx) {
-  const text = document.getElementById('content' + idx).textContent;
+  let text;
+  if (idx === 5) {
+    // For tags, copy the raw text stored in hidden content5
+    text = document.getElementById('content5').textContent;
+  } else {
+    text = document.getElementById('content' + idx).textContent;
+  }
   await navigator.clipboard.writeText(text);
-  const btns = document.querySelectorAll('.copy-btn');
-  const btn = btns[idx];
+  const btn = document.querySelectorAll('.copy-btn')[idx];
   btn.textContent = '✓ Copied!';
   btn.classList.add('copied');
-  setTimeout(() => { btn.textContent = '⎘ Copy'; btn.classList.remove('copied'); }, 2000);
+  setTimeout(() => { btn.textContent = '⎘ Copy' + (idx === 5 ? ' All Tags' : ''); btn.classList.remove('copied'); }, 2000);
+}
+
+async function copyTagPill(pill, tag) {
+  await navigator.clipboard.writeText(tag);
+  pill.classList.add('copied-pill');
+  const orig = pill.textContent;
+  pill.textContent = '✓ ' + tag;
+  setTimeout(() => { pill.textContent = orig; pill.classList.remove('copied-pill'); }, 1500);
+}
+
+function renderTagPills(tagsText) {
+  // Extract hashtags from the AI output
+  const matches = tagsText.match(/#[\w&'%!.\- ]+/g) || [];
+  // Normalize and deduplicate
+  const seen = new Set();
+  const tags = [];
+  for (const raw of matches) {
+    const trimmed = raw.trim().replace(/\s+$/, '');
+    if (!seen.has(trimmed.toLowerCase())) {
+      seen.add(trimmed.toLowerCase());
+      tags.push(trimmed);
+    }
+  }
+
+  const wrap = document.getElementById('tagPills');
+  const note = document.getElementById('tagNote');
+  wrap.innerHTML = '';
+
+  if (tags.length === 0) {
+    note.textContent = 'No matching tags found — see raw output below.';
+    document.getElementById('content5').style.display = 'block';
+    return;
+  }
+
+  note.textContent = `${tags.length} tags recommended — click any tag to copy it individually, or use "Copy All Tags" below.`;
+
+  for (const tag of tags) {
+    const pill = document.createElement('span');
+    pill.className = 'tag-pill';
+    pill.textContent = tag;
+    pill.title = 'Click to copy';
+    pill.addEventListener('click', () => copyTagPill(pill, tag));
+    wrap.appendChild(pill);
+  }
+
+  // Store plain text in hidden element for "copy all"
+  document.getElementById('content5').textContent = tags.join(' ');
 }
 
 function downloadOutput() {
@@ -712,6 +888,15 @@ function downloadOutput() {
       output += content;
       output += '\n\n\n';
     }
+  }
+
+  // Task 6 — tags
+  const tagContent = document.getElementById('content5').textContent.trim();
+  if (tagContent) {
+    output += `TASK 6 — ${TASK_LABELS[5].toUpperCase()}\n`;
+    output += `${thinDivider}\n\n`;
+    output += tagContent;
+    output += '\n\n\n';
   }
 
   output += `${divider}\n`;
@@ -756,7 +941,7 @@ function buildPrompt() {
   const g = id => document.getElementById(id).value.trim() || 'none';
   return `You are an SEO strategist, conversion copywriter, and partner communications manager for Batch, a marketplace for local experiences and activities (letsbatch.com). Your job is to fully optimize a listing for visibility on both the Batch platform and Google search — then communicate those changes to the experience partner in a clear, outcome-focused email.
 
-Complete all five tasks below in order.
+Complete all six tasks below in order.
 
 ═══════════════════════════════════════
 LISTING INFORMATION
@@ -911,7 +1096,22 @@ OUTPUT 2 — 3 ALTERNATIVE VERSIONS:
 OUTPUT 3 — SEO + CONVERSION NOTES:
   (a) Where and how the primary keyword appears
   (b) Which secondary keywords were used and where
-  (c) One specific reason this version converts better than the original`;
+  (c) One specific reason this version converts better than the original
+
+═══════════════════════════════════════
+TASK 6 — RECOMMENDED TAGS
+═══════════════════════════════════════
+
+Below is the complete list of available tags in the Batch system. Your job is to select ONLY tags from this exact list that are genuinely relevant to this experience.
+
+AVAILABLE TAGS:
+#trending, #100% that Batch, #Adults Only, #adventure, #afternoons, #Afternoons, #Anaheim, #Animal Lovers, #Arrival & Departure Days, #Asbury Park, #Asheville, #Aspen, #at home, #atlanta, #Atlanta, #Atlantic City, #Attraction, #ATV/UTV, #Austin, #bachelor, #bachelorette, #ballin, #Bar Crawl, #Batch Favorite, #Batch Nights, #Batch of a Lifetime, #Batch+, #Beaches, #Beer Me!, #Beer Tour, #Best of Batch, #Big Spender, #Bike Rental, #Bike Tour, #Boat Cruise, #Boat Rental, #Boat Tour, #Boston, #Boulder, #Brewery, #Bride Vibe, #Budget-friendly, #Bus Tour, #BYOB Parties, #Cabo, #Cancun, #Cape Cod, #Cape May, #Car Rental, #Catskills, #Charleston, #Charlotte, #Cheap Eats, #Cheeky, #cheers! let's drink, #Chicago, #Chill Vibes, #Chocolate Tour, #City Tour, #Classes, #clearwater, #Close to the Action, #Cocktail Tour, #Creative & Crafty, #Cruise, #Cruise / Large Boat, #Customizable for the Batch, #Customizable for the Bride, #Dallas, #Deal Drop, #Decorations and Supplies, #Denver, #Destin, #Detox, #Distillery, #DIY, #Dolphin, #Drag, #Drink Pouch, #Driving Tour, #E-Bike, #Eco Tour, #Escape Room, #Evening Cruise, #Event, #Events, #Exclusive, #Fall Favorites, #Family Friendly, #Fanny Packs, #Farm, #Ferry, #Festival, #Fitness Freaks, #Food, #Food and Wine Tour, #Food Tour, #Foodies Will Love, #For the Bride, #For the Extreme BACHer, #For the Extreme Batch, #For the Girls, #Fort Lauderdale, #Fort Myers, #Fredericksburg, #Ft. Lauderdale, #Galentine, #Galentines, #Games & Challenges, #Gatlinburg, #Get Pampered, #Get Wild, #Getting Frisky, #Ghost Tour, #Good For Bachelors, #Good for College, #Good for Under 21, #Great For Fall, #Great for Large Groups, #Group Activities, #Group Adventures, #Group Classes, #Guided Tour, #Guided Tours, #Gulf Coast, #Gulf Shores, #Hamptons, #Hangover, #Happy Hour Tour, #Health & Fitness, #Health & Wellness, #Hello Brunch, #Hiking, #Hilton Head, #History, #History Tour, #Honolulu, #Houston, #Hudson Valley, #Industry, #insta-worthy, #Insta-Worthy, #instant, #Joshua Tree, #Kansas City, #Kayak, #Key Largo, #Key West, #Lake Ozark, #Lake Tahoe, #Las Vegas, #Let's Hibachi, #life of the party, #Life of the Party, #Live Music, #Local Activities, #Long Beach Island, #Long Island, #Los Angeles, #Los Cabos, #Male Revue & Services, #Marina, #Miami, #Miami Beach, #mornings, #Mornings, #most popular, #Museum, #Music Tour, #Must Add-on, #Nantucket, #Nashville, #New Orleans, #New York, #Newport, #Newport Beach, #Nightlife, #Ocean City, #On Sale, #On the Water, #orlando, #Orlando, #outdoor adventure, #Outdoor Adventures, #Outdoor Seating, #Outdoors, #Package, #Palm Beach, #Palm Springs, #Parasail, #Park City, #party, #party at home, #Party at Home, #Party Boat, #Party Bus, #Party Buses, #party supplies, #Party Tours & Buses, #Perfect Packages, #Perfect Pregame, #Philadelphia, #Phoenix, #Photography Tour, #Picnic Party, #Playa del Carmen, #Pocono Mountains, #Pontoon Boat Rental, #Popular for Bachelorettes, #Popular for Bachelors, #Popular for the Bachelorette, #Popular for the Bachelorettes, #Portland, #Private, #Private Boat Charter, #Private Reservations Available, #Private Tour, #Private Wine Tour, #Protocol Friendly, #Pub Crawl, #Puff Party, #Rentals, #Retail, #Retail Therapy, #River Cruise, #Romantic, #Rooftop Views, #Sailing, #San Diego, #San Francisco, #Santa Barbara, #Santa Fe, #Sarasota, #Savannah, #Scooter, #scottsdale, #Scottsdale, #Scuba, #Seattle, #Segway, #Shooting Range, #Shows, #Sightseeing Tour, #Small Plates, #Smoky Mountain Tour, #Snorkel, #So Sophisticated, #Something for Everyone, #Soothe, #Sternwheeler/Riverboat, #Summer Kickoff, #Summer Splash, #Sunday Brunch, #Sunset Cruise, #Sunset Sail, #SUP, #Swim with Dolphins, #Swingers, #Tampa, #Tiki Time, #Top Booked Activity, #Top Restaurant, #Top-Activity, #Tourist Time, #Transportation, #trending, #Under 21, #unique finds, #Unique Finds, #UTV Rentals, #Vail, #Vegas Girls Night Out, #Vegas Vibes, #Vegetarian Friendly, #Vice, #Virtual, #Wakeboarding, #Walking Tour, #Walking Tours, #Washington, #Water Activities, #Water Park, #Wellness, #Westchester County, #Wheelchair Accessible, #Where to Eat, #Wildlife, #Wine, #Wine Not?, #Wine Tour, #Winery, #Workshop, #Yoga, #Your Birthday Your Way
+
+RULES:
+- ONLY use tags from the list above — do not invent or modify any tag
+- Select 8–15 tags that best match the experience type, audience, city, vibe, and occasion
+- Prioritize: activity type, city/location, audience (bachelor/bachelorette/group), occasion, and vibe tags
+- Output ONLY the selected tags as a space-separated list of hashtags, nothing else — no explanation, no numbering, no headers`;
 }
 
 async function runOptimizer() {
@@ -938,11 +1138,13 @@ async function runOptimizer() {
   document.getElementById('progressWrap').classList.add('visible');
   setProgress(5);
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 6; i++) {
     document.getElementById('content' + i).textContent = '';
     document.getElementById('body' + i).classList.remove('open');
     document.getElementById('toggle' + i).classList.remove('open');
   }
+  document.getElementById('tagPills').innerHTML = '';
+  document.getElementById('tagNote').textContent = '';
 
   document.getElementById('outputArea').classList.add('visible');
 
@@ -994,7 +1196,7 @@ async function runOptimizer() {
           if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
             fullText += parsed.delta.text;
             parseAndDisplay(fullText);
-            const approxPct = Math.min(90, 15 + (fullText.length / 150));
+            const approxPct = Math.min(90, 15 + (fullText.length / 180));
             setProgress(approxPct);
           }
         } catch {}
@@ -1020,7 +1222,7 @@ async function runOptimizer() {
 }
 
 function parseAndDisplay(text, final = false) {
-  const taskPattern = /(?:^|\n)(?:#+\s*)?(?:\*{1,2})?(?:TASK|Task)\s+([1-5])(?:\*{1,2})?[\s\-—:]+([^\n]*)/g;
+  const taskPattern = /(?:^|\n)(?:#+\s*)?(?:\*{1,2})?(?:TASK|Task)\s+([1-6])(?:\*{1,2})?[\s\-—:]+([^\n]*)/g;
 
   const matches = [];
   let m;
@@ -1048,6 +1250,11 @@ function parseAndDisplay(text, final = false) {
     if (task >= 0 && task < 5) {
       document.getElementById('content' + task).textContent = body;
       openSection(task);
+    } else if (task === 5) {
+      // Task 6 — render as tag pills
+      document.getElementById('content5').textContent = body;
+      renderTagPills(body);
+      openSection(5);
     }
   }
 }
