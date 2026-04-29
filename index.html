@@ -129,7 +129,7 @@
   .progress-bar-inner { max-width: 900px; margin: 0 auto; width: 100%; display: flex; align-items: center; gap: 16px; }
   .progress-label { font-size: 12px; color: rgba(240,241,244,0.5); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
   .progress-track { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
-  .progress-fill { height: 100%; width: 10%; background: var(--gold); border-radius: 10px; transition: width 0.5s ease; }
+  .progress-fill { height: 100%; width: 20%; background: var(--gold); border-radius: 10px; transition: width 0.5s ease; }
   .progress-count { font-size: 12px; color: rgba(240,241,244,0.5); font-weight: 700; white-space: nowrap; }
 
   /* MAIN CONTENT */
@@ -339,7 +339,7 @@
   <div class="progress-bar-inner">
     <span class="progress-label">Progress</span>
     <div class="progress-track"><div class="progress-fill"></div></div>
-    <span class="progress-count">1 / 10 days</span>
+    <span class="progress-count">2 / 10 days</span>
   </div>
 </div>
 
@@ -364,19 +364,20 @@
       <span class="day-date">April 27, 2026</span>
     </a>
 
-    <!-- DAY 2 — LOCKED -->
-    <div class="day-card c-blue locked">
-      <div class="day-status">🔒</div>
+    <!-- DAY 2 — AVAILABLE -->
+    <a href="day2.html" class="day-card c-blue available">
+      <div class="day-status">✅</div>
       <div class="day-num">Day 2</div>
-      <div class="day-title">Partner Health & Optimization</div>
-      <div class="day-desc">Reviewing live partner accounts, listing quality standards, and hands-on optimization walkthroughs.</div>
+      <div class="day-title">Partner Health & Deep Dives</div>
+      <div class="day-desc">All 5 booking methods, listing health framework, CoStar SEO prompt, retention levers, HubSpot navigation, and Airtable workflows.</div>
       <div class="day-tags">
-        <span class="day-tag">Airtable</span>
-        <span class="day-tag">Listings</span>
+        <span class="day-tag">Booking Types</span>
         <span class="day-tag">SEO</span>
+        <span class="day-tag">HubSpot</span>
+        <span class="day-tag">Retention</span>
       </div>
-      <span class="day-date">To follow</span>
-    </div>
+      <span class="day-date">April 28, 2026</span>
+    </a>
 
     <!-- DAY 3 — LOCKED -->
     <div class="day-card c-pink locked">
@@ -492,6 +493,27 @@
 
   </div>
 
+  <!-- TOOLS SECTION -->
+  <div class="section-label">Tools</div>
+
+  <div class="day-grid" style="margin-bottom: 56px;">
+
+    <a href="listing-optimizer.html" class="day-card c-green available" style="border-width: 2px;">
+      <div class="day-status">🛠️</div>
+      <div class="day-num">Tool</div>
+      <div class="day-title">Listing Optimizer</div>
+      <div class="day-desc">Paste any partner listing and auto-generate SEO keywords, an optimized title & description, a partner email, and a rewritten profile — powered by Claude AI.</div>
+      <div class="day-tags">
+        <span class="day-tag">SEO</span>
+        <span class="day-tag">CoStar</span>
+        <span class="day-tag">Claude AI</span>
+        <span class="day-tag">5 Tasks</span>
+      </div>
+      <span class="day-date">Live · ~5 min per listing</span>
+    </a>
+
+  </div>
+
   <!-- QUICK REFERENCE -->
   <div class="section-label">Quick Reference</div>
   <div class="quick-ref">
@@ -536,6 +558,22 @@
       <div class="ref-item">
         <div class="ref-label">Dispute Win Rate</div>
         <div class="ref-val pink">~6% (needs fix)</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-label">Booking Methods</div>
+        <div class="ref-val gold">5 types</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-label">Min. Listing Photos</div>
+        <div class="ref-val blue">5 photos + 1 video</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-label">CoStar Workflow</div>
+        <div class="ref-val green">5 tasks, ~5 min</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-label">Churn Levers</div>
+        <div class="ref-val orange">4 levels</div>
       </div>
     </div>
   </div>
