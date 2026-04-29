@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Partner Update Email Generator · Batch Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://js.puter.com/v2/"></script>
+<style>
+  :root {
+    --black: #0F0C0C; --white: #F0F1F4; --sunset: #FF5F00; --ocean: #4F97FC;
+    --cosmo: #FF93D3; --lime: #00DF00; --gold: #FFCA00; --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF; --cosmo-tint: #FFE0F3; --lime-tint: #C8FFB0; --sunset-tint: #FFD9C0;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Mulish', sans-serif; background: var(--white); color: var(--black); min-height: 100vh; font-size: 14px; }
+
+  .topnav { background: var(--black); padding: 14px 40px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--ocean); }
+  .topnav a { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.15s; }
+  .topnav a:hover { color: var(--ocean); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--ocean); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+
+  .hero { background: var(--black); padding: 52px 40px 44px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; right: -80px; top: -80px; width: 360px; height: 360px; border-radius: 50%; background: var(--ocean); opacity: 0.06; }
+  .hero::after { content: ''; position: absolute; left: -60px; bottom: -60px; width: 240px; height: 240px; border-radius: 50%; background: var(--gold); opacity: 0.06; }
+  .hero-inner { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--ocean); color: var(--black); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; padding: 5px 14px; border-radius: 30px; margin-bottom: 16px; }
+  .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--black); }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 52px); font-weight: 900; color: #fff; line-height: 1.08; margin-bottom: 10px; }
+  .hero h1 span { color: var(--ocean); }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); max-width: 420px; line-height: 1.6; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+  .chip { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(240,241,244,0.7); border: 1px solid rgba(255,255,255,0.1); }
+  .hero-steps { display: flex; flex-direction: column; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px 22px; min-width: 200px; }
+  .hero-step { display: flex; align-items: center; gap: 10px; }
+  .hero-step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--ocean); color: var(--black); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .hero-step-label { font-size: 12px; color: rgba(240,241,244,0.65); font-weight: 600; }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 36px 40px 80px; }
+  .sec-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; color: rgba(15,12,12,0.35); margin-bottom: 16px; margin-top: 8px; display: flex; align-items: center; gap: 10px; }
+  .sec-label::after { content: ''; flex: 1; height: 1px; background: rgba(15,12,12,0.1); }
+
+  .card { background: #fff; border-radius: 16px; border: 1.5px solid rgba(15,12,12,0.09); padding: 24px 26px; margin-bottom: 16px; }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+  .card-tag { font-family: 'Mulish', sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 3px 10px; border-radius: 20px; }
+  .card-tag.required { background: var(--sunset-tint); color: #993300; }
+  .card-tag.optional { background: var(--ocean-tint); color: #1a4d8f; }
+
+  .hint-box { background: var(--ocean-tint); border-left: 4px solid var(--ocean); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; color: #1a3d6e; margin-bottom: 16px; line-height: 1.6; }
+
+  .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: rgba(15,12,12,0.45); margin-bottom: 6px; }
+  .field input, .field textarea { width: 100%; border: 1.5px solid rgba(15,12,12,0.12); border-radius: 10px; padding: 10px 13px; font-family: 'Mulish', sans-serif; font-size: 13.5px; color: var(--black); background: var(--white); outline: none; transition: border-color 0.2s, background 0.2s; resize: vertical; }
+  .field input:focus, .field textarea:focus { border-color: var(--ocean); background: #fff; box-shadow: 0 0 0 3px rgba(79,151,252,0.1); }
+  .field textarea { min-height: 80px; line-height: 1.6; }
+
+  .toggle-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: rgba(15,12,12,0.45); margin-bottom: 10px; }
+  .toggle-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+  .toggle-pill { font-size: 12px; font-weight: 700; padding: 6px 15px; border-radius: 30px; border: 1.5px solid rgba(15,12,12,0.12); background: var(--white); color: rgba(15,12,12,0.5); cursor: pointer; transition: all 0.15s; user-select: none; letter-spacing: 0.2px; }
+  .toggle-pill:hover { border-color: var(--ocean); color: var(--ocean); }
+  .toggle-pill.active { background: var(--black); color: var(--ocean); border-color: var(--black); }
+
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+  .run-btn { width: 100%; background: var(--black); color: #fff; border: none; border-radius: 14px; padding: 18px 24px; font-family: 'Mulish', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; transition: background 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 28px; letter-spacing: 0.3px; position: relative; overflow: hidden; }
+  .run-btn::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--ocean); }
+  .run-btn:hover:not(:disabled) { background: #1a1818; transform: translateY(-1px); }
+  .run-btn:active:not(:disabled) { transform: scale(0.99); }
+  .run-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: var(--ocean); border-radius: 50%; animation: spin 0.7s linear infinite; display: none; flex-shrink: 0; }
+  .run-btn.loading .spinner { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .progress-wrap { height: 4px; background: rgba(15,12,12,0.08); border-radius: 4px; margin-bottom: 20px; overflow: hidden; display: none; }
+  .progress-wrap.visible { display: block; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--ocean), var(--lime)); width: 0%; transition: width 0.4s ease; border-radius: 4px; }
+
+  .output-area { display: none; }
+  .output-area.visible { display: block; }
+
+  .subject-banner { background: var(--ocean-tint); border: 2px solid var(--ocean); border-radius: 16px; padding: 18px 22px; margin-bottom: 16px; }
+  .subject-banner-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #1a4d8f; margin-bottom: 8px; }
+  .subject-value { font-size: 15px; font-weight: 700; color: var(--black); min-height: 22px; }
+
+  .email-output-card { background: #fff; border: 1.5px solid rgba(15,12,12,0.09); border-radius: 14px; overflow: hidden; margin-bottom: 16px; }
+  .email-output-header { padding: 14px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(15,12,12,0.07); }
+  .email-num { width: 28px; height: 28px; border-radius: 50%; background: var(--ocean); color: #fff; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .email-output-title { font-weight: 700; font-size: 14px; }
+  .email-body-wrap { padding: 20px 22px; }
+  .email-preview { white-space: pre-wrap; font-size: 14px; line-height: 1.8; color: #333; font-family: 'Mulish', sans-serif; background: var(--white); border-radius: 10px; padding: 18px 20px; border: 1.5px solid rgba(15,12,12,0.07); min-height: 60px; }
+  .streaming-cursor { display: inline-block; width: 2px; height: 14px; background: var(--ocean); animation: blink 0.8s infinite; margin-left: 2px; vertical-align: middle; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  .copy-btn { background: transparent; border: 1.5px solid rgba(15,12,12,0.12); border-radius: 8px; padding: 7px 14px; font-family: 'Mulish', sans-serif; font-size: 12px; font-weight: 700; color: rgba(15,12,12,0.45); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; }
+  .copy-btn:hover { border-color: var(--ocean); color: var(--ocean); }
+  .copy-btn.copied { border-color: #00aa00; color: #00aa00; }
+
+  .error-banner { background: #FDECEA; border: 1.5px solid #F5C6C2; border-radius: 12px; padding: 14px 18px; color: #B02D2D; font-size: 13.5px; font-weight: 600; margin-bottom: 16px; display: none; line-height: 1.5; }
+
+  .bottom-nav { border-top: 2px solid rgba(15,12,12,0.08); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 860px; margin: 0 auto; }
+  .bottom-nav a { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--black); text-decoration: none; padding: 10px 20px; border: 2px solid rgba(15,12,12,0.15); border-radius: 30px; transition: all 0.15s; }
+  .bottom-nav a:hover { background: var(--black); color: var(--ocean); border-color: var(--black); }
+
+  @media (max-width: 600px) {
+    .topnav { padding: 14px 20px; } .hero { padding: 36px 20px 32px; } .container { padding: 24px 20px 60px; }
+    .fields-grid { grid-template-columns: 1fr; } .metrics-grid { grid-template-columns: 1fr; } .hero-steps { display: none; } .bottom-nav { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html">Training Hub</a>
+  <span class="sep">›</span>
+  <span class="current">Partner Update Email Generator</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-badge"><div class="dot"></div>Batch Tool · Puter.js Powered</div>
+      <h1>Partner Update<br><span>Email Generator</span></h1>
+      <p class="hero-sub">Fill in what you know, pick what you optimized and what to recommend, and get a warm, plain-language update email ready to send.</p>
+      <div class="hero-chips">
+        <div class="chip">Proactive outreach</div>
+        <div class="chip">Puter.js · No API key</div>
+        <div class="chip">Copy and send</div>
+      </div>
+    </div>
+    <div class="hero-steps">
+      <div class="hero-step"><div class="hero-step-num">1</div><div class="hero-step-label">Partner Info</div></div>
+      <div class="hero-step"><div class="hero-step-num">2</div><div class="hero-step-label">90-Day Metrics</div></div>
+      <div class="hero-step"><div class="hero-step-num">3</div><div class="hero-step-label">What You Optimized</div></div>
+      <div class="hero-step"><div class="hero-step-num">4</div><div class="hero-step-label">Your Recommendations</div></div>
+      <div class="hero-step"><div class="hero-step-num">5</div><div class="hero-step-label">Generated Email</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="hint-box"><strong>Heads up:</strong> Only the partner name is required. Fill in what you have and Claude will build the email around it. The more you add, the more personalized it gets.</div>
+
+  <div style="background:var(--lime-tint);border:2px solid var(--lime);border-radius:16px;padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <div style="font-size:22px;flex-shrink:0;">⚡</div>
+    <div style="flex:1;min-width:200px;">
+      <strong style="font-size:13px;font-weight:800;display:block;margin-bottom:3px;color:var(--black);">Powered by Puter.js — No API Key Needed</strong>
+      <p style="font-size:12px;color:#336600;line-height:1.5;">This tool runs Claude AI for free via <a href="https://developer.puter.com" target="_blank" style="color:#226600;font-weight:700;">Puter.js</a>. No API key or account required — just fill in the form and hit Generate. You may be asked to sign in to Puter on first use (it's free).</p>
+    </div>
+  </div>
+
+  <div class="sec-label">Partner Info</div>
+  <div class="card">
+    <div class="card-title">Who are you emailing? <span class="card-tag required">Required</span></div>
+    <div class="fields-grid">
+      <div class="field">
+        <label>Partner / Business Name <span style="color:#cc4400">*</span></label>
+        <input type="text" id="partnerName" placeholder="e.g. Escape Room Madness" />
+      </div>
+      <div class="field">
+        <label>Contact First Name <span style="color:rgba(15,12,12,0.3);font-weight:600;font-size:10px;text-transform:none;letter-spacing:0">optional</span></label>
+        <input type="text" id="contactName" placeholder="e.g. Sarah" />
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">Last 90-Day Performance</div>
+  <div class="card">
+    <div class="card-title">Metrics <span class="card-tag optional">Optional</span></div>
+    <div class="metrics-grid">
+      <div class="field">
+        <label>Page Views</label>
+        <input type="number" id="pageviews" placeholder="e.g. 312" />
+      </div>
+      <div class="field">
+        <label>Favorites</label>
+        <input type="number" id="favorites" placeholder="e.g. 24" />
+      </div>
+      <div class="field">
+        <label>Itinerary Adds</label>
+        <input type="number" id="itinAdds" placeholder="e.g. 5" />
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">What You Already Did</div>
+  <div class="card">
+    <div class="card-title">Optimizations completed <span class="card-tag optional">Optional</span></div>
+    <div class="toggle-label">Pick all that apply</div>
+    <div class="toggle-group" id="optimizations">
+      <span class="toggle-pill" data-val="title and description">Title and description</span>
+      <span class="toggle-pill" data-val="keywords">Keywords</span>
+      <span class="toggle-pill" data-val="profile details">Profile</span>
+      <span class="toggle-pill" data-val="photos">Photos</span>
+      <span class="toggle-pill" data-val="tags">Tags</span>
+      <span class="toggle-pill" data-val="pricing details">Pricing</span>
+    </div>
+  </div>
+
+  <div class="sec-label">What You're Recommending</div>
+  <div class="card">
+    <div class="card-title">Next steps for the partner <span class="card-tag optional">Optional</span></div>
+    <div class="toggle-label">Pick all that apply</div>
+    <div class="toggle-group" id="recommendations">
+      <span class="toggle-pill" data-val="adding reviews from past clients">Add reviews</span>
+      <span class="toggle-pill" data-val="uploading videos of their experience">Upload videos</span>
+      <span class="toggle-pill" data-val="using the free UGC QR code tool to collect guest photos and videos">UGC QR tool</span>
+      <span class="toggle-pill" data-val="getting a free custom blog post written and promoted on Batch">Blog post</span>
+      <span class="toggle-pill" data-val="completing their partner profile with logo, bio, and social links">Complete profile</span>
+      <span class="toggle-pill" data-val="adding more high-quality photos">More photos</span>
+    </div>
+  </div>
+
+  <div class="sec-label">Personal Note</div>
+  <div class="card">
+    <div class="card-title">Anything specific? <span class="card-tag optional">Optional</span></div>
+    <div class="field">
+      <label>Extra context or a personal note for this partner</label>
+      <textarea id="extraNote" placeholder="e.g. They mentioned they're planning a new location opening soon..."></textarea>
+    </div>
+  </div>
+
+  <div class="error-banner" id="errorBanner"></div>
+  <div class="progress-wrap" id="progressWrap"><div class="progress-fill" id="progressFill"></div></div>
+
+  <button class="run-btn" id="runBtn" onclick="generateEmail()">
+    <div class="spinner"></div>
+    <span id="btnText">Generate Email</span>
+  </button>
+
+  <div class="output-area" id="outputArea">
+    <div class="sec-label">Your Email</div>
+    <div class="subject-banner">
+      <div class="subject-banner-label">Subject line</div>
+      <div class="subject-value" id="subjectOut"></div>
+    </div>
+    <div class="email-output-card">
+      <div class="email-output-header">
+        <div class="email-num">✉</div>
+        <div class="email-output-title">Email Body</div>
+      </div>
+      <div class="email-body-wrap">
+        <div class="email-preview" id="emailOut"></div>
+        <button class="copy-btn" id="copyBtn" onclick="copyEmail()">⎘ Copy Email</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <a href="index.html">← Back to Hub</a>
+</div>
+
+<script>
+  document.querySelectorAll('.toggle-pill').forEach(pill => {
+    pill.addEventListener('click', () => pill.classList.toggle('active'));
+  });
+
+  function getSelected(groupId) {
+    return [...document.querySelectorAll(`#${groupId} .toggle-pill.active`)].map(b => b.dataset.val);
+  }
+
+  function setProgress(pct) {
+    document.getElementById('progressFill').style.width = pct + '%';
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorBanner');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function hideError() {
+    document.getElementById('errorBanner').style.display = 'none';
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function parseOutput(text) {
+    const subjectMatch = text.match(/SUBJECT:\s*(.+)/i);
+    const bodyMatch = text.match(/BODY:\s*([\s\S]*)/i);
+    return {
+      subject: subjectMatch ? subjectMatch[1].trim() : '',
+      body: bodyMatch ? bodyMatch[1].trim() : text.trim()
+    };
+  }
+
+  async function generateEmail() {
+    const partner = document.getElementById('partnerName').value.trim();
+    if (!partner) {
+      showError('Please enter the partner name before generating.');
+      return;
+    }
+    hideError();
+
+    const contact = document.getElementById('contactName').value.trim();
+    const pv = document.getElementById('pageviews').value;
+    const fav = document.getElementById('favorites').value;
+    const ia = document.getElementById('itinAdds').value;
+    const opts = getSelected('optimizations');
+    const recs = getSelected('recommendations');
+    const extra = document.getElementById('extraNote').value.trim();
+
+    const btn = document.getElementById('runBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+    document.getElementById('btnText').textContent = 'Generating...';
+    document.getElementById('progressWrap').classList.add('visible');
+    setProgress(10);
+
+    document.getElementById('outputArea').classList.add('visible');
+    document.getElementById('subjectOut').textContent = '';
+    document.getElementById('emailOut').innerHTML = '<span class="streaming-cursor"></span>';
+
+    const metricsSection = (pv || fav || ia)
+      ? `Last 90-day metrics: Page views: ${pv || 'not provided'}, Favorites: ${fav || 'not provided'}, Itinerary adds: ${ia || 'not provided'}.`
+      : 'No metrics provided.';
+    const optsSection = opts.length ? `Optimizations already completed on their listing: ${opts.join(', ')}.` : 'No optimizations done yet.';
+    const recsSection = recs.length ? `Recommendations to include for the partner: ${recs.join(', ')}.` : 'No specific recommendations.';
+    const extraSection = extra ? `Extra context or personal note: ${extra}` : '';
+
+    const prompt = `You are writing a short, warm partner update email on behalf of a Batch team member. Batch is a marketplace for local experiences and group activities (letsbatch.com). Do not include a sign-off name.
+
+CONTEXT:
+- Partner / business name: ${partner}
+- Contact first name: ${contact || 'not provided — use the business name in the greeting instead'}
+- ${metricsSection}
+- ${optsSection}
+- ${recsSection}
+- ${extraSection}
+
+TASK:
+Write a subject line and email body. Output them in this exact format, nothing else before or after:
+
+SUBJECT: [subject line here]
+
+BODY:
+[email body here]
+
+WRITING RULES — every single one is non-negotiable:
+- Zero em dashes. Not one. Use a colon or rewrite the sentence instead.
+- No exclamation marks anywhere in the email.
+- No filler openers: do not start with "Hope this finds you well", "I wanted to reach out", "Just checking in", "I'm excited to share", or anything similar.
+- No corporate speak or AI-sounding phrases.
+- Warm, direct, peer-to-peer tone. Short sentences. Active voice.
+- If metrics are provided, list them cleanly and explain what itinerary adds mean in plain language (customers who have gone past browsing and are seriously considering booking, usually converts within 30 to 90 days).
+- If optimizations were done, mention them naturally and briefly explain why they help.
+- If recommendations are provided, explain each one in plain terms — what it is and why it helps. Keep each to 2 to 3 sentences max.
+- If extra context was provided, weave it in naturally where it fits.
+- Do not include a sign-off name. End the email body with "Talk soon!" on its own line.
+- Subject line: catchy, under 50 characters, no em dashes, no exclamation marks.
+- The whole email should be readable in under 90 seconds.`;
+
+    try {
+      setProgress(25);
+      const response = await puter.ai.chat(prompt, { model: 'claude-sonnet-4-6', stream: true });
+      setProgress(40);
+
+      let fullText = '';
+      for await (const part of response) {
+        if (part?.text) {
+          fullText += part.text;
+          const { subject, body } = parseOutput(fullText);
+          if (subject) document.getElementById('subjectOut').textContent = subject;
+          document.getElementById('emailOut').innerHTML = escapeHtml(body) + '<span class="streaming-cursor"></span>';
+          setProgress(Math.min(90, 40 + fullText.length / 25));
+        }
+      }
+
+      const { subject, body } = parseOutput(fullText);
+      if (subject) document.getElementById('subjectOut').textContent = subject;
+      document.getElementById('emailOut').textContent = body;
+
+      setProgress(100);
+      setTimeout(() => {
+        document.getElementById('progressWrap').classList.remove('visible');
+        setProgress(0);
+        document.getElementById('outputArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 600);
+
+    } catch (err) {
+      showError('Something went wrong: ' + (err.message || String(err)));
+      document.getElementById('progressWrap').classList.remove('visible');
+    } finally {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      document.getElementById('btnText').textContent = 'Generate Email';
+    }
+  }
+
+  async function copyEmail() {
+    const subject = document.getElementById('subjectOut').textContent;
+    const body = document.getElementById('emailOut').textContent;
+    await navigator.clipboard.writeText(`Subject: ${subject}\n\n${body}`);
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '⎘ Copy Email'; btn.classList.remove('copied'); }, 2000);
+  }
+</script>
+</body>
+</html>
