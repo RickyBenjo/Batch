@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listing Optimizer · Batch Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0F0C0C;
+    --white: #F0F1F4;
+    --sunset: #FF5F00;
+    --ocean: #4F97FC;
+    --cosmo: #FF93D3;
+    --lime: #00DF00;
+    --gold: #FFCA00;
+    --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF;
+    --cosmo-tint: #FFE0F3;
+    --lime-tint: #C8FFB0;
+    --sunset-tint: #FFD9C0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Mulish', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  /* TOP NAV */
+  .topnav {
+    background: var(--black);
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--lime);
+  }
+  .topnav a { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.15s; }
+  .topnav a:hover { color: var(--lime); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--lime); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+
+  /* HERO */
+  .hero {
+    background: var(--black);
+    padding: 52px 40px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    right: -80px; top: -80px;
+    width: 360px; height: 360px;
+    border-radius: 50%;
+    background: var(--lime);
+    opacity: 0.06;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    left: -60px; bottom: -60px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.06;
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .hero-left {}
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--lime);
+    color: var(--black);
+    font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px;
+    padding: 5px 14px; border-radius: 30px; margin-bottom: 16px;
+  }
+  .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--black); }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 52px); font-weight: 900; color: #fff; line-height: 1.08; margin-bottom: 10px; }
+  .hero h1 span { color: var(--lime); }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); max-width: 420px; line-height: 1.6; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+  .chip { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(240,241,244,0.7); border: 1px solid rgba(255,255,255,0.1); }
+
+  .hero-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 18px 22px;
+    min-width: 200px;
+  }
+  .hero-step { display: flex; align-items: center; gap: 10px; }
+  .hero-step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--lime); color: var(--black); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .hero-step-label { font-size: 12px; color: rgba(240,241,244,0.65); font-weight: 600; }
+
+  /* MAIN */
+  .container { max-width: 860px; margin: 0 auto; padding: 36px 40px 80px; }
+
+  /* SECTION DIVIDER */
+  .sec-label {
+    font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px;
+    color: rgba(15,12,12,0.35); margin-bottom: 16px; margin-top: 8px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sec-label::after { content: ''; flex: 1; height: 1px; background: rgba(15,12,12,0.1); }
+
+  /* CARDS */
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1.5px solid rgba(15,12,12,0.09);
+    padding: 24px 26px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; font-weight: 700;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card-tag {
+    font-family: 'Mulish', sans-serif;
+    font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .card-tag.required { background: var(--sunset-tint); color: #993300; }
+  .card-tag.optional { background: var(--ocean-tint); color: #1a4d8f; }
+
+  /* FIELDS */
+  .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field-full { grid-column: 1 / -1; }
+
+  .field label {
+    display: block;
+    font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+    color: rgba(15,12,12,0.45);
+    margin-bottom: 6px;
+  }
+  .field input, .field textarea, .field select {
+    width: 100%;
+    border: 1.5px solid rgba(15,12,12,0.12);
+    border-radius: 10px;
+    padding: 10px 13px;
+    font-family: 'Mulish', sans-serif;
+    font-size: 13.5px;
+    color: var(--black);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    resize: vertical;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    border-color: var(--ocean);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(79,151,252,0.1);
+  }
+  .field textarea { min-height: 100px; line-height: 1.6; }
+  .field textarea.tall { min-height: 160px; }
+  .field-hint { font-size: 11px; color: rgba(15,12,12,0.4); margin-top: 5px; }
+
+  /* HINT BOX */
+  .hint-box {
+    background: var(--ocean-tint);
+    border-left: 4px solid var(--ocean);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 12.5px;
+    color: #1a3d6e;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  /* ERROR */
+  .error-banner {
+    background: #FDECEA;
+    border: 1.5px solid #F5C6C2;
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: #B02D2D;
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  /* PROGRESS */
+  .progress-wrap {
+    height: 4px;
+    background: rgba(15,12,12,0.08);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    display: none;
+  }
+  .progress-wrap.visible { display: block; }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--lime), var(--ocean));
+    width: 0%;
+    transition: width 0.4s ease;
+    border-radius: 4px;
+  }
+
+  /* RUN BUTTON */
+  .run-btn {
+    width: 100%;
+    background: var(--black);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 18px 24px;
+    font-family: 'Mulish', sans-serif;
+    font-size: 16px; font-weight: 800;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    margin-bottom: 28px;
+    letter-spacing: 0.3px;
+    position: relative;
+    overflow: hidden;
+  }
+  .run-btn::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+    background: var(--lime);
+  }
+  .run-btn:hover { background: #1a1818; transform: translateY(-1px); }
+  .run-btn:active { transform: scale(0.99); }
+  .run-btn:disabled { background: #555; cursor: not-allowed; transform: none; }
+
+  .run-btn .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: var(--lime);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .run-btn.loading .spinner { display: block; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* OUTPUT SECTIONS */
+  .output-area { display: none; }
+  .output-area.visible { display: block; }
+
+  .output-section {
+    background: #fff;
+    border: 1.5px solid rgba(15,12,12,0.09);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .output-section:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
+
+  .output-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .output-header:hover { background: var(--white); }
+
+  .output-header-left { display: flex; align-items: center; gap: 12px; }
+
+  .output-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--black);
+    color: #fff;
+    font-size: 12px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* Each task gets an accent color */
+  .task-0 .output-num { background: var(--ocean); }
+  .task-1 .output-num { background: var(--lime); color: var(--black); }
+  .task-2 .output-num { background: var(--cosmo); color: var(--black); }
+  .task-3 .output-num { background: var(--gold); color: var(--black); }
+  .task-4 .output-num { background: var(--sunset); }
+
+  .output-label { font-weight: 700; font-size: 14px; }
+  .output-sublabel { font-size: 11px; color: rgba(15,12,12,0.4); font-weight: 600; margin-top: 1px; }
+
+  .output-toggle { font-size: 14px; color: rgba(15,12,12,0.3); transition: transform 0.2s; }
+  .output-toggle.open { transform: rotate(180deg); }
+
+  .output-body { padding: 0 20px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.2s; }
+  .output-body.open { max-height: 2000px; padding: 4px 20px 20px; }
+
+  .output-divider { height: 1px; background: rgba(15,12,12,0.07); margin-bottom: 16px; }
+
+  .output-content {
+    white-space: pre-wrap;
+    font-size: 13.5px; line-height: 1.75;
+    color: #333;
+    font-family: 'Mulish', sans-serif;
+  }
+
+  .copy-btn {
+    margin-top: 14px;
+    background: transparent;
+    border: 1.5px solid rgba(15,12,12,0.12);
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-family: 'Mulish', sans-serif;
+    font-size: 12px; font-weight: 700;
+    color: rgba(15,12,12,0.45);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .copy-btn:hover { border-color: var(--ocean); color: var(--ocean); }
+  .copy-btn.copied { border-color: #00aa00; color: #00aa00; }
+
+  /* STREAMING CURSOR */
+  .streaming-cursor {
+    display: inline-block;
+    width: 2px; height: 16px;
+    background: var(--ocean);
+    margin-left: 2px;
+    animation: blink 0.8s steps(1) infinite;
+    vertical-align: text-bottom;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* FOOTER */
+  .bottom-nav {
+    border-top: 2px solid rgba(15,12,12,0.08);
+    padding: 24px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+    max-width: 860px; margin: 0 auto;
+  }
+  .bottom-nav a {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; color: var(--black);
+    text-decoration: none; padding: 10px 20px;
+    border: 2px solid rgba(15,12,12,0.15); border-radius: 30px;
+    transition: all 0.15s;
+  }
+  .bottom-nav a:hover { background: var(--black); color: var(--lime); border-color: var(--black); }
+
+  @media (max-width: 600px) {
+    .topnav { padding: 14px 20px; }
+    .hero { padding: 36px 20px 32px; }
+    .container { padding: 24px 20px 60px; }
+    .fields-grid { grid-template-columns: 1fr; }
+    .hero-steps { display: none; }
+    .bottom-nav { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html">Training Hub</a>
+  <span class="sep">›</span>
+  <span class="current">Listing Optimizer</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-badge">
+        <div class="dot"></div>
+        Batch Tool · CoStar Powered
+      </div>
+      <h1>Listing<br><span>Optimizer</span></h1>
+      <p class="hero-sub">Paste any partner listing and get SEO keywords, an optimized title & description, a partner email, and a rewritten profile — all in one shot.</p>
+      <div class="hero-chips">
+        <div class="chip">5 tasks automated</div>
+        <div class="chip">Claude AI powered</div>
+        <div class="chip">~5 min per listing</div>
+      </div>
+    </div>
+    <div class="hero-steps">
+      <div class="hero-step"><div class="hero-step-num">1</div><div class="hero-step-label">SEO Keyword Research</div></div>
+      <div class="hero-step"><div class="hero-step-num">2</div><div class="hero-step-label">Optimized Title</div></div>
+      <div class="hero-step"><div class="hero-step-num">3</div><div class="hero-step-label">Optimized Description</div></div>
+      <div class="hero-step"><div class="hero-step-num">4</div><div class="hero-step-label">Partner Update Email</div></div>
+      <div class="hero-step"><div class="hero-step-num">5</div><div class="hero-step-label">Partner Profile "About"</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="hint-box">
+    <strong>Always review AI output before sending.</strong> The optimizer generates suggestions — you must verify accuracy. If a claim doesn't match reality (e.g., claiming reviews exist when they don't), edit it before sending to the partner.
+  </div>
+
+  <!-- LISTING INFO -->
+  <div class="sec-label">Listing Information</div>
+
+  <div class="card">
+    <div class="card-title">
+      Core Details
+      <span class="card-tag required">Required</span>
+    </div>
+    <div class="fields-grid">
+      <div class="field">
+        <label>Partner Name</label>
+        <input type="text" id="partnerName" placeholder="e.g. Wet Again Charters">
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <input type="text" id="category" placeholder="e.g. Water Activities">
+      </div>
+      <div class="field">
+        <label>Sub-category</label>
+        <input type="text" id="subcategory" placeholder="e.g. Party Boats">
+      </div>
+      <div class="field">
+        <label>City</label>
+        <input type="text" id="city" placeholder="e.g. Chicago, IL">
+      </div>
+      <div class="field field-full">
+        <label>Current Experience Title</label>
+        <input type="text" id="title" placeholder="Paste the current listing title here">
+      </div>
+      <div class="field">
+        <label>Duration</label>
+        <input type="text" id="duration" placeholder="e.g. 4 hours">
+      </div>
+      <div class="field">
+        <label>Price</label>
+        <input type="text" id="price" placeholder="e.g. $1,600 / party">
+      </div>
+      <div class="field">
+        <label>Location Type</label>
+        <input type="text" id="locationType" placeholder="e.g. Partner Location">
+      </div>
+      <div class="field field-full">
+        <label>About This Experience — Current Description</label>
+        <textarea id="description" class="tall" placeholder="Paste the full current listing description here"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      Additional Content
+      <span class="card-tag optional">Optional but helpful</span>
+    </div>
+    <div class="fields-grid">
+      <div class="field field-full">
+        <label>Current Partner Profile "About" Text</label>
+        <textarea id="partnerAbout" placeholder='Paste the current "About" text, or type "none"'></textarea>
+      </div>
+      <div class="field field-full">
+        <label>Additional Info / What's Included</label>
+        <textarea id="additionalInfo" placeholder='FAQs, inclusions, restrictions, booking notes — or type "none"'></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-banner" id="errorBanner"></div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-fill" id="progressBar"></div>
+  </div>
+
+  <!-- RUN BUTTON -->
+  <button class="run-btn" id="runBtn" onclick="runOptimizer()">
+    <div class="spinner"></div>
+    <span class="btn-text">Generate Full Optimization</span>
+  </button>
+
+  <!-- OUTPUT -->
+  <div class="output-area" id="outputArea">
+
+    <div class="sec-label">Optimization Results</div>
+
+    <div class="output-section task-0">
+      <div class="output-header" onclick="toggleSection(0)">
+        <div class="output-header-left">
+          <div class="output-num">1</div>
+          <div>
+            <div class="output-label">SEO Keyword Research</div>
+            <div class="output-sublabel">Primary, secondary, long-tail + keywords to avoid</div>
+          </div>
+        </div>
+        <div class="output-toggle" id="toggle0">▼</div>
+      </div>
+      <div class="output-body" id="body0">
+        <div class="output-divider"></div>
+        <div class="output-content" id="content0"></div>
+        <button class="copy-btn" onclick="copySection(0)">⎘ Copy</button>
+      </div>
+    </div>
+
+    <div class="output-section task-1">
+      <div class="output-header" onclick="toggleSection(1)">
+        <div class="output-header-left">
+          <div class="output-num">2</div>
+          <div>
+            <div class="output-label">Optimized Title</div>
+            <div class="output-sublabel">3 options ranked by SEO strength + recommendation</div>
+          </div>
+        </div>
+        <div class="output-toggle" id="toggle1">▼</div>
+      </div>
+      <div class="output-body" id="body1">
+        <div class="output-divider"></div>
+        <div class="output-content" id="content1"></div>
+        <button class="copy-btn" onclick="copySection(1)">⎘ Copy</button>
+      </div>
+    </div>
+
+    <div class="output-section task-2">
+      <div class="output-header" onclick="toggleSection(2)">
+        <div class="output-header-left">
+          <div class="output-num">3</div>
+          <div>
+            <div class="output-label">Optimized Description</div>
+            <div class="output-sublabel">Full "About This Experience" rewrite in Batch format</div>
+          </div>
+        </div>
+        <div class="output-toggle" id="toggle2">▼</div>
+      </div>
+      <div class="output-body" id="body2">
+        <div class="output-divider"></div>
+        <div class="output-content" id="content2"></div>
+        <button class="copy-btn" onclick="copySection(2)">⎘ Copy</button>
+      </div>
+    </div>
+
+    <div class="output-section task-3">
+      <div class="output-header" onclick="toggleSection(3)">
+        <div class="output-header-left">
+          <div class="output-num">4</div>
+          <div>
+            <div class="output-label">Partner Update Email</div>
+            <div class="output-sublabel">Ready-to-send email covering all 4 changes</div>
+          </div>
+        </div>
+        <div class="output-toggle" id="toggle3">▼</div>
+      </div>
+      <div class="output-body" id="body3">
+        <div class="output-divider"></div>
+        <div class="output-content" id="content3"></div>
+        <button class="copy-btn" onclick="copySection(3)">⎘ Copy</button>
+      </div>
+    </div>
+
+    <div class="output-section task-4">
+      <div class="output-header" onclick="toggleSection(4)">
+        <div class="output-header-left">
+          <div class="output-num">5</div>
+          <div>
+            <div class="output-label">Partner Profile "About"</div>
+            <div class="output-sublabel">Recommended + 3 alternative versions</div>
+          </div>
+        </div>
+        <div class="output-toggle" id="toggle4">▼</div>
+      </div>
+      <div class="output-body" id="body4">
+        <div class="output-divider"></div>
+        <div class="output-content" id="content4"></div>
+        <button class="copy-btn" onclick="copySection(4)">⎘ Copy</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <a href="index.html">← Back to Hub</a>
+</div>
+
+<script>
+function toggleSection(idx) {
+  const body = document.getElementById('body' + idx);
+  const toggle = document.getElementById('toggle' + idx);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  toggle.classList.toggle('open', !isOpen);
+}
+
+function openSection(idx) {
+  document.getElementById('body' + idx).classList.add('open');
+  document.getElementById('toggle' + idx).classList.add('open');
+}
+
+async function copySection(idx) {
+  const text = document.getElementById('content' + idx).textContent;
+  await navigator.clipboard.writeText(text);
+  const btns = document.querySelectorAll('.copy-btn');
+  const btn = btns[idx];
+  btn.textContent = '✓ Copied!';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = '⎘ Copy'; btn.classList.remove('copied'); }, 2000);
+}
+
+function setProgress(pct) {
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBanner');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function hideError() {
+  document.getElementById('errorBanner').style.display = 'none';
+}
+
+function buildPrompt() {
+  const g = id => document.getElementById(id).value.trim() || 'none';
+  return `You are an SEO strategist, conversion copywriter, and partner communications manager for Batch, a marketplace for local experiences and activities (letsbatch.com). Your job is to fully optimize a listing for visibility on both the Batch platform and Google search — then communicate those changes to the experience partner in a clear, outcome-focused email.
+
+Complete all five tasks below in order.
+
+═══════════════════════════════════════
+LISTING INFORMATION
+═══════════════════════════════════════
+
+Partner Name: ${g('partnerName')}
+Category: ${g('category')}
+Sub-category: ${g('subcategory')}
+Experience Title: ${g('title')}
+City: ${g('city')}
+Duration: ${g('duration')}
+Price: ${g('price')}
+Location Type: ${g('locationType')}
+
+Current Partner Profile "About" Text:
+${g('partnerAbout')}
+
+About This Experience:
+${g('description')}
+
+Additional Info / What's Included:
+${g('additionalInfo')}
+
+═══════════════════════════════════════
+TASK 1 — SEO KEYWORD RESEARCH
+═══════════════════════════════════════
+
+Based on the listing above, identify:
+
+1. PRIMARY KEYWORD (1 term)
+   - The single most important search term this listing should rank for
+   - Include search intent (transactional, informational, navigational)
+
+2. SECONDARY KEYWORDS (4–6 terms)
+   - Mix of location-based, activity-based, and audience-based terms
+
+3. LONG-TAIL KEYWORDS (3–5 phrases, 4+ words each)
+   - High intent, lower competition — people searching these are ready to book
+
+4. KEYWORDS TO AVOID
+   - Too broad, too competitive, or off-target for this listing
+
+Use these keywords in Tasks 2, 3, and 5 below.
+
+═══════════════════════════════════════
+TASK 2 — OPTIMIZED TITLE
+═══════════════════════════════════════
+
+Using the keywords from Task 1, rewrite the listing title.
+
+Rules:
+- 50–70 characters (including spaces)
+- Include the city or a location-based modifier
+- Lead with the most compelling aspect
+- Title Case — no emojis, exclamation marks, or all-caps
+- Specific and clickable — not interchangeable with any other listing
+- Natural language — no keyword stuffing
+
+Output:
+- 3 title options ranked by SEO strength
+- 1-line rationale for each
+- Single best recommendation with a brief reason
+
+═══════════════════════════════════════
+TASK 3 — OPTIMIZED DESCRIPTION
+═══════════════════════════════════════
+
+Using the keywords from Task 1, rewrite the full "About This Experience" section. Follow the exact Batch format below. Do not skip, rename, or reorder any section.
+
+---
+FORMAT TO FOLLOW:
+
+About This Experience
+
+What you'll do:
+[Hook sentence — vivid, specific, written in second person. No clichés.]
+
+* [Action bullet 1] – [1 sentence]
+* [Action bullet 2] – [1 sentence]
+* [Action bullet 3] – [1 sentence]
+* [Action bullet 4] – [1 sentence]
+* [Action bullet 5] – [1 sentence]
+
+[1–2 closing sentences capturing the overall vibe.]
+
+Why we love it for your [group type]:
+
+* [Feature 1] – [Why it matters to the guest]
+* [Feature 2] – [Why it matters]
+* [Feature 3] – [Why it matters]
+* [Feature 4] – [Why it matters]
+* [Feature 5] – [Why it matters]
+
+About this experience partner:
+[2–3 sentences in third person about the partner.]
+
+Additional information:
+* [Practical detail]
+* [Practical detail]
+* [Practical detail]
+* [Practical detail]
+---
+
+DESCRIPTION RULES:
+- Second person throughout except "About this experience partner" (third person)
+- Naturally weave in primary keyword and 1–2 secondary keywords
+- Avoid clichés: "unforgettable," "one-of-a-kind," "world-class," "amazing"
+- Each bullet: label + dash + benefit
+- SEO Notes at end: (a) primary keyword placed, (b) secondary keywords used, (c) one readability note
+
+═══════════════════════════════════════
+TASK 4 — PARTNER UPDATE EMAIL
+═══════════════════════════════════════
+
+Write a short, scannable partner-facing email covering exactly four changes:
+
+CHANGE 1 — LISTING TITLE: old title → new title, why it gets found by more of the right people
+CHANGE 2 — DESCRIPTION: what specifically improved and what that means for how quickly a visitor decides to book
+CHANGE 3 — KEYWORD STRATEGY: name the primary keyword and 1–2 secondary keywords, explain in plain language how they help
+CHANGE 4 — PARTNER PROFILE "ABOUT": old text → new text, why the rewrite works harder
+
+STYLE: Warm, confident, peer to peer. Plain-spoken. Under 90 seconds to read.
+
+FORMAT:
+✅ Subject line — 2 options (Option A: Direct, Option B: Curiosity-driven)
+✅ Greeting
+✅ Opening (2–3 lines max)
+✅ Body (4 labeled changes — 2–4 lines each)
+✅ Closing (1 line CTA)
+✅ Sign-off: [Your Name], [Your Title], Batch
+
+═══════════════════════════════════════
+TASK 5 — OPTIMIZED PARTNER PROFILE "ABOUT"
+═══════════════════════════════════════
+
+Rewrite the partner's "About" section so it:
+1. Answers: what they do, what makes them unique, and who they serve
+2. Weaves in primary keyword and 1–2 secondary keywords naturally
+3. Is specific enough that a first-time visitor immediately understands the offer
+4. Builds trust and curiosity so the visitor scrolls down to book
+
+STYLE: Third person, present tense, 3–5 sentences, single flowing paragraph, no headers or bullets.
+RULES: No clichés, no first person, no exclamation marks or emojis.
+
+OUTPUT 1 — RECOMMENDED "ABOUT" PARAGRAPH (ready to paste, no label or commentary)
+
+OUTPUT 2 — 3 ALTERNATIVE VERSIONS:
+  Version A — Lead with the unique venue or landmark differentiator
+  Version B — Lead with the occasions served
+  Version C — Lead with the private/exclusive angle
+
+OUTPUT 3 — SEO + CONVERSION NOTES:
+  (a) Where and how the primary keyword appears
+  (b) Which secondary keywords were used and where
+  (c) One specific reason this version converts better than the original`;
+}
+
+async function runOptimizer() {
+  const apiKey = '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';
+
+  const required = ['partnerName','category','title','city','description'];
+  for (const id of required) {
+    if (!document.getElementById(id).value.trim()) {
+      showError('Please fill in at least: Partner Name, Category, Experience Title, City, and Description.');
+      return;
+    }
+  }
+
+  hideError();
+  const btn = document.getElementById('runBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  btn.querySelector('.btn-text').textContent = 'Generating optimization...';
+
+  document.getElementById('progressWrap').classList.add('visible');
+  setProgress(5);
+
+  for (let i = 0; i < 5; i++) {
+    document.getElementById('content' + i).textContent = '';
+    document.getElementById('body' + i).classList.remove('open');
+    document.getElementById('toggle' + i).classList.remove('open');
+  }
+
+  document.getElementById('outputArea').classList.add('visible');
+
+  const prompt = buildPrompt();
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 8000,
+        stream: true,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || 'API error ' + response.status);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    let buffer = '';
+
+    setProgress(15);
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+            fullText += parsed.delta.text;
+            parseAndDisplay(fullText);
+            const approxPct = Math.min(90, 15 + (fullText.length / 150));
+            setProgress(approxPct);
+          }
+        } catch {}
+      }
+    }
+
+    parseAndDisplay(fullText, true);
+    setProgress(100);
+
+    setTimeout(() => {
+      document.getElementById('progressWrap').classList.remove('visible');
+      setProgress(0);
+    }, 800);
+
+  } catch (err) {
+    showError('Error: ' + err.message);
+    document.getElementById('progressWrap').classList.remove('visible');
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    btn.querySelector('.btn-text').textContent = 'Generate Full Optimization';
+  }
+}
+
+function parseAndDisplay(text, final = false) {
+  const taskPattern = /(?:^|\n)(?:#+\s*)?(?:\*{1,2})?(?:TASK|Task)\s+([1-5])(?:\*{1,2})?[\s\-—:]+([^\n]*)/g;
+
+  const matches = [];
+  let m;
+  while ((m = taskPattern.exec(text)) !== null) {
+    matches.push({ task: parseInt(m[1]) - 1, index: m.index });
+  }
+
+  if (matches.length === 0) {
+    if (text.trim().length > 0) {
+      document.getElementById('content0').textContent = text.trim();
+      openSection(0);
+    }
+    return;
+  }
+
+  for (let i = 0; i < matches.length; i++) {
+    const task = matches[i].task;
+    const start = matches[i].index;
+    const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
+    const chunk = text.slice(start, end).trim();
+
+    const bodyStart = chunk.indexOf('\n');
+    const body = bodyStart !== -1 ? chunk.slice(bodyStart + 1).trim() : chunk;
+
+    if (task >= 0 && task < 5) {
+      document.getElementById('content' + task).textContent = body;
+      openSection(task);
+    }
+  }
+}
+</script>
+
+</body>
+</html>
