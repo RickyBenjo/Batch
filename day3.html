@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 3 — Ticket Handling & Intercom · Batch Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0F0C0C;
+    --white: #F0F1F4;
+    --sunset: #FF5F00;
+    --ocean: #4F97FC;
+    --cosmo: #FF93D3;
+    --lime: #00DF00;
+    --gold: #FFCA00;
+    --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF;
+    --cosmo-tint: #FFE0F3;
+    --lime-tint: #C8FFB0;
+    --sunset-tint: #FFD9C0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Mulish', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .topnav {
+    background: var(--black);
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--cosmo);
+  }
+  .topnav a { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.15s; }
+  .topnav a:hover { color: var(--cosmo); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--cosmo); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+
+  .tab-nav {
+    background: var(--black);
+    padding: 0 40px;
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .tab-btn {
+    padding: 12px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(240,241,244,0.45);
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    font-family: 'Mulish', sans-serif;
+    letter-spacing: 0.3px;
+  }
+  .tab-btn:hover { color: rgba(240,241,244,0.8); }
+  .tab-btn.active { color: var(--cosmo); border-bottom-color: var(--cosmo); }
+
+  .hero {
+    background: var(--black);
+    padding: 52px 40px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: var(--cosmo);
+    opacity: 0.07;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    left: -60px; bottom: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.06;
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-badge {
+    display: inline-block;
+    background: var(--cosmo);
+    color: var(--black);
+    font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px;
+    padding: 5px 14px; border-radius: 30px; margin-bottom: 16px;
+  }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 48px); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 10px; }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); margin-bottom: 24px; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(240,241,244,0.7); border: 1px solid rgba(255,255,255,0.1); }
+
+  .page-body { max-width: 900px; margin: 0 auto; padding: 36px 40px 80px; }
+
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 3px solid; }
+  .sec-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .sec-head h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+
+  .card { background: #fff; border-radius: 14px; border: 1.5px solid rgba(15,12,12,0.09); padding: 20px 22px; margin-bottom: 14px; }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 13.5px; color: #555; line-height: 1.65; }
+  .card ul { padding-left: 18px; }
+  .card li { margin-bottom: 4px; }
+
+  .callout { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; border-left: 4px solid; }
+  .callout.gold { background: var(--gold-tint); border-color: var(--gold); }
+  .callout.blue { background: var(--ocean-tint); border-color: var(--ocean); }
+  .callout.pink { background: var(--cosmo-tint); border-color: var(--cosmo); }
+  .callout.green { background: var(--lime-tint); border-color: #00b800; }
+  .callout.orange { background: var(--sunset-tint); border-color: var(--sunset); }
+  .callout strong { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+  .callout p, .callout li { font-size: 13.5px; line-height: 1.6; }
+  .callout ul { padding-left: 16px; }
+  .callout li { margin-bottom: 3px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+
+  .ctable { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; border-radius: 12px; overflow: hidden; }
+  .ctable th { background: var(--black); color: var(--white); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .ctable td { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+  .ctable tr:last-child td { border-bottom: none; }
+  .ctable tr:nth-child(even) td { background: rgba(240,241,244,0.5); }
+  .check { color: #00aa00; font-weight: 700; }
+  .cross { color: #cc2200; font-weight: 700; }
+
+  .steps { }
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--black); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-body { flex: 1; }
+  .step-body strong { font-size: 13.5px; display: block; margin-bottom: 2px; }
+  .step-body span { font-size: 12.5px; color: #666; }
+
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .tag.gold { background: var(--gold); color: var(--black); }
+  .tag.blue { background: var(--ocean); color: #fff; }
+  .tag.orange { background: var(--sunset); color: #fff; }
+  .tag.green { background: var(--lime); color: var(--black); }
+  .tag.pink { background: var(--cosmo); color: var(--black); }
+
+  .warning { background: #fff3e0; border: 2px solid var(--sunset); border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; }
+  .warning .w-title { font-weight: 800; color: var(--sunset); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .warning p, .warning li { font-size: 13px; line-height: 1.65; }
+  .warning ul { padding-left: 16px; }
+
+  .color-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .color-chip { display: flex; align-items: center; gap: 8px; border-radius: 10px; padding: 8px 14px; font-size: 12.5px; font-weight: 700; border: 1.5px solid rgba(0,0,0,0.08); }
+  .color-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+  .bottom-nav {
+    border-top: 2px solid rgba(15,12,12,0.08);
+    padding: 24px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+    max-width: 900px; margin: 0 auto;
+  }
+  .bottom-nav a {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; color: var(--black);
+    text-decoration: none; padding: 10px 20px;
+    border: 2px solid rgba(15,12,12,0.15); border-radius: 30px;
+    transition: all 0.15s;
+  }
+  .bottom-nav a:hover { background: var(--black); color: var(--cosmo); border-color: var(--black); }
+  .bottom-nav .disabled { opacity: 0.35; pointer-events: none; }
+
+  @media (max-width: 600px) {
+    .topnav, .tab-nav { padding-left: 20px; padding-right: 20px; }
+    .page-body { padding: 24px 20px 60px; }
+    .bottom-nav { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html">Training Hub</a>
+  <span class="sep">›</span>
+  <span class="current">Day 3 — Ticket Handling & Intercom</span>
+</nav>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="show('tickets', this)">Ticket Sources</button>
+  <button class="tab-btn" onclick="show('churn', this)">Churn Case Study</button>
+  <button class="tab-btn" onclick="show('intercom', this)">Intercom Deep Dive</button>
+  <button class="tab-btn" onclick="show('email', this)">Email Strategy</button>
+  <button class="tab-btn" onclick="show('outreach', this)">Proactive Outreach</button>
+  <button class="tab-btn" onclick="show('retention', this)">Updated Retention Policy</button>
+  <button class="tab-btn" onclick="show('hubspot', this)">HubSpot & Calendar</button>
+  <button class="tab-btn" onclick="show('ops', this)">Ops & Team Updates</button>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Day 3 · April 29, 2026</div>
+    <h1>Ticket Handling & Intercom</h1>
+    <p class="hero-sub">Churn case study walkthrough, Intercom deep dive, proactive outreach workflow, updated retention policy, and the shift to a proactive engagement model.</p>
+    <div class="hero-chips">
+      <div class="chip">Parts 1–5 covered</div>
+      <div class="chip">New outreach workflow</div>
+      <div class="chip">Retention policy updated</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- TICKET SOURCES -->
+  <div class="section visible" id="sec-tickets">
+    <div class="sec-head" style="border-color: var(--cosmo);">
+      <div class="sec-dot" style="background: var(--cosmo);"></div>
+      <h2>Ticket Sources & Priorities</h2>
+    </div>
+
+    <div class="callout pink">
+      <strong>Priority Order</strong>
+      <p>Handle <strong>churn/cancellation requests via Intercom first</strong> before moving to phone calls. Familiarize yourself with Intercom conversations before anything else.</p>
+    </div>
+
+    <div class="card">
+      <h3>Four Sources Where Tickets Originate</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>#</th><th>Source</th><th>Where to Find It</th><th>Priority</th></tr>
+        <tr>
+          <td><strong>1</strong></td>
+          <td>Scheduled partner calls</td>
+          <td>Team calendar (HubSpot meeting links)</td>
+          <td><span class="tag orange">High</span></td>
+        </tr>
+        <tr>
+          <td><strong>2</strong></td>
+          <td>Cancellation requests</td>
+          <td>Vendor Directory / Airtable churn view</td>
+          <td><span class="tag orange">High</span></td>
+        </tr>
+        <tr>
+          <td><strong>3</strong></td>
+          <td>Proactive outreach</td>
+          <td>Core Engagement Google Sheet</td>
+          <td><span class="tag gold">Medium</span></td>
+        </tr>
+        <tr>
+          <td><strong>4</strong></td>
+          <td>Stripe disputes</td>
+          <td>Stripe dashboard + Airtable disputes view</td>
+          <td><span class="tag gold">Medium</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>New Simplified Daily Workflow (Effective Day 3)</h3>
+      <p style="margin-bottom: 12px; font-size: 13.5px;">Following the Dulcie + Stefan meeting, the workflow has shifted from churn-focused to <strong>proactive engagement</strong>. Just two steps:</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Optimize the partner's listing</strong><span>Review all listings, apply CoStar improvements, fix tags, media, title, description</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Send an email notification</strong><span>Inform partner of what was improved — plain language, via Intercom</span></div></div>
+      </div>
+      <p style="font-size: 12px; color: #888; margin-top: 6px;">Focus on comfort and competency first — don't rush speed. Scale up after mastering the process.</p>
+    </div>
+
+    <div class="card">
+      <h3>After-Call Time Block (5–7 PM CST)</h3>
+      <ul>
+        <li>Optimization work, blog posts, and email follow-ups happen here</li>
+        <li>Two hours daily dedicated to after-call tasks</li>
+        <li>If capacity is insufficient, additional time blocks will be scheduled</li>
+        <li>When Cliff is in meetings, use this time for optimization practice</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CHURN CASE STUDY -->
+  <div class="section" id="sec-churn">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Churn Case Study — Main Street Motion</h2>
+    </div>
+
+    <div class="callout orange">
+      <strong>What This Case Teaches</strong>
+      <p>This is a full real-world walkthrough of how to handle a cancellation request — from investigation to optimization to email strategy. Study every step.</p>
+    </div>
+
+    <div class="card">
+      <h3>Case Background</h3>
+      <ul>
+        <li>Partner requested cancellation, claims no one responded via Intercom</li>
+        <li>Cliff checked Intercom, HubSpot, and Airtable — <strong>no conversation history found</strong></li>
+        <li>Contact email (way.mainstreetshop.com) yielded no results in any system</li>
+        <li>Conclusion: partner likely being dishonest about lack of response — no notes = no searchable record</li>
+        <li>Partner explicitly <strong>refused a 30-minute consultation call</strong> and demanded immediate cancellation</li>
+        <li>Since they won't engage by phone: proceed with cancellation attempt while still showing value received</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Subscription Analysis</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Detail</th><th>Value</th></tr>
+        <tr><td>Total paid</td><td>$600 on March 28</td></tr>
+        <tr><td>Billing cycle</td><td>3-month cycle ending June 28</td></tr>
+        <tr><td>Monthly equivalent</td><td>$200/month</td></tr>
+        <tr><td>Cancellation request date</td><td>April 22</td></tr>
+        <tr><td>Refund eligible?</td><td class="cross">✗ No — past payment date, no prior cancellation promise</td></tr>
+        <tr><td>Retention offer timing</td><td>Delay until <strong>June 21</strong> (1 week before end) — optimize first</td></tr>
+      </table>
+      <p style="font-size: 12px; color: #888; margin-top: 8px;">Strategy: don't give away discounts early. Let optimization work first, then offer retention levers close to the subscription end date.</p>
+    </div>
+
+    <div class="card">
+      <h3>90-Day Performance Metrics</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Metric</th><th>Value</th><th>Use in Email?</th></tr>
+        <tr><td>Impressions</td><td>238</td><td class="check">✓ Yes — proves SEO working (~2–3x/day in search)</td></tr>
+        <tr><td>Page views</td><td>29</td><td class="check">✓ Yes — clear and defensible</td></tr>
+        <tr><td>Favorites</td><td>0</td><td class="cross">✗ Skip — weak signal</td></tr>
+        <tr><td>Itinerary adds</td><td>0</td><td class="cross">✗ Skip — weak signal</td></tr>
+        <tr><td>Video views</td><td>1,099</td><td class="cross">✗ Avoid — confusing vs 29 page views</td></tr>
+        <tr><td>Photo views</td><td>1,596</td><td class="cross">✗ Avoid — confusing vs 29 page views</td></tr>
+      </table>
+      <p style="font-size: 12.5px; color: #888; margin-top: 8px; font-style: italic;">Never share metrics you can't confidently explain. If a partner compares video views (1,099) to page views (29), it raises questions about inflated traffic you can't answer yet.</p>
+    </div>
+
+    <div class="card">
+      <h3>Listing Optimizations Performed</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Rearranged media order</strong><span>Lead with the racing simulator car image — more compelling than people standing. Then video, then additional content.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Added experience tags</strong><span>Previous listing had only 3 tags (Bachelor, guys trip, company event). Added: motorsports, racing, simulator, team building, corporate events, and more.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Re-optimized title and description via CoStar</strong><span>Removed M-dashes from AI-generated content (signals artificial generation to customers).</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Identified review gap</strong><span>Only 5 reviews — requested partner add more. Also flagged video and photo additions needed.</span></div></div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Tags Are Critical — Most Partners Have Too Few</div>
+      <p>Tags function as <strong>backend keywords</strong>. Customers search terms that may not appear anywhere in your listing text — tags capture those searches. Always compare your partner's tags to competitors. A well-optimized competitor might have 20+ tags vs your partner's 2–3.</p>
+      <ul style="margin-top: 8px;">
+        <li>Do NOT add tags marked only for Boost or Party Pro features</li>
+        <li>Use CoStar to generate relevant tag suggestions</li>
+        <li>Tags ≠ description keywords — they work in addition to, not instead of, description SEO</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- INTERCOM DEEP DIVE -->
+  <div class="section" id="sec-intercom">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Intercom Deep Dive</h2>
+    </div>
+
+    <div class="card">
+      <h3>Searching for Partners in Intercom</h3>
+      <p style="margin-bottom: 10px; font-size: 13.5px;">Try all four methods — partners often use different emails across systems:</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Partner account name</strong><span>Try this first — fastest when teammates have added names to notes</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Email address</strong><span>Try the BizDev email AND the public/booking email</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Phone number</strong><span>Useful when email searches fail</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Domain</strong><span>Search the partner's website domain (e.g. mainstreetshop.com)</span></div></div>
+      </div>
+      <p style="font-size: 12px; color: #888; margin-top: 6px;"><strong>Always add partner names to conversation notes.</strong> Without it, conversations become unsearchable — exactly what happened with Main Street Motion.</p>
+    </div>
+
+    <div class="card">
+      <h3>Message Color Coding</h3>
+      <div class="color-legend">
+        <div class="color-chip" style="background: var(--ocean-tint); border-color: var(--ocean);"><div class="color-dot" style="background: var(--ocean);"></div>Blue = Outgoing messages (sent by team)</div>
+        <div class="color-chip" style="background: var(--gold-tint); border-color: var(--gold);"><div class="color-dot" style="background: var(--gold);"></div>Yellow = Internal notes (team only, partner cannot see)</div>
+        <div class="color-chip" style="background: #f0f0ee; border-color: #ccc;"><div class="color-dot" style="background: #aaa;"></div>Gray = Partner messages (incoming)</div>
+      </div>
+      <p style="font-size: 12.5px; color: #555;">Toggle message type before sending to switch between outgoing message and internal note.</p>
+    </div>
+
+    <div class="card">
+      <h3>Intercom Macros</h3>
+      <ul>
+        <li>Access by typing <strong>/</strong> (backslash) in the message field</li>
+        <li>Pre-built for common communications: blog post offers, optimization updates, etc.</li>
+        <li>Macros are labeled by team: <strong>AM</strong> (Account Manager), <strong>PX</strong> (Partner Support), <strong>MX</strong> (Member/Customer Support)</li>
+        <li><strong>Use team macros only</strong> — personal macros become outdated when team macros are updated</li>
+        <li>All partner communications should be assigned to the <strong>PX team</strong></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Closing a Conversation — Step by Step</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Follow up at least twice</strong><span>48-hour intervals between follow-ups before closing</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Select conversation type</strong><span>Email or chat — based on the final message sent</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Select ticket category</strong><span>Listing question / Partner account help / Onboarding help / Booking question / Cancellation request</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Close or snooze</strong><span>Snooze if waiting for partner reply — set to reappear at your next login time</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Inbox Management — Time Blocking</h3>
+      <ul>
+        <li>Block <strong>20 min to 1 hour at shift start (10–11 AM CST)</strong> specifically for inbox review</li>
+        <li>Without this block, phone calls consume the entire shift and messages get missed</li>
+        <li>Without dedicated inbox time, the backlog becomes unmanageable fast</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Intercom Knowledge Base (SOPs)</h3>
+      <ul>
+        <li>Contains internal SOPs organized by task: calendar management, customer changes/cancellations, order fulfillment, partner support</li>
+        <li>Many SOPs are <strong>6–8 years old and outdated</strong> — Cliff is updating them but hasn't finished due to call volume</li>
+        <li>Use Cliff's materials directly for now rather than outdated SOPs</li>
+        <li>Once updated, all SOPs will be referenceable directly in Intercom</li>
+      </ul>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Rick's Missing Intercom Access — Escalated to Lewis</div>
+      <p>Rick is missing team inbox views (PX Team, CX Team) and cannot see macro management options. Cliff escalated to Lewis with screenshots showing the missing views. Rick provided a screen recording to help diagnose. <strong>This must be resolved before Rick can fully manage partner communications.</strong></p>
+    </div>
+  </div>
+
+  <!-- EMAIL STRATEGY -->
+  <div class="section" id="sec-email">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Email Communication Strategy</h2>
+    </div>
+
+    <div class="callout gold">
+      <strong>Golden Rule — Acknowledge First</strong>
+      <p>Always open by acknowledging the partner's request before anything else. Partners need to feel heard. Lead with <em>"We understand you'd like to cancel..."</em> — not with metrics or company actions. This was the key correction on the Main Street Motion draft.</p>
+    </div>
+
+    <div class="card">
+      <h3>Two-Email Strategy (Same Intercom Thread)</h3>
+      <p style="margin-bottom: 12px; font-size: 13.5px;">Never send one overwhelming email. Use two touchpoints in the same thread:</p>
+      <table class="ctable" style="margin: 0;">
+        <tr><th>Email</th><th>Content</th><th>Subject/Header</th></tr>
+        <tr>
+          <td><strong>Email 1</strong></td>
+          <td>
+            1. Acknowledge the cancellation request<br>
+            2. Explain constraints (3-month term, no refund)<br>
+            3. Show performance metrics (impressions + page views only)<br>
+            4. Offer to optimize/boost listing instead
+          </td>
+          <td>New subject line for the thread</td>
+        </tr>
+        <tr>
+          <td><strong>Email 2</strong></td>
+          <td>
+            Specific details of optimizations performed:<br>
+            — Media rearrangement<br>
+            — Tags added<br>
+            — Content re-optimized<br>
+            — Blog feature offer<br>
+            — Request for partner actions (add reviews, videos)
+          </td>
+          <td>Header within the same thread body (not a new subject)</td>
+        </tr>
+      </table>
+      <p style="font-size: 12px; color: #888; margin-top: 10px;">This phased approach prevents partners from seeing it as spam and gives them time to digest the first email before receiving detailed optimization specifics.</p>
+    </div>
+
+    <div class="card">
+      <h3>Email Tone — Plain Language Rules</h3>
+      <ul>
+        <li>90% of core partners are small business owners — no corporate jargon</li>
+        <li>Instead of <em>"incentivize customers"</em> → say <em>"customers have a chance to win a surprise"</em></li>
+        <li>Instead of <em>"SEO optimization"</em> → say <em>"we added keywords so more customers find you when they search"</em></li>
+        <li>Treat partners like customers — conversational language that works in phone calls too</li>
+        <li>Avoid M-dashes in AI-generated content — they signal artificial generation</li>
+        <li><strong>Always review AI output before sending</strong> — never send a template verbatim</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Email Structure for Churn Request (Template)</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Open: Acknowledge the request</strong><span>"We understand you'd like to cancel your subscription with Batch."</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Constraints: Explain the 3-month term</strong><span>Immediate cancellation isn't possible — explain why without being cold</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Value: Share metrics (impressions + page views only)</strong><span>Frame positively — "238 times your listing appeared in search over 90 days"</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Action: What Batch is doing for them</strong><span>Optimizations performed — specific, not vague</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Ask: What you need from the partner</strong><span>Add reviews, videos, approve blog post offer</span></div></div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Always Get Cliff's Review Before Sending Churn Emails</div>
+      <p>For churn/cancellation partner emails, draft first → send to Cliff → wait for approval → send via Intercom. The Wade email was held for this exact reason — it needed revision before going out.</p>
+    </div>
+  </div>
+
+  <!-- PROACTIVE OUTREACH -->
+  <div class="section" id="sec-outreach">
+    <div class="sec-head" style="border-color: var(--lime);">
+      <div class="sec-dot" style="background: var(--lime);"></div>
+      <h2>Proactive Outreach Workflow</h2>
+    </div>
+
+    <div class="callout green">
+      <strong>Strategy Shift — Proactive Over Reactive</strong>
+      <p>The team is moving from reactive churn management to <strong>proactive engagement</strong>. Optimize listings before partners complain. Show value before they consider leaving.</p>
+    </div>
+
+    <div class="card">
+      <h3>Partner Segmentation for Outreach</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Signal</th><th>Itinerary Adds</th><th>Action</th></tr>
+        <tr><td><span class="tag blue">Strong</span></td><td>5+ in 30 days</td><td>Proactive outreach — celebrate wins, offer upgrades</td></tr>
+        <tr><td><span class="tag gold">Medium</span></td><td>1–4 in 30 days</td><td>Proactive outreach — optimize and encourage</td></tr>
+        <tr><td><span class="tag" style="background:#eee; color:#666;">Zero</span></td><td>0 in 30 days</td><td>Skip for now — focus on medium/strong to prevent churn</td></tr>
+      </table>
+      <p style="font-size: 12px; color: #888; margin-top: 8px;">Focus exclusively on medium to strong signal partners. Partners already performing well are more likely to stay — shore them up first.</p>
+    </div>
+
+    <div class="card">
+      <h3>Outreach Task Workflow (Step by Step)</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Assign task to yourself</strong><span>In the Core Engagement tracking document — use "last 90 days" filter for metrics, not "Q1"</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Open partner's page in Admin</strong><span>Not Stripe or HubSpot — go straight to the admin portal for listing review</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Review partner page, listings, and performance</strong><span>Check listing health across all sections (details, profile, metrics)</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Optimize all listings</strong><span>Core: up to 5 listings. Basic: up to 3 listings. Use CoStar for title, description, tags.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Send optimization email</strong><span>Simple: "We optimized your listing." Plain language. Via Intercom.</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Mark tracking document</strong><span>Email contacted = Yes. Listing improvements = Yes. Add today's date.</span></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-body"><strong>Add Intercom conversation link</strong><span>Ensure it's the full conversation view — not search view — so teammates reach the correct page</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Recommendations to Include in Outreach Emails</h3>
+      <ul>
+        <li><strong>Ratings and reviews:</strong> Offer to upload them — <em>"Send us your Google review links and we'll add them for you"</em></li>
+        <li><strong>Videos and photos:</strong> Ask partner to share high-quality media without watermarks</li>
+        <li><strong>UGC tool:</strong> <em>"Your guests have a chance to win a surprise when they scan the QR code and upload photos"</em> — don't say "incentivize"</li>
+        <li><strong>Partner page completion:</strong> Missing logo, about section, social links — offer to help fill these in</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Tracking Document Rules</h3>
+      <ul>
+        <li>Use <strong>"last 90 days"</strong> filter — not "Q1" — for most current performance data</li>
+        <li>Duplicate partners in backlog: mark as <strong>"not started"</strong></li>
+        <li>Cancelled partners: mark as <strong>"canceled"</strong></li>
+        <li>Partners upgraded to Boost: mark as <strong>"boost"</strong> and take no further action</li>
+        <li><strong>Do not set a resolve date</strong> until all follow-up communications with the partner are complete</li>
+        <li>Reference Kring's notes in the rightmost column for context on previous interactions</li>
+        <li>Current backlog: <strong>434 partners</strong></li>
+      </ul>
+    </div>
+
+    <div class="callout blue">
+      <strong>CoStar Prompt Refinements (Day 3 Updates)</strong>
+      <ul>
+        <li>Remove the 50–70 character limit restriction from the title section — allow longer keyword-rich titles</li>
+        <li>Description has no specific word count limit — be as comprehensive as needed for SEO</li>
+        <li>Selectively edit CoStar output — don't copy wholesale. Take the best parts, keep what you prefer.</li>
+        <li>The "About this partner" section appears in two places — use the more keyword-rich version for both</li>
+        <li>Remove M-dashes from any AI-generated output before publishing</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- RETENTION POLICY UPDATE -->
+  <div class="section" id="sec-retention">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Updated Retention Policy</h2>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Policy Change — Free Months Are Eliminated</div>
+      <p>Effective Day 3, the team will <strong>no longer offer free months or 30-day pauses</strong>. These were found to be ineffective and create extra work for partners who churn anyway.</p>
+    </div>
+
+    <div class="card">
+      <h3>New Retention Offer Sequence</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Offer</th><th>Amount</th><th>Delivered By</th><th>Channel</th></tr>
+        <tr><td><strong>Level 1</strong></td><td>25% discount for 3 months</td><td>Ervene / Felix</td><td>Intercom (before call)</td></tr>
+        <tr><td><strong>Level 2</strong></td><td>$150/month</td><td>Ervene / Felix</td><td>Intercom (before call)</td></tr>
+        <tr><td><strong>Level 3</strong></td><td>$99/month</td><td>Rick (on call)</td><td>Phone call</td></tr>
+        <tr><td><strong>Final option</strong></td><td>Convert to email/bookable partner</td><td>Rick (on call)</td><td>Phone call</td></tr>
+      </table>
+    </div>
+
+    <div class="callout pink">
+      <strong>New Final Option — Convert to Email/Bookable Partner</strong>
+      <p>Instead of a free month, offer to convert the partner to an <strong>email or bookable listing</strong>. This lets partners see actual bookings and payments directly in their Batch account — solving the core problem: partners can't track which bookings came from Batch. With bookable listings, they get <strong>transparent booking and payment records</strong>, making Batch's ROI demonstrable and measurable.</p>
+    </div>
+
+    <div class="card">
+      <h3>Timing Strategy for Retention Offers</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Time Remaining</th><th>Action</th></tr>
+        <tr><td><strong>Less than 3 weeks</strong></td><td>Simply confirm the cancellation — no retention attempt</td></tr>
+        <tr><td><strong>1 month+</strong></td><td>Offer optimization services + schedule follow-up call to show improved metrics</td></tr>
+        <tr><td><strong>1 week before end date</strong></td><td>Proactively reach out with pricing retention offers (25% off, $99, $150)</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Why the Email/Bookable Conversion Solves the Core Problem</h3>
+      <ul>
+        <li>Many partners don't see ROI from direct website traffic — they can't track which bookings came from Batch</li>
+        <li>With email/bookable listings: partners log in to accept/decline bookings or offer alternate times</li>
+        <li>They see actual booking records and payments inside Batch</li>
+        <li>This makes value tangible — not just traffic numbers, but real bookings they can see</li>
+        <li>A new SOP for the email/bookable conversion process needs to be created</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- HUBSPOT & CALENDAR -->
+  <div class="section" id="sec-hubspot">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>HubSpot & Calendar Management</h2>
+    </div>
+
+    <div class="card">
+      <h3>HubSpot Call Recording</h3>
+      <ul>
+        <li>HubSpot automatically records and AI-summarizes all phone calls</li>
+        <li>Main tasks: find contacts/companies, review history (churn dates, recent messages), set up calendar availability</li>
+        <li>Call recordings sync to HubSpot automatically from Aircall</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Universal Meeting Link — How It Works</h3>
+      <ul>
+        <li>One shared meeting link distributed to all partners</li>
+        <li>Incoming calls are <strong>distributed randomly</strong> among available team members (Cliff, Rick, Kring)</li>
+        <li>No priority assignment — ensures balanced distribution across the team</li>
+        <li>Partners self-schedule through the link; it routes automatically to whoever has availability</li>
+        <li>This is why keeping your calendar availability updated matters — if you're not available, you won't get calls</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Gmail Inbox — What to Watch For</h3>
+      <ul>
+        <li>Watch for direct messages from <strong>Stefan</strong> — act on these promptly</li>
+        <li>Watch for <strong>access links sent by partners</strong> — these expire quickly, don't let them sit</li>
+        <li>Monitor for any missed communications that bypassed Intercom</li>
+        <li>Check at shift start and shift end as a minimum</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- OPS & TEAM UPDATES -->
+  <div class="section" id="sec-ops">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Ops & Team Updates</h2>
+    </div>
+
+    <div class="card">
+      <h3>Staffing — Stefan Approved 2 New Hires</h3>
+      <ul>
+        <li>Stefan approved <strong>2 additional people</strong> (not the 5 originally requested)</li>
+        <li>Reasoning: customer support drops significantly Aug–Jan (slow season — less than 10 conversations/day)</li>
+        <li>Two new hires handle urgent tasks during peak season, then shift to outreach work during slow season</li>
+        <li>By August: Irvin and Felix will primarily support partner outreach with minimal customer support</li>
+        <li><strong>Eric Ingrasya</strong> is being rehired as one of the approved new headcount — previously worked with Cliff's team, transferred to Diptune. Has extensive Batch system knowledge so onboarding will be faster.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Stefan's New Tools (In Development)</h3>
+      <ul>
+        <li>Blog post creation tool</li>
+        <li>Landing page generator</li>
+        <li>Description rewriting tool (rewrites only sections that need improvement)</li>
+        <li>Claude Artifacts HTML dashboard showing partner insights, emails, listing health, and optimization opportunities</li>
+        <li>Stefan will convert the HTML listing optimizer into a proper website with API integration — Rick to provide the HTML code to Cliff who forwards to Stefan</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Stefan Communication Clarification</h3>
+      <ul>
+        <li>Stefan's style is blunt and direct — typical New York communication preference, not personal</li>
+        <li>When Stefan appears critical, he often approves immediately after — Dulce confirmed "he smiled and approved"</li>
+        <li>Key lesson: update Stefan on decisions made, what's needed, and what's lacking — don't make unilateral decisions without communicating them up</li>
+        <li>Stefan gave Cliff "full authority" to manage the team — use it, but keep Stefan informed</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>EOD Report Reminder</h3>
+      <ul>
+        <li>Submit daily to the <strong>Batch Team Slack channel</strong></li>
+        <li>Include: primary tasks, sub-tasks, accomplishments, in-progress items</li>
+        <li>Complete during the last 5–15 minutes of your shift</li>
+        <li>Send learning summary to Cliff (misunderstandings and clarifications needed) so Cliff can prepare answers for the next session</li>
+        <li>Login/logout form for New Work still needs to be completed</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <a href="day2.html">← Day 2</a>
+  <a href="index.html">Training Hub</a>
+  <a href="#" class="disabled">Day 4 — Coming Soon →</a>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('visible');
+  btn.classList.add('active');
+  window.scrollTo({ top: document.querySelector('.page-body').offsetTop - 60, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
