@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeoWork Listing QA — Batch</title>
+<script src="https://js.puter.com/v2/"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0F0C0C;
+    --white: #F0F1F4;
+    --sunset: #FF5F00;
+    --ocean: #4F97FC;
+    --cosmo: #FF93D3;
+    --lime: #00DF00;
+    --gold: #FFCA00;
+    --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF;
+    --cosmo-tint: #FFE0F3;
+    --lime-tint: #C8FFB0;
+    --sunset-tint: #FFD9C0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Mulish', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .topnav {
+    background: var(--black);
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--sunset);
+  }
+  .topnav a { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.15s; }
+  .topnav a:hover { color: var(--sunset); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--sunset); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+
+  .tab-nav {
+    position: sticky;
+    top: 46px;
+    z-index: 99;
+    background: var(--black);
+    padding: 0 40px;
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .tab-btn {
+    padding: 12px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(240,241,244,0.45);
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    font-family: 'Mulish', sans-serif;
+    letter-spacing: 0.3px;
+  }
+  .tab-btn:hover { color: rgba(240,241,244,0.8); }
+  .tab-btn.active { color: var(--sunset); border-bottom-color: var(--sunset); }
+
+  .hero {
+    background: var(--black);
+    padding: 52px 40px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: var(--sunset);
+    opacity: 0.08;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    left: -80px; bottom: -80px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.06;
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--sunset);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    padding: 5px 14px;
+    border-radius: 30px;
+    margin-bottom: 16px;
+  }
+  .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 48px); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 10px; }
+  .hero h1 span { color: var(--sunset); }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); margin-bottom: 24px; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(240,241,244,0.7); border: 1px solid rgba(255,255,255,0.1); }
+
+  .page-body { max-width: 900px; margin: 0 auto; padding: 36px 40px 80px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 3px solid; }
+  .sec-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .sec-head h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+
+  .card { background: #fff; border-radius: 14px; border: 1.5px solid rgba(15,12,12,0.09); padding: 20px 22px; margin-bottom: 14px; }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 13.5px; color: #555; line-height: 1.65; }
+  .card ul { padding-left: 18px; }
+  .card li { margin-bottom: 4px; }
+
+  .collapsible-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+  .collapsible-header h3 { margin-bottom: 0; }
+  .collapsible-body { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(0,0,0,0.07); }
+  .collapsible-body.open { display: block; }
+  .caret { font-size: 11px; color: #aaa; transition: transform 0.2s; }
+  .caret.open { transform: rotate(180deg); }
+
+  .callout { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; border-left: 4px solid; }
+  .callout.gold { background: var(--gold-tint); border-color: var(--gold); }
+  .callout.blue { background: var(--ocean-tint); border-color: var(--ocean); }
+  .callout.pink { background: var(--cosmo-tint); border-color: var(--cosmo); }
+  .callout.green { background: var(--lime-tint); border-color: #00b800; }
+  .callout.orange { background: var(--sunset-tint); border-color: var(--sunset); }
+  .callout strong { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+  .callout p, .callout li { font-size: 13.5px; line-height: 1.6; }
+  .callout ul { padding-left: 16px; }
+  .callout li { margin-bottom: 3px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; position: relative; }
+  .step:not(:last-child)::after { content: ''; position: absolute; left: 13px; top: 29px; width: 1px; height: calc(100% + 2px); background: rgba(15,12,12,0.1); }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--black); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; z-index: 1; }
+  .step-num.orange { background: var(--sunset); }
+  .step-body { flex: 1; }
+  .step-body strong { font-size: 13.5px; display: block; margin-bottom: 2px; }
+  .step-body span { font-size: 12.5px; color: #666; }
+  .step-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .tag.gold { background: var(--gold); color: var(--black); }
+  .tag.blue { background: var(--ocean); color: #fff; }
+  .tag.orange { background: var(--sunset); color: #fff; }
+  .tag.green { background: var(--lime); color: var(--black); }
+  .tag.pink { background: var(--cosmo); color: var(--black); }
+  .tag.gray { background: rgba(15,12,12,0.08); color: #555; }
+  .tag.red { background: #fee2e2; color: #b91c1c; }
+
+  .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+  .check-item:last-child { border-bottom: none; }
+  .check-item label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; flex: 1; font-size: 13.5px; line-height: 1.5; }
+  .check-item input[type="checkbox"] { margin-top: 3px; accent-color: var(--sunset); flex-shrink: 0; width: 15px; height: 15px; cursor: pointer; }
+  .check-item.done label { color: #bbb; text-decoration: line-through; }
+  .check-item.done label b { color: #bbb; }
+  .check-note { font-size: 12px; color: #777; margin-top: 3px; line-height: 1.5; }
+  .check-tip { font-size: 11px; font-weight: 700; color: #1e40af; background: var(--ocean-tint); border-radius: 6px; padding: 3px 8px; margin-top: 5px; display: inline-block; }
+  .check-warn { font-size: 11px; font-weight: 700; color: #92400e; background: var(--gold-tint); border-radius: 6px; padding: 3px 8px; margin-top: 5px; display: inline-block; }
+  .check-critical { font-size: 11px; font-weight: 700; color: #b91c1c; background: #fee2e2; border-radius: 6px; padding: 3px 8px; margin-top: 5px; display: inline-block; }
+
+  .progress-wrap { margin-bottom: 24px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #666; margin-bottom: 6px; }
+  .progress-bar { background: rgba(15,12,12,0.08); border-radius: 99px; height: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--sunset); border-radius: 99px; transition: width 0.35s ease; }
+
+  .sec-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .sec-badge.todo { background: rgba(15,12,12,0.07); color: #888; }
+  .sec-badge.partial { background: var(--gold-tint); color: #92400e; }
+  .sec-badge.done { background: var(--lime-tint); color: #166534; }
+
+  .sub-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #aaa; margin: 16px 0 8px; }
+
+  .routing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .routing-grid { grid-template-columns: 1fr; } }
+  .routing-box { border-radius: 14px; padding: 18px; border: 2px solid; }
+  .routing-box h4 { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .routing-box p { font-size: 13px; color: #555; line-height: 1.6; }
+
+  .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .cat-card { background: #fff; border: 1.5px solid rgba(15,12,12,0.09); border-radius: 12px; padding: 14px 16px; }
+  .cat-name { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .cat-subs { font-size: 12.5px; color: #666; line-height: 1.65; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 7px; display: block; }
+  .form-input { width: 100%; padding: 9px 13px; border: 1.5px solid rgba(15,12,12,0.15); border-radius: 10px; font-size: 13.5px; font-family: 'Mulish', sans-serif; background: #fff; color: var(--black); outline: none; transition: border-color 0.15s; }
+  .form-input:focus { border-color: var(--sunset); box-shadow: 0 0 0 3px var(--sunset-tint); }
+  .form-input::placeholder { color: #bbb; }
+  textarea.form-input { resize: vertical; min-height: 80px; line-height: 1.5; }
+  .check-label { display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; color: var(--black); cursor: pointer; margin-bottom: 8px; }
+  .check-label input { margin-top: 2px; accent-color: var(--sunset); }
+
+  .generate-btn {
+    background: var(--sunset);
+    color: #fff;
+    border: none;
+    padding: 11px 24px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'Mulish', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .generate-btn:hover { background: #e55000; transform: translateY(-1px); }
+  .generate-btn:active { transform: scale(0.98); }
+  .generate-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(79,151,252,0.12);
+    border: 1px solid rgba(79,151,252,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ocean);
+    margin-left: 10px;
+  }
+  .ai-badge .ai-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--ocean);
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .streaming-indicator {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: var(--ocean-tint);
+    border-radius: 10px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #1e40af;
+    font-weight: 600;
+  }
+  .streaming-indicator.visible { display: flex; }
+  .spinner {
+    width: 16px; height: 16px; border: 2px solid rgba(79,151,252,0.3);
+    border-top-color: var(--ocean); border-radius: 50%;
+    animation: spin 0.7s linear infinite; flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .email-output { display: none; margin-top: 24px; }
+  .email-output.visible { display: block; }
+  .email-box { background: #fff; border: 1.5px solid rgba(15,12,12,0.1); border-radius: 14px; overflow: hidden; }
+  .email-box-header { background: var(--black); padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; }
+  .email-box-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(240,241,244,0.6); }
+  .copy-btn { font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 12px; cursor: pointer; color: rgba(240,241,244,0.8); font-family: 'Mulish', sans-serif; transition: all 0.15s; }
+  .copy-btn:hover { background: rgba(255,255,255,0.2); }
+  .copy-btn.copied { background: var(--lime-tint); color: #166534; border-color: #166534; }
+  .email-subject { font-size: 13px; font-weight: 800; padding: 12px 18px; border-bottom: 1px solid rgba(0,0,0,0.07); background: rgba(240,241,244,0.4); color: var(--black); }
+  .email-body { padding: 18px; font-size: 13.5px; line-height: 1.75; color: #333; white-space: pre-wrap; font-family: 'Mulish', sans-serif; min-height: 60px; }
+
+  .reset-btn { font-size: 11px; font-weight: 700; background: none; border: 1.5px solid rgba(15,12,12,0.15); border-radius: 20px; padding: 5px 14px; cursor: pointer; color: #888; font-family: 'Mulish', sans-serif; transition: all 0.15s; }
+  .reset-btn:hover { border-color: var(--sunset); color: var(--sunset); }
+
+  .bottom-nav { border-top: 2px solid rgba(15,12,12,0.08); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 900px; margin: 0 auto; }
+  .bottom-nav a { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--black); text-decoration: none; padding: 10px 20px; border: 2px solid rgba(15,12,12,0.15); border-radius: 30px; transition: all 0.15s; }
+  .bottom-nav a:hover { background: var(--black); color: var(--sunset); border-color: var(--black); }
+
+  hr { border: none; border-top: 2px dashed rgba(0,0,0,0.07); margin: 20px 0; }
+
+  .opt-row { background:#fff; border:1.5px solid rgba(15,12,12,0.09); border-radius:12px; padding:12px 14px; margin-bottom:10px; position:relative; }
+  .opt-row-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .opt-row-num { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--sunset); }
+  .opt-remove { font-size:11px; color:#bbb; background:none; border:none; cursor:pointer; font-family:'Mulish',sans-serif; padding:2px 6px; border-radius:4px; transition:all 0.1s; }
+  .opt-remove:hover { color:#b91c1c; background:#fee2e2; }
+  .opt-sublabel { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:#aaa; margin-bottom:4px; display:block; }
+  .opt-input { width:100%; padding:7px 10px; border:1.5px solid rgba(15,12,12,0.12); border-radius:8px; font-size:13px; font-family:'Mulish',sans-serif; background:var(--white); color:var(--black); outline:none; transition:border-color 0.15s; margin-bottom:8px; }
+  .opt-input:focus { border-color:var(--sunset); box-shadow:0 0 0 3px var(--sunset-tint); }
+  .opt-input::placeholder { color:#ccc; }
+  .opt-input:last-child { margin-bottom:0; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html">Training Hub</a>
+  <span class="sep">›</span>
+  <span class="current">NeoWork Listing QA</span>
+</nav>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="show('workflow', this)">Workflow</button>
+  <button class="tab-btn" onclick="show('checklist', this)">QA Checklist</button>
+  <button class="tab-btn" onclick="show('email', this)">Email Generator</button>
+  <button class="tab-btn" onclick="show('categories', this)">Categories</button>
+  <button class="tab-btn" onclick="show('routing', this)">Routing Guide</button>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge"><div class="dot"></div>Batch Tool · QA Operations</div>
+    <h1>NeoWork <span>Listing QA</span></h1>
+    <p class="hero-sub">Quality check, optimize, and send partner emails for Basic & Core listings — all in one place.</p>
+    <div class="hero-chips">
+      <div class="chip">Basic & Core Partners</div>
+      <div class="chip">Start from oldest listing</div>
+      <div class="chip">No checkmark until all steps done</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- WORKFLOW -->
+  <div class="section visible" id="sec-workflow">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>8-Step QA Workflow</h2>
+    </div>
+
+    <div class="callout orange">
+      <strong>Before you start</strong>
+      <p>Only work from the <b>NeoWork tab</b> in Vendor Directory → Recently Live. Basic & Core partners only. Boost → Aislinn. Party Pro → Rachel.</p>
+    </div>
+
+    <div class="card">
+      <div class="step">
+        <div class="step-num orange">1</div>
+        <div class="step-body">
+          <strong>Open Vendor Directory → Recently Live → NeoWork tab</strong>
+          <span>Start from the <b>bottom of the list</b> (oldest listing first). These are listings that went live but haven't been reviewed yet — some go back to March 24.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num orange">2</div>
+        <div class="step-body">
+          <strong>Click the listing → Assign your name (no checkmark yet)</strong>
+          <span>Add yourself as the assignee. Do NOT check the done box until every step is complete.</span>
+          <div class="step-tags"><span class="tag red">No checkmark until fully done</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num orange">3</div>
+        <div class="step-body">
+          <strong>Run the full QA Checklist — Listing Details tab</strong>
+          <span>Title casing, booking URL with UTM, duration, location, address, description, all media. Use the Checklist tab above to track every item.</span>
+          <div class="step-tags"><span class="tag red">Open every link to verify</span><span class="tag red">Watch full videos — no skipping or muting</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num orange">4</div>
+        <div class="step-body">
+          <strong>Check Attachments, Ratings & FAQs</strong>
+          <span>Menus/maps as PDFs in Attachments (not media). At least 10 ratings. FAQs copied from partner's website, one Q+A per block — only if they have them.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num orange">5</div>
+        <div class="step-body">
+          <strong>Check Admin tab — Category & Sub-category tags</strong>
+          <span>Verify the correct category and sub-category are applied. Use the Categories tab for the full reference. Check similar live listings when unsure.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num orange">6</div>
+        <div class="step-body">
+          <strong>Check Partner Profile — fill in any missing info</strong>
+          <span>Logo (required), social links (Facebook ID only — not the full URL), main website, public phone number (only if officially publicly listed).</span>
+          <div class="step-tags"><span class="tag gold">Completing the profile = better SEO indexing</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num orange">7</div>
+        <div class="step-body">
+          <strong>Optimize the listing — tags + About section</strong>
+          <span>Add/refine tags and improve the About This Experience section using CoStar and other tools. Same process as previous optimization work.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num orange">8</div>
+        <div class="step-body">
+          <strong>Send partner email → then add checkmark</strong>
+          <span>Let them know you optimized their listing and highlight what they can do next (ratings, videos, social links). Focus on adding value — not performance data. Use the Email Generator tab. Only after sending: add the checkmark.</span>
+          <div class="step-tags"><span class="tag orange">Email Generator tab →</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="section" id="sec-checklist">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>QA Checklist</h2>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+      <div style="flex:1; margin-right:20px;">
+        <div class="progress-label">
+          <span>Overall Progress</span>
+          <span id="progress-count">0 / 0 complete</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      </div>
+      <button class="reset-btn" onclick="resetAll()">Reset all</button>
+    </div>
+
+    <!-- Listing Details -->
+    <div class="card" id="sec-details">
+      <div class="collapsible-header" onclick="toggleCard('details')">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:18px;">📋</span>
+          <h3>Listing Details Page</h3>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="sec-badge todo" id="badge-details">Not started</span>
+          <span class="caret open" id="caret-details">▼</span>
+        </div>
+      </div>
+      <div class="collapsible-body open" id="body-details">
+        <div class="sub-label">Experience Details</div>
+
+        <div class="check-item" id="ci-title">
+          <label><input type="checkbox" onchange="tick(this,'ci-title')">
+            <div><b>Title — Proper Casing</b>
+              <div class="check-note">Connecting/article words lowercase (and, on, in, at, from, a, the, with). All other words capitalized. Aim for 40–70 characters.</div>
+              <span class="check-warn">Remove "number one experience" → use "highly recommended" or "highly sought"</span>
+              <div class="check-note" style="margin-top:5px;">Fix any grammar or spelling errors</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-url">
+          <label><input type="checkbox" onchange="tick(this,'ci-url')">
+            <div><b>Booking URL — must contain <code style="font-size:11px;background:#f3f4f6;padding:1px 5px;border-radius:3px;">utm_source=batch</code></b>
+              <div class="check-note">Without this, bookings record as direct traffic — not Batch referrals. Partner loses visibility on where the booking came from.</div>
+              <span class="check-critical">Open the link — confirm it goes to the correct experience AND correct city</span>
+              <div class="check-note" style="margin-top:5px;">Partners with multiple locations: make sure the link isn't pointing to the wrong city</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-city">
+          <label><input type="checkbox" onchange="tick(this,'ci-city')">
+            <div><b>Batch City — verified correct</b>
+              <div class="check-note">Cross-check the city against the URL and the description text</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-duration">
+          <label><input type="checkbox" onchange="tick(this,'ci-duration')">
+            <div><b>Duration — verified accurate</b>
+              <div class="check-note">Check against partner website or description. Partners sometimes accidentally enter wrong values (e.g., 4 minutes instead of 4 hours).</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-price">
+          <label><input type="checkbox" onchange="tick(this,'ci-price')">
+            <div><b>Starting price — check accuracy</b>
+              <div class="check-note">Verify per-person and per-party pricing against partner website. Partners may offer Batch a lower rate than their public pricing — that's fine.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-location">
+          <label><input type="checkbox" onchange="tick(this,'ci-location')">
+            <div><b>Location — set to partner's location</b>
+              <span class="check-critical">Never set to the customer's location</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-address">
+          <label><input type="checkbox" onchange="tick(this,'ci-address')">
+            <div><b>Address — verified correct</b>
+              <div class="check-note">Confirm it matches the partner's actual business location. General city-level addresses are acceptable if that's what the partner provided.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="sub-label">About This Experience</div>
+
+        <div class="check-item" id="ci-desc">
+          <label><input type="checkbox" onchange="tick(this,'ci-desc')">
+            <div><b>Description — no red flag words, no duplicate sections</b>
+              <div class="check-note">Scan for typos, misspellings, awkward phrasing. Remove any duplicate "What You'll Do" or other repeated sections.</div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Media -->
+    <div class="card" id="sec-media">
+      <div class="collapsible-header" onclick="toggleCard('media')">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:18px;">🖼️</span>
+          <h3>Media Library</h3>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="sec-badge todo" id="badge-media">Not started</span>
+          <span class="caret" id="caret-media">▼</span>
+        </div>
+      </div>
+      <div class="collapsible-body" id="body-media">
+
+        <div class="check-item" id="ci-watermarks">
+          <label><input type="checkbox" onchange="tick(this,'ci-watermarks')">
+            <div><b>No external watermarks</b>
+              <div class="check-note">TikTok, Instagram, Facebook, YouTube, or other creator watermarks = delete or crop out. Partner's own watermark on their own content is fine to keep.</div>
+              <span class="check-critical">Watch every video fully — no skipping, no muting</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-nudity">
+          <label><input type="checkbox" onchange="tick(this,'ci-nudity')">
+            <div><b>No nudity in any media</b>
+              <div class="check-note">Remove immediately if found</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-children">
+          <label><input type="checkbox" onchange="tick(this,'ci-children')">
+            <div><b>Children handled correctly per listing type</b>
+              <div class="check-note">Adult-oriented listings (bachelorette, bar, yacht party, etc.) — remove all photos/videos with children. Genuinely wholesome experiences — children may appear but never in the first 4 slots and never as the main image.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-logos">
+          <label><input type="checkbox" onchange="tick(this,'ci-logos')">
+            <div><b>No logo-only images</b>
+              <div class="check-note">Remove any pictures that are just a logo with no experience content</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-menus-media">
+          <label><input type="checkbox" onchange="tick(this,'ci-menus-media')">
+            <div><b>No menus, maps, or info docs in media</b>
+              <div class="check-note">These belong in Attachments as PDFs — not in the media gallery</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-best-first">
+          <label><input type="checkbox" onchange="tick(this,'ci-best-first')">
+            <div><b>Best photo placed first (main image)</b>
+              <div class="check-note">Clear, not blurry. People enjoying the experience. Good lighting. No text or watermarks. Authentic over staged/empty venue shots.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-video-slot">
+          <label><input type="checkbox" onchange="tick(this,'ci-video-slot')">
+            <div><b>Video in correct slot</b>
+              <div class="check-note">Vertical video → slot 2 · Horizontal video → slot 3</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-alternate">
+          <label><input type="checkbox" onchange="tick(this,'ci-alternate')">
+            <div><b>Videos and photos alternate — no consecutive videos</b>
+              <div class="check-note">Pattern: photo → video → photo → video. Never stack multiple videos in a row.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-dispersed">
+          <label><input type="checkbox" onchange="tick(this,'ci-dispersed')">
+            <div><b>Similar-looking photos dispersed throughout</b>
+              <div class="check-note">Don't cluster near-identical shots. Spread them out across the gallery for visual variety.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-authentic">
+          <label><input type="checkbox" onchange="tick(this,'ci-authentic')">
+            <div><b>People-enjoying-the-experience photos appear early</b>
+              <div class="check-note">Authentic guest experience shots in the first few positions — more compelling than empty venue or product-only photos.</div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attachments & FAQs -->
+    <div class="card" id="sec-attach">
+      <div class="collapsible-header" onclick="toggleCard('attach')">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:18px;">📎</span>
+          <h3>Attachments, Ratings & FAQs</h3>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="sec-badge todo" id="badge-attach">Not started</span>
+          <span class="caret" id="caret-attach">▼</span>
+        </div>
+      </div>
+      <div class="collapsible-body" id="body-attach">
+
+        <div class="check-item" id="ci-attachments">
+          <label><input type="checkbox" onchange="tick(this,'ci-attachments')">
+            <div><b>Menus, maps, schedules, disclaimers → Attachments as PDFs</b>
+              <div class="check-note">Anything document-like must live in Attachments — not the media gallery</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-ratings">
+          <label><input type="checkbox" onchange="tick(this,'ci-ratings')">
+            <div><b>Ratings & reviews — at least 10</b>
+              <div class="check-note">If under 10, flag in the partner email. Ask them to send reviews or share the listing link so they can add them. You can also upload submitted reviews yourself.</div>
+              <span class="check-warn">Flag in email if under 10 reviews</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-faq">
+          <label><input type="checkbox" onchange="tick(this,'ci-faq')">
+            <div><b>FAQs — copied from partner website (only if they have them)</b>
+              <div class="check-note">One question + one answer per block. Do NOT create from scratch. Do NOT copy FAQs that directly contradict the listing (e.g., different pricing than shown on Batch).</div>
+              <span class="check-tip">Check partner website for their FAQ page first</span>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin -->
+    <div class="card" id="sec-admin">
+      <div class="collapsible-header" onclick="toggleCard('admin')">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:18px;">⚙️</span>
+          <h3>Admin Page</h3>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="sec-badge todo" id="badge-admin">Not started</span>
+          <span class="caret" id="caret-admin">▼</span>
+        </div>
+      </div>
+      <div class="collapsible-body" id="body-admin">
+
+        <div class="check-item" id="ci-category">
+          <label><input type="checkbox" onchange="tick(this,'ci-category')">
+            <div><b>Category & Sub-category — correct and applied</b>
+              <div class="check-note">Verify both match the experience type. Most listings need both, but sometimes a sub-category won't apply. Check similar live listings for reference.</div>
+              <span class="check-tip">See Categories tab for full list</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-tags">
+          <label><input type="checkbox" onchange="tick(this,'ci-tags')">
+            <div><b>Tags optimized</b>
+              <div class="check-note">Add relevant SEO tags that describe the experience. Use CoStar and other optimization tools.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-booking-notes">
+          <label><input type="checkbox" onchange="tick(this,'ci-booking-notes')">
+            <div><b>Booking notes reviewed (empty is fine)</b>
+              <div class="check-note">Review if present. No booking notes is totally acceptable.</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-availability">
+          <label><input type="checkbox" onchange="tick(this,'ci-availability')">
+            <div><b>Availability — empty for Batch Direct partners</b>
+              <div class="check-note">Partners with a booking URL should have empty availability. Email/web partners should have availability populated.</div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Partner Profile -->
+    <div class="card" id="sec-profile">
+      <div class="collapsible-header" onclick="toggleCard('profile')">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:18px;">👤</span>
+          <h3>Partner Profile Page</h3>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="sec-badge todo" id="badge-profile">Not started</span>
+          <span class="caret" id="caret-profile">▼</span>
+        </div>
+      </div>
+      <div class="collapsible-body" id="body-profile">
+
+        <div class="check-item" id="ci-logo">
+          <label><input type="checkbox" onchange="tick(this,'ci-logo')">
+            <div><b>Logo present</b>
+              <div class="check-note">If missing, request it from the partner — send them the profile edit link</div>
+              <span class="check-warn">Flag in email if logo is missing</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-social">
+          <label><input type="checkbox" onchange="tick(this,'ci-social')">
+            <div><b>Social links — Facebook, Instagram, TikTok</b>
+              <div class="check-note">For Facebook: paste the ID only (part after facebook.com/) — not the full URL. Phone number only if officially publicly listed — not internal business contacts.</div>
+              <span class="check-tip">If links are missing, request them in your email</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="check-item" id="ci-website">
+          <label><input type="checkbox" onchange="tick(this,'ci-website')">
+            <div><b>Main website URL set to landing page</b>
+              <div class="check-note">Use the partner's main homepage. Referral link also acceptable. This improves SEO indexing on Batch.</div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMAIL GENERATOR -->
+  <div class="section" id="sec-email">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Partner Email Generator
+        <span class="ai-badge"><span class="ai-dot"></span>Powered by Claude</span>
+      </h2>
+    </div>
+
+    <div class="callout orange">
+      <strong>Email Approach</strong>
+      <p>The goal is to <b>add value</b> — let the partner know their listing was optimized and what they can do next to improve visibility. Keep it warm and human. No fluff, no corporate speak. Like you're talking to a person, not writing a press release.</p>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="form-group">
+          <label class="form-label">Partner / Contact Name</label>
+          <input type="text" class="form-input" id="e-name" placeholder="e.g. Sarah, or Chicago Yachts Team">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Experience / Listing Name</label>
+          <input type="text" class="form-input" id="e-listing" placeholder="e.g. Private Yacht Charter on Chicago Skyline">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input type="text" class="form-input" id="e-sender" placeholder="e.g. Rick">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Current Review Count</label>
+          <input type="number" class="form-input" id="e-ratings" placeholder="e.g. 6" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Additional Notes (optional)</label>
+          <textarea class="form-input" id="e-notes" placeholder="e.g. Their FAQ mentions a different price, worth a follow-up..."></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="form-group">
+          <label class="form-label">Optimizations Made — What & Why</label>
+          <p style="font-size:12px;color:#888;margin-bottom:10px;">For each change, fill in what you did and the reason why — both will appear in the email.</p>
+          <div id="opt-rows"></div>
+          <button type="button" onclick="addOptRow()" style="margin-top:8px;font-size:12px;font-weight:700;color:var(--sunset);background:var(--sunset-tint);border:1.5px solid var(--sunset);border-radius:20px;padding:5px 14px;cursor:pointer;font-family:'Mulish',sans-serif;transition:all 0.15s;">+ Add optimization</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Action Items to Request from Partner</label>
+      <div style="background:#fff; border:1.5px solid rgba(15,12,12,0.09); border-radius:12px; padding:16px 18px;">
+        <label class="check-label"><input type="checkbox" id="ask-ratings"> Ask for more ratings/reviews (goal: at least 10 total)</label>
+        <label class="check-label"><input type="checkbox" id="ask-videos"> Request more photos/videos</label>
+        <label class="check-label"><input type="checkbox" id="ask-social"> Request social media links (Facebook, Instagram, TikTok)</label>
+        <label class="check-label"><input type="checkbox" id="ask-logo"> Request logo upload</label>
+        <label class="check-label"><input type="checkbox" id="ask-utm"> Request referral booking link with utm_source=batch</label>
+      </div>
+    </div>
+
+    <button class="generate-btn" id="generate-btn" onclick="generateEmail()">
+      <span id="btn-text">Generate Email with Claude</span>
+      <span id="btn-icon">✦</span>
+    </button>
+
+    <div class="streaming-indicator" id="streaming-indicator">
+      <div class="spinner"></div>
+      <span id="streaming-msg">Claude is writing your email...</span>
+    </div>
+
+    <div class="email-output" id="email-output">
+      <div class="email-box">
+        <div class="email-box-header">
+          <span class="email-box-title">Generated Email</span>
+          <button class="copy-btn" id="copy-btn" onclick="copyEmail()">Copy email</button>
+        </div>
+        <div class="email-subject" id="email-subject"></div>
+        <div class="email-body" id="email-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="section" id="sec-categories">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Category Reference</h2>
+    </div>
+
+    <div class="callout gold">
+      <strong>How to use</strong>
+      <p>Most listings need both a Category and a Sub-category. If no sub-category clearly fits, it's okay to leave it blank. When in doubt, check similar live listings on the site for reference.</p>
+    </div>
+
+    <div class="cat-grid">
+      <div class="cat-card">
+        <div class="cat-name" style="color:var(--sunset);">🍽 Dining</div>
+        <div class="cat-subs">Private Chefs & Catering<br>Restaurants (Brunch, Lunch, Dinner)<br>Experiential Dining (Drag Show, Hibachi, Magic Show, Dinner Detective)<br>Food & Drink Tours</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-name" style="color:var(--ocean);">🌙 Daylife & Nightlife</div>
+        <div class="cat-subs">Bottle Service & Bars (incl. Karaoke bars)<br>Bar Crawls<br>Pool Parties<br>Breweries & Wine Tasting</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-name" style="color:#7c3aed;">🚌 Party Buses</div>
+        <div class="cat-subs">Pedal Bikes<br>Party Buses<br>Shuttles & Transportation (transfers, limos, sprinter vans)</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-name" style="color:var(--sunset);">🗺 Local Experiences</div>
+        <div class="cat-subs">Local Activities (tours, rides, boot fitting, music recording)<br>Outdoor Activities (Jeep, Bike, Guided Hike, ATVs)<br>Sports & Games (Axe Throwing, Escape Room, Bowling, Golf)<br>Museums (Wax, Sex, Ice Cream)</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-name" style="color:var(--cosmo);">🎨 Group Classes</div>
+        <div class="cat-subs">Flower arranging · Candle making · Jewelry · Permanent Jewelry · Painting · Arts & Crafts · Mixology · Cooking · Line Dancing · Salsa · Hat making · Cigar Rolling</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-name" style="color:var(--ocean);">⛵ Water Activities</div>
+        <div class="cat-subs">Party Boats (Yacht, Pontoon, Tiki, Sail, Catamaran, Pedal Pub)<br>Water Sports (Fishing, Kayaking, Paddle Boarding, Surfing, Scuba, Whale Watching)<br>Beach Set-ups</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-name" style="color:#be185d;">💆 Health & Beauty</div>
+        <div class="cat-subs">Fitness (Yoga, Pilates, Goat Yoga, Pole Dancing, Bootcamp)<br>IV Hydration · Hair & Makeup<br>Spa Treatments (Facials, Massages, Nails, Spray Tan)<br>Alternative Wellness (Tarot, Astrology, Sound Bath)</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-name" style="color:var(--sunset);">🎭 Live Shows</div>
+        <div class="cat-subs">Live Shows (you attend: Blue Man Group, Comedy, Magic)<br>Male Revue (Gents, Hunk-o-mania, Magic Mike, Cowboylesque)<br>Drag Shows</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-name" style="color:#92400e;">🎉 Party Services</div>
+        <div class="cat-subs">Bartenders & Hosts · Decorations · Concierge Services · Picnics · Food Delivery · Luggage Storage · Photographers · Entertainment (comes to YOU) · Event Spaces (venue rental)</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-name" style="color:#555;">📦 Physical Product</div>
+        <div class="cat-subs">Shipped to customer (not an experience or drop-off)<br>Examples: Hangover gummies, CBD products, Bride robe</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROUTING GUIDE -->
+  <div class="section" id="sec-routing">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Routing Guide</h2>
+    </div>
+
+    <div class="routing-grid">
+      <div class="routing-box" style="border-color:var(--sunset);background:var(--sunset-tint);">
+        <h4 style="color:var(--sunset);">NeoWork (You)</h4>
+        <p><b>Basic & Core partners</b><br>Both Onboarding and Active</p>
+      </div>
+      <div class="routing-box" style="border-color:var(--ocean);background:var(--ocean-tint);">
+        <h4 style="color:var(--ocean);">Aislinn (or Beth)</h4>
+        <p><b>Boost listings</b><br>Both Onboarding and Active</p>
+      </div>
+      <div class="routing-box" style="border-color:var(--cosmo);background:var(--cosmo-tint);">
+        <h4 style="color:#be185d;">Rachel</h4>
+        <p><b>Party Pro listings</b><br>Both Onboarding and Active</p>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Partner Status Definitions</h3>
+        <div style="margin-top:10px;">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.06);">
+            <span class="tag orange">Onboarding</span>
+            <span style="font-size:13px;color:#555;">First live date is 30 days or less</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;">
+            <span class="tag gray">Active</span>
+            <span style="font-size:13px;color:#555;">First live date is more than 30 days ago</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Beth's Role (separate queue)</h3>
+        <p style="margin-top:8px;">High-level audit only: checks for duplicate listings, merge opportunities, and overall structure. Beth reviews from a bird's-eye view and does not handle individual QA checkboxes.</p>
+      </div>
+    </div>
+
+    <div class="callout blue">
+      <strong>Queue Organization</strong>
+      <p>There should be separate queues for NeoWork, Beth, Boost, and Party Pro. The Recently Live interface has sub-sections to toggle between them. Once the final QA checkbox is selected, the listing is removed from the queue.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <a href="index.html">← Training Hub</a>
+  <a href="listing-optimizer.html">Listing Optimizer →</a>
+</div>
+
+<script>
+  function show(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('sec-' + id).classList.add('visible');
+    btn.classList.add('active');
+  }
+
+  function toggleCard(id) {
+    const body = document.getElementById('body-' + id);
+    const caret = document.getElementById('caret-' + id);
+    body.classList.toggle('open');
+    caret.classList.toggle('open');
+  }
+
+  function tick(cb, itemId) {
+    document.getElementById(itemId).classList.toggle('done', cb.checked);
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const all = document.querySelectorAll('#sec-checklist input[type="checkbox"]');
+    const checked = document.querySelectorAll('#sec-checklist input[type="checkbox"]:checked');
+    const total = all.length, done = checked.length;
+    const pct = total ? Math.round((done / total) * 100) : 0;
+    document.getElementById('progress-count').textContent = done + ' / ' + total + ' complete';
+    document.getElementById('progress-fill').style.width = pct + '%';
+
+    ['details','media','attach','admin','profile'].forEach(s => {
+      const sAll = document.querySelectorAll('#sec-' + s + ' input[type="checkbox"]');
+      const sDone = document.querySelectorAll('#sec-' + s + ' input[type="checkbox"]:checked');
+      const badge = document.getElementById('badge-' + s);
+      if (!badge) return;
+      if (sDone.length === 0) { badge.textContent = 'Not started'; badge.className = 'sec-badge todo'; }
+      else if (sDone.length < sAll.length) { badge.textContent = sDone.length + '/' + sAll.length + ' done'; badge.className = 'sec-badge partial'; }
+      else { badge.textContent = 'Complete ✓'; badge.className = 'sec-badge done'; }
+    });
+  }
+
+  function resetAll() {
+    if (!confirm('Reset all checkboxes for this listing?')) return;
+    document.querySelectorAll('#sec-checklist input[type="checkbox"]').forEach(cb => {
+      cb.checked = false;
+      const item = cb.closest('.check-item');
+      if (item) item.classList.remove('done');
+    });
+    updateProgress();
+  }
+
+  let optCount = 0;
+
+  function addOptRow(what = '', why = '') {
+    optCount++;
+    const n = optCount;
+    const presets = [
+      { what: 'Updated title casing', why: 'so it follows proper formatting standards and looks more professional to customers browsing the platform' },
+      { what: 'Rearranged media order', why: 'to lead with the most compelling photo and alternate videos with images, which keeps customers engaged longer' },
+      { what: 'Moved video to slot 2/3', why: 'vertical videos perform better in slot 2 and horizontal in slot 3, improving how the listing looks on mobile and desktop' },
+      { what: 'Removed media with external watermarks', why: 'watermarks from TikTok/Instagram create a less polished impression and can raise content ownership questions' },
+      { what: 'Added/corrected Category and Sub-category tags', why: 'so your listing shows up in the right search filters when customers are browsing Batch' },
+      { what: 'Improved the About This Experience section', why: 'to make it more descriptive and engaging, helping customers understand what to expect and increasing the likelihood they book' },
+      { what: 'Added UTM source to booking URL', why: 'this ensures that bookings coming from Batch are properly tracked as referrals in your analytics, rather than showing up as direct traffic' },
+      { what: 'Added social media links to your partner profile', why: 'a complete profile improves how your listing is indexed on Batch and gives customers more ways to discover you' },
+      { what: 'Dispersed similar-looking photos throughout the gallery', why: 'grouping near-identical shots together can feel repetitive -- spreading them out keeps the gallery visually interesting' },
+      { what: 'Moved people-enjoying-the-experience photos earlier', why: 'authentic guest photos early in the gallery build trust and help customers picture themselves at the event' },
+    ];
+    const p = presets[(n - 1) % presets.length];
+    const wVal = what || p.what;
+    const yVal = why || p.why;
+
+    const row = document.createElement('div');
+    row.className = 'opt-row';
+    row.id = 'opt-row-' + n;
+    row.innerHTML = `
+      <div class="opt-row-head">
+        <span class="opt-row-num">Change #${n}</span>
+        <button class="opt-remove" onclick="removeOptRow(${n})">x Remove</button>
+      </div>
+      <span class="opt-sublabel">What you changed</span>
+      <input class="opt-input" id="opt-what-${n}" type="text" placeholder="e.g. Updated title casing" value="${wVal}">
+      <span class="opt-sublabel">Why you did it (shown in email)</span>
+      <input class="opt-input" id="opt-why-${n}" type="text" placeholder="e.g. so it follows proper formatting and looks polished to customers" value="${yVal}">
+    `;
+    document.getElementById('opt-rows').appendChild(row);
+  }
+
+  function removeOptRow(n) {
+    const row = document.getElementById('opt-row-' + n);
+    if (row) row.remove();
+  }
+
+  // Strip em dashes from any string
+  function stripEmDashes(text) {
+    return text
+      .replace(/\u2014/g, '--')   // em dash
+      .replace(/\u2013/g, '-')    // en dash
+      .replace(/\u2012/g, '-')    // figure dash
+      .replace(/---/g, '--');     // triple hyphens
+  }
+
+  async function generateEmail() {
+    const name = document.getElementById('e-name').value.trim() || 'there';
+    const listing = document.getElementById('e-listing').value.trim() || 'your listing';
+    const sender = document.getElementById('e-sender').value.trim() || 'Rick';
+    const ratings = parseInt(document.getElementById('e-ratings').value) || 0;
+    const notes = document.getElementById('e-notes').value.trim();
+
+    const askRatings = document.getElementById('ask-ratings').checked;
+    const askVideos = document.getElementById('ask-videos').checked;
+    const askSocial = document.getElementById('ask-social').checked;
+    const askLogo = document.getElementById('ask-logo').checked;
+    const askUtm = document.getElementById('ask-utm').checked;
+
+    const rows = document.querySelectorAll('.opt-row');
+    const optItems = [];
+    rows.forEach(row => {
+      const id = row.id.replace('opt-row-', '');
+      const what = document.getElementById('opt-what-' + id)?.value.trim();
+      const why = document.getElementById('opt-why-' + id)?.value.trim();
+      if (what) optItems.push({ what, why });
+    });
+
+    // Build context for Claude
+    const actionRequests = [];
+    if (askRatings) actionRequests.push(`Ask for more reviews (currently at ${ratings}, goal is 10+)`);
+    if (askVideos) actionRequests.push('Request more photos and videos of the experience');
+    if (askSocial) actionRequests.push('Request their Facebook, Instagram, and TikTok handles');
+    if (askLogo) actionRequests.push('Ask them to upload a logo to their partner profile');
+    if (askUtm) actionRequests.push('Ask for a booking link that includes utm_source=batch for proper referral tracking');
+
+    const optimizationsText = optItems.length > 0
+      ? optItems.map((o, i) => `${i+1}. Changed: ${o.what}. Reason: ${o.why}`).join('\n')
+      : 'General improvements to title, media, categories, and description';
+
+    const prompt = `Write a short, warm, friendly partner outreach email from ${sender} at Batch (a bachelorette/group experience booking platform) to ${name} about their listing called "${listing}".
+
+Context:
+- Optimizations made to their listing:
+${optimizationsText}
+${actionRequests.length > 0 ? `- Things to ask the partner to do:\n${actionRequests.map(a => '  - ' + a).join('\n')}` : ''}
+${notes ? `- Extra note to include: ${notes}` : ''}
+
+Tone and style rules (IMPORTANT):
+- Write like a real person talking to another real person, not a corporate email
+- Warm and friendly but direct -- no fluff, no filler phrases
+- Layman's terms -- avoid jargon where possible
+- Short sentences. Conversational flow.
+- Do NOT use em dashes (-- or the unicode em dash character). Use regular commas, periods, or colons instead.
+- Do NOT use phrases like "I hope this email finds you well", "I wanted to reach out", "I am writing to", "delighted", "pleased to inform", "leverage", "synergy", or other corporate/AI-sounding language
+- Do NOT use bullet points in the email body -- write it as flowing paragraphs
+- The email should feel like it came from a teammate who actually looked at their listing and cares about making it better
+- Keep it reasonably short -- partners are busy
+- Sign off casually with just the sender's first name and "Batch Partner Success Team" on the next line
+
+Format your response exactly like this (no extra commentary, just the email):
+SUBJECT: [subject line here]
+
+[email body here]`;
+
+    // UI: loading state
+    const btn = document.getElementById('generate-btn');
+    const btnText = document.getElementById('btn-text');
+    const streamingEl = document.getElementById('streaming-indicator');
+    const streamingMsg = document.getElementById('streaming-msg');
+    const outputEl = document.getElementById('email-output');
+
+    btn.disabled = true;
+    btnText.textContent = 'Writing...';
+    streamingEl.classList.add('visible');
+    outputEl.classList.remove('visible');
+    document.getElementById('email-body').textContent = '';
+    document.getElementById('email-subject').textContent = '';
+
+    const msgs = [
+      'Claude is writing your email...',
+      'Making it sound human...',
+      'Cutting the fluff...',
+      'Almost done...'
+    ];
+    let msgIdx = 0;
+    const msgInterval = setInterval(() => {
+      msgIdx = (msgIdx + 1) % msgs.length;
+      streamingMsg.textContent = msgs[msgIdx];
+    }, 1800);
+
+    try {
+      const response = await puter.ai.chat(prompt, {
+        model: 'claude-sonnet-4-5',
+        stream: false
+      });
+
+      clearInterval(msgInterval);
+
+      let fullText = '';
+      if (typeof response === 'string') {
+        fullText = response;
+      } else if (response && response.message && response.message.content) {
+        fullText = response.message.content.map(b => b.text || '').join('');
+      } else if (response && response.text) {
+        fullText = response.text;
+      } else {
+        fullText = String(response);
+      }
+
+      // Strip em dashes
+      fullText = stripEmDashes(fullText);
+
+      // Parse subject and body
+      const subjectMatch = fullText.match(/^SUBJECT:\s*(.+)/m);
+      const subject = subjectMatch ? subjectMatch[1].trim() : `Quick update on your Batch listing -- ${listing}`;
+      const bodyStart = fullText.indexOf('\n\n', fullText.indexOf('SUBJECT:'));
+      const body = bodyStart !== -1 ? fullText.slice(bodyStart).trim() : fullText;
+
+      document.getElementById('email-subject').textContent = 'Subject: ' + stripEmDashes(subject);
+      document.getElementById('email-body').textContent = stripEmDashes(body);
+
+      streamingEl.classList.remove('visible');
+      outputEl.classList.add('visible');
+      outputEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    } catch (err) {
+      clearInterval(msgInterval);
+      streamingEl.classList.remove('visible');
+      console.error('Puter AI error:', err);
+      alert('Something went wrong generating the email. Make sure you are signed into Puter. Error: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btnText.textContent = 'Generate Email with Claude';
+    }
+  }
+
+  function copyEmail() {
+    const subject = document.getElementById('email-subject').textContent.replace('Subject: ', '');
+    const body = document.getElementById('email-body').textContent;
+    const fullText = 'Subject: ' + subject + '\n\n' + body;
+    navigator.clipboard.writeText(fullText).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy email'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  updateProgress();
+  addOptRow();
+  addOptRow();
+</script>
+</body>
+</html>
