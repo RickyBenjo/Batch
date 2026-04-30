@@ -129,7 +129,7 @@
   .progress-bar-inner { max-width: 900px; margin: 0 auto; width: 100%; display: flex; align-items: center; gap: 16px; }
   .progress-label { font-size: 12px; color: rgba(240,241,244,0.5); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
   .progress-track { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
-  .progress-fill { height: 100%; width: 20%; background: var(--gold); border-radius: 10px; transition: width 0.5s ease; }
+  .progress-fill { height: 100%; width: 30%; background: var(--gold); border-radius: 10px; transition: width 0.5s ease; }
   .progress-count { font-size: 12px; color: rgba(240,241,244,0.5); font-weight: 700; white-space: nowrap; }
 
   /* MAIN CONTENT */
@@ -339,7 +339,7 @@
   <div class="progress-bar-inner">
     <span class="progress-label">Progress</span>
     <div class="progress-track"><div class="progress-fill"></div></div>
-    <span class="progress-count">2 / 10 days</span>
+    <span class="progress-count">3 / 10 days</span>
   </div>
 </div>
 
@@ -379,19 +379,20 @@
       <span class="day-date">April 28, 2026</span>
     </a>
 
-    <!-- DAY 3 — LOCKED -->
-    <div class="day-card c-pink locked">
-      <div class="day-status">🔒</div>
+    <!-- DAY 3 — AVAILABLE -->
+    <a href="day3.html" class="day-card c-pink available">
+      <div class="day-status">✅</div>
       <div class="day-num">Day 3</div>
-      <div class="day-title">Ticket Handling</div>
-      <div class="day-desc">Processing support requests, email templates, common partner issues, and Intercom workflows.</div>
+      <div class="day-title">Ticket Handling & Intercom</div>
+      <div class="day-desc">Churn case study, Intercom deep dive, proactive outreach workflow, updated retention policy, and the shift to proactive engagement.</div>
       <div class="day-tags">
         <span class="day-tag">Intercom</span>
-        <span class="day-tag">HubSpot</span>
-        <span class="day-tag">Emails</span>
+        <span class="day-tag">Churn</span>
+        <span class="day-tag">Outreach</span>
+        <span class="day-tag">Retention</span>
       </div>
-      <span class="day-date">To follow</span>
-    </div>
+      <span class="day-date">April 29, 2026</span>
+    </a>
 
     <!-- DAY 4 — LOCKED -->
     <div class="day-card c-green locked">
@@ -507,23 +508,9 @@
         <span class="day-tag">SEO</span>
         <span class="day-tag">CoStar</span>
         <span class="day-tag">Claude AI</span>
-        <span class="day-tag">6 Tasks</span>
+        <span class="day-tag">5 Tasks</span>
       </div>
       <span class="day-date">Live · ~5 min per listing</span>
-    </a>
-
-    <a href="partner-update-email-generator.html" class="day-card c-blue available" style="border-width: 2px;">
-      <div class="day-status">✉️</div>
-      <div class="day-num">Tool</div>
-      <div class="day-title">Partner Update Email Generator</div>
-      <div class="day-desc">Fill in the partner's metrics, what you optimized, and what you're recommending — get a warm, plain-language update email ready to send in seconds.</div>
-      <div class="day-tags">
-        <span class="day-tag">Outreach</span>
-        <span class="day-tag">Email</span>
-        <span class="day-tag">Claude AI</span>
-        <span class="day-tag">Proactive</span>
-      </div>
-      <span class="day-date">Live · ~1 min per partner</span>
     </a>
 
   </div>
@@ -588,6 +575,18 @@
       <div class="ref-item">
         <div class="ref-label">Churn Levers</div>
         <div class="ref-val orange">4 levels</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-label">Free Month Offer</div>
+        <div class="ref-val orange">Eliminated</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-label">Outreach Backlog</div>
+        <div class="ref-val pink">434 partners</div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-label">Inbox Block</div>
+        <div class="ref-val blue">10–11 AM CST</div>
       </div>
     </div>
   </div>
