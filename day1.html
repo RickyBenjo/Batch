@@ -57,6 +57,9 @@
   .topnav .current { color: var(--gold); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
 
   .tab-nav {
+    position: sticky;
+    top: 46px;
+    z-index: 99;
     background: var(--black);
     padding: 0 40px;
     display: flex;
@@ -348,7 +351,7 @@
         <li>Poor onboarding — no follow-up or education</li>
         <li>Partners promised bookings but received only visibility</li>
         <li>Previous management gatekeeping processes and blocking improvements</li>
-        <li><strong>Stefan's arrival</strong> is reversing this — better leadership, process transparency</li>
+        <li><strong>Estefan's arrival</strong> is reversing this — better leadership, process transparency</li>
       </ul>
     </div>
   </div>
@@ -365,7 +368,7 @@
       <tr><td><strong>Role</strong></td><td>Provide experiences, post listings</td><td>Search and book experiences</td></tr>
       <tr><td><strong>Pay Batch</strong></td><td class="check">✓ Monthly subscription</td><td class="cross">✗ Free to use</td></tr>
       <tr><td><strong>Dashboard Access</strong></td><td class="check">✓ Analytics + performance</td><td class="cross">✗ N/A</td></tr>
-      <tr><td><strong>Who Rick supports</strong></td><td class="check">✓ Primary focus</td><td class="cross">✗ Minimal (Felix/Ervene handle)</td></tr>
+      <tr><td><strong>Who Rick supports</strong></td><td class="check">✓ Primary focus</td><td class="cross">✗ Minimal (Felix/Irvin handle)</td></tr>
       <tr><td><strong>Commission</strong></td><td>0% on Batch Direct; 10–30% on higher-tier bookings</td><td>N/A</td></tr>
     </table>
 
@@ -489,14 +492,14 @@
         <td>Small %</td>
         <td>Booking calendar requires manual confirmation or team intervention</td>
         <td>10–30%</td>
-        <td>Ervene / Felix</td>
+        <td>Irvin / Felix</td>
       </tr>
       <tr>
         <td><span class="tag blue">Web Partner</span></td>
         <td>Small %</td>
         <td>Booking calendar; team may need to assist</td>
         <td>10–30%</td>
-        <td>Ervene / Felix</td>
+        <td>Irvin / Felix</td>
       </tr>
       <tr>
         <td><span class="tag pink">API Partner</span></td>
@@ -670,7 +673,7 @@
       <div class="tool-item"><div class="tool-icon">🔐</div><div class="tool-name">1Password</div><div class="tool-desc">Password manager for team credentials. Invite pending from admin team.</div></div>
       <div class="tool-item"><div class="tool-icon">💼</div><div class="tool-name">Partner Portal</div><div class="tool-desc">admin.letsmatch.com — shows exactly what partners see. Features vary by tier. Access via green button.</div></div>
       <div class="tool-item"><div class="tool-icon">📱</div><div class="tool-name">Let's Batch App</div><div class="tool-desc">Bug testing only. Replicate partner issues on both app + website. Report with screenshots via Share Bugs channel.</div></div>
-      <div class="tool-item"><div class="tool-icon">💬</div><div class="tool-name">Slack</div><div class="tool-desc">Team comms. 5 primary channels: NeoWork Daily, NeoWork Batch, Batch Partner Support, PX Team, Share Bugs.</div></div>
+      <div class="tool-item"><div class="tool-icon">💬</div><div class="tool-name">Slack</div><div class="tool-desc">Team comms. 5 primary channels: New Work Daily, New Work Batch, Batch Partner Support, PX Team, Share Bugs.</div></div>
       <div class="tool-item"><div class="tool-icon">📧</div><div class="tool-name">Let's Batch Email</div><div class="tool-desc">Two uses only: directives from leadership + calendar requests for email/web partners. Check at shift start and end.</div></div>
     </div>
 
@@ -690,7 +693,7 @@
 
     <div class="callout gold">
       <strong>Two Separate Claude Accounts — Keep Them Separate</strong>
-      <p><strong>Batch Claude</strong> (Let's Batch email, from Lewis) → Batch work only &nbsp;|&nbsp; <strong>Newark Claude Enterprise</strong> (NeoWork email, from Simeon) → Primary daily work, more capacity, learns your preferences over time. Test on NeoWork Claude before using Batch Claude for live partner work.</p>
+      <p><strong>Batch Claude</strong> (Let's Batch email, from Lewis) → Batch work only &nbsp;|&nbsp; <strong>Newark Claude Enterprise</strong> (New Work email, from Simeon) → Primary daily work, more capacity, learns your preferences over time. Test on New Work Claude before using Batch Claude for live partner work.</p>
     </div>
 
     <div class="card">
@@ -791,9 +794,9 @@
         <h3>Batch Onshore Leadership</h3>
         <ul>
           <li><strong>Joshua</strong> — CEO</li>
-          <li><strong>Dulci</strong> — Director of Operations</li>
-          <li><strong>Stefan</strong> — New Leader, driving process improvements and system overhauls</li>
-          <li><strong>Luis</strong> — Dev team contact (system builder; historically resistant to changes, but Stefan is pushing through)</li>
+          <li><strong>Dulcy/Dulce</strong> — Director of Operations</li>
+          <li><strong>Estefan (Stefan)</strong> — New Leader, driving process improvements and system overhauls</li>
+          <li><strong>Luis/Lewis</strong> — Dev team contact (system builder; historically resistant to changes, but Stefan is pushing through)</li>
         </ul>
       </div>
       <div class="card">
@@ -802,9 +805,9 @@
           <li><strong>Cliff</strong> — Supervisor (4 yrs at Batch, 2 yrs supervising)</li>
           <li><strong>Kring</strong> — Senior Agent</li>
           <li><strong>Rick</strong> — New Partner Engagement Specialist (you!)</li>
-          <li><strong>Ervene</strong> — Email/Web partner bookings + customer support</li>
+          <li><strong>Irvin</strong> — Email/Web partner bookings + customer support</li>
           <li><strong>Felix</strong> — Email/Web partner bookings + customer support</li>
-          <li><strong>NeoWork offshore team</strong> — 8 people, partner support</li>
+          <li><strong>New Work offshore team</strong> — 8 people, partner support</li>
         </ul>
       </div>
     </div>
@@ -813,9 +816,9 @@
       <h3>Escalation Path</h3>
       <div class="steps">
         <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Core/Basic partner issues</strong><span>Rick handles directly → PX Team Slack channel</span></div></div>
-        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Need team help</strong><span>NeoWork Batch Slack → ask Felix or Ervene</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Need team help</strong><span>New Work Batch Slack → ask Felix or Irvin</span></div></div>
         <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Boost / Party Pro accounts</strong><span>Batch Partner Support Slack → tag the relevant account manager</span></div></div>
-        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Major decisions or complex cases</strong><span>Escalate to Stefan via Batch Partner Support channel</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Major decisions or complex cases</strong><span>Escalate to Estefan via Batch Partner Support channel</span></div></div>
       </div>
     </div>
 
@@ -823,8 +826,8 @@
       <h3>Rick's 5 Primary Slack Channels</h3>
       <table class="ctable" style="margin: 8px 0 0;">
         <tr><th>Channel</th><th>Purpose</th></tr>
-        <tr><td><strong>NeoWork Daily</strong></td><td>Login/logout, breaks, schedule. 15-min check-ins help track hours if system fails.</td></tr>
-        <tr><td><strong>NeoWork Batch</strong></td><td>Customer support requests — get help from Felix/Ervene when needed.</td></tr>
+        <tr><td><strong>New Work Daily</strong></td><td>Login/logout, breaks, schedule. 15-min check-ins help track hours if system fails.</td></tr>
+        <tr><td><strong>New Work Batch</strong></td><td>Customer support requests — get help from Felix/Irvin when needed.</td></tr>
         <tr><td><strong>Batch Partner Support</strong></td><td>Boost/PartyPro escalations + anything needing Stefan's attention.</td></tr>
         <tr><td><strong>PX Team</strong></td><td>Core/Basic partner work — Rick's main working channel.</td></tr>
         <tr><td><strong>Share Bugs</strong></td><td>Bug reports with screenshots/recordings for dev team.</td></tr>
@@ -843,14 +846,14 @@
       <div class="status-box" style="background: var(--lime-tint); border: 2px solid #00b800;">
         <h4 style="color: #005500;">✅ Confirmed (Day 1)</h4>
         <ul>
-          <li>Let's Batch email (NeoWork)</li>
-          <li>NeoWork email</li>
+          <li>Let's Batch email (Mework)</li>
+          <li>New Work email</li>
           <li>Airtable — Vendor/Partner Directory</li>
           <li>Airtable — Internal Data (editor)</li>
           <li>Let's Batch App (phone)</li>
           <li>Slack (all 5 channels)</li>
-          <li>NeoWork Academy training channel</li>
-          <li>Claude AI (via Arjon)</li>
+          <li>Mework Academy training channel</li>
+          <li>Claude AI (via Arjan)</li>
         </ul>
       </div>
       <div class="status-box" style="background: var(--sunset-tint); border: 2px solid var(--sunset);">
@@ -881,7 +884,7 @@
     <div class="card">
       <h3>Training Deadlines & Next Steps</h3>
       <ul>
-        <li><strong>Today (EOD):</strong> Send training summary to Dulci via email (cc Stefan) — not Slack. Avoid negative commentary about management.</li>
+        <li><strong>Today (EOD):</strong> Send training summary to Dulce via email (cc Stefan) — not Slack. Avoid negative commentary about management.</li>
         <li><strong>May 1:</strong> Pragmatico training due — 1.5 hours of video + assignment</li>
         <li><strong>May 22:</strong> Advanced AI training</li>
         <li><strong>Tomorrow:</strong> Recap meeting before 11pm shift → Day 2 training</li>
