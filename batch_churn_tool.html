@@ -5,207 +5,76 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Batch — Churn Call Script Tool</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://js.puter.com/v2/"></script>
 <style>
-  :root {
-    --black: #0F0C0C; --white: #F0F1F4; --sunset: #FF5F00; --ocean: #4F97FC;
-    --cosmo: #FF93D3; --lime: #00DF00; --gold: #FFCA00;
-    --gold-tint: #FFF3B0; --ocean-tint: #D6E9FF; --cosmo-tint: #FFE0F3;
-    --lime-tint: #C8FFB0; --sunset-tint: #FFD9C0;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Mulish', sans-serif; background: var(--white); color: var(--black); min-height: 100vh; font-size: 14px; }
-
-  /* ── TOP NAV ── */
-  .topnav { background: var(--black); padding: 14px 40px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--sunset); }
-  .topnav a { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.15s; }
-  .topnav a:hover { color: var(--sunset); }
-  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
-  .topnav .current { color: var(--sunset); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
-
-  /* ── HERO ── */
-  .hero { background: var(--black); padding: 52px 40px 44px; position: relative; overflow: hidden; }
-  .hero::before { content: ''; position: absolute; right: -80px; top: -80px; width: 360px; height: 360px; border-radius: 50%; background: var(--sunset); opacity: 0.06; }
-  .hero::after { content: ''; position: absolute; left: -60px; bottom: -60px; width: 240px; height: 240px; border-radius: 50%; background: var(--gold); opacity: 0.06; }
-  .hero-inner { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
-  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--sunset); color: #fff; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; padding: 5px 14px; border-radius: 30px; margin-bottom: 16px; }
-  .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; }
-  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 52px); font-weight: 900; color: #fff; line-height: 1.08; margin-bottom: 10px; }
-  .hero h1 span { color: var(--gold); }
-  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); max-width: 420px; line-height: 1.6; }
-  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
-  .chip { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(240,241,244,0.7); border: 1px solid rgba(255,255,255,0.1); }
-  .hero-steps { display: flex; flex-direction: column; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px 22px; min-width: 200px; }
-  .hero-step { display: flex; align-items: center; gap: 10px; }
-  .hero-step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--sunset); color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .hero-step-label { font-size: 12px; color: rgba(240,241,244,0.65); font-weight: 600; }
-
-  /* ── CONTAINER ── */
-  .container { max-width: 860px; margin: 0 auto; padding: 36px 40px 80px; }
-
-  /* ── SECTION LABEL ── */
-  .sec-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; color: rgba(15,12,12,0.35); margin-bottom: 16px; margin-top: 8px; display: flex; align-items: center; gap: 10px; }
-  .sec-label::after { content: ''; flex: 1; height: 1px; background: rgba(15,12,12,0.1); }
-
-  /* ── CARDS ── */
-  .card { background: #fff; border-radius: 16px; border: 1.5px solid rgba(15,12,12,0.09); padding: 24px 26px; margin-bottom: 16px; }
-  .card.hidden { display: none; }
-  .card-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .card-tag { font-family: 'Mulish', sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 3px 10px; border-radius: 20px; }
-  .card-tag.step { background: var(--sunset-tint); color: #993300; }
-  .card-tag.lever { background: var(--ocean-tint); color: #1a4d8f; }
-  .card-tag.final { background: var(--lime-tint); color: #336600; }
-  .card-tag.done { background: var(--lime-tint); color: #226600; }
-
-  /* ── PUTER BADGE ── */
-  .puter-badge { background: var(--sunset-tint); border: 2px solid var(--sunset); border-radius: 16px; padding: 14px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .puter-badge-icon { font-size: 22px; flex-shrink: 0; }
-  .puter-badge-text strong { font-size: 13px; font-weight: 800; display: block; margin-bottom: 3px; color: var(--black); }
-  .puter-badge-text p { font-size: 12px; color: #661a00; line-height: 1.5; }
-  .puter-badge-text a { color: #991a00; font-weight: 700; }
-  .signin-btn { background: var(--black); color: #fff; border: none; border-radius: 30px; padding: 9px 18px; font-family: 'Mulish', sans-serif; font-size: 12px; font-weight: 800; cursor: pointer; white-space: nowrap; transition: background 0.2s; flex-shrink: 0; }
-  .signin-btn:hover { background: #333; }
-
-  /* ── FIELDS ── */
-  .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .fields-grid.four { grid-template-columns: 1fr 1fr 1fr 1fr; }
-  .field-full { grid-column: 1 / -1; }
-  .field label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: rgba(15,12,12,0.45); margin-bottom: 6px; }
-  .field input, .field select, .field textarea {
-    width: 100%; border: 1.5px solid rgba(15,12,12,0.12); border-radius: 10px;
-    padding: 10px 13px; font-family: 'Mulish', sans-serif; font-size: 13.5px;
-    color: var(--black); background: var(--white); outline: none;
-    transition: border-color 0.2s, background 0.2s;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--ocean); background: #fff; box-shadow: 0 0 0 3px rgba(79,151,252,0.1); }
-  .field textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
-  .hr { height: 1px; background: rgba(15,12,12,0.08); margin: 18px 0; }
-
-  /* ── PILL BUTTONS (churn reason) ── */
-  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
-  .pill { padding: 8px 18px; border-radius: 30px; border: 2px solid rgba(15,12,12,0.15); font-family: 'Mulish', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; background: var(--white); color: var(--black); transition: all 0.15s; }
-  .pill:hover { border-color: var(--black); background: var(--black); color: #fff; }
-  .pill.sel-orange { background: var(--sunset); border-color: var(--sunset); color: #fff; }
-  .pill.sel-blue { background: var(--ocean); border-color: var(--ocean); color: #fff; }
-  .pill.sel-gold { background: var(--gold); border-color: var(--gold); color: var(--black); }
-  .pill.sel-lime { background: var(--lime); border-color: var(--lime); color: var(--black); }
-  .pill.sel-pink { background: var(--cosmo); border-color: var(--cosmo); color: var(--black); }
-  .pill.sel-black { background: var(--black); border-color: var(--black); color: #fff; }
-
-  /* ── OTHER TEXTAREA ── */
-  .other-wrap { display: none; margin-top: 10px; }
-  .other-wrap.show { display: block; }
-  .other-wrap textarea { width: 100%; border: 1.5px solid rgba(15,12,12,0.12); border-radius: 10px; padding: 10px 13px; font-family: 'Mulish', sans-serif; font-size: 13.5px; color: var(--black); background: var(--white); outline: none; resize: vertical; min-height: 65px; }
-  .other-wrap textarea:focus { border-color: var(--ocean); background: #fff; box-shadow: 0 0 0 3px rgba(79,151,252,0.1); }
-
-  /* ── LEVER CARD ── */
-  .lever-info { border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 14px; }
-  .lever-info.l1 { background: var(--sunset-tint); border: 1.5px solid var(--sunset); }
-  .lever-info.l2 { background: var(--ocean-tint); border: 1.5px solid var(--ocean); }
-  .lever-info.l3 { background: var(--gold-tint); border: 1.5px solid var(--gold); }
-  .lever-info.l4 { background: var(--lime-tint); border: 1.5px solid #00cc00; }
-  .lever-badge { font-size: 11px; font-weight: 800; padding: 3px 11px; border-radius: 20px; border: 1.5px solid; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
-  .l1 .lever-badge { color: #993300; border-color: var(--sunset); background: #fff; }
-  .l2 .lever-badge { color: #1a4d8f; border-color: var(--ocean); background: #fff; }
-  .l3 .lever-badge { color: #7a5c00; border-color: var(--gold); background: #fff; }
-  .l4 .lever-badge { color: #226600; border-color: #00cc00; background: #fff; }
-  .lever-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 3px; }
-  .lever-desc { font-size: 12px; color: rgba(15,12,12,0.55); line-height: 1.5; }
-
-  /* ── PRICE LADDER ── */
-  .price-ladder { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 16px; }
-  .price-opt { padding: 9px 18px; border-radius: 30px; border: 2px solid rgba(15,12,12,0.15); font-family: 'Mulish', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; background: var(--white); color: rgba(15,12,12,0.4); transition: all 0.15s; pointer-events: none; }
-  .price-opt.unlocked { color: var(--black); pointer-events: auto; border-color: rgba(15,12,12,0.25); }
-  .price-opt.unlocked:hover { border-color: var(--gold); background: var(--gold-tint); }
-  .price-opt.active { background: var(--gold); border-color: var(--gold); color: var(--black); pointer-events: auto; }
-
-  /* ── RUN BUTTON ── */
-  .run-btn { background: var(--black); color: #fff; border: none; border-radius: 14px; padding: 16px 24px; font-family: 'Mulish', sans-serif; font-size: 15px; font-weight: 800; cursor: pointer; transition: background 0.2s, transform 0.1s; display: inline-flex; align-items: center; gap: 12px; position: relative; overflow: hidden; letter-spacing: 0.3px; }
-  .run-btn::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--sunset); }
-  .run-btn.blue::before { background: var(--ocean); }
-  .run-btn.gold::before { background: var(--gold); }
-  .run-btn.lime::before { background: var(--lime); }
-  .run-btn:hover:not(:disabled) { background: #1a1818; transform: translateY(-1px); }
-  .run-btn:active:not(:disabled) { transform: scale(0.99); }
-  .run-btn:disabled { background: #666; cursor: not-allowed; transform: none; }
-  .run-btn .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.25); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; display: none; flex-shrink: 0; }
-  .run-btn.loading .spinner { display: block; }
-  .run-btn.loading .btn-text { opacity: 0.7; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── YES / NO ── */
-  .yn-wrap { display: none; border-top: 1.5px solid rgba(15,12,12,0.08); margin-top: 18px; padding-top: 18px; }
-  .yn-wrap.show { display: block; }
-  .yn-q { font-size: 13px; font-weight: 800; margin-bottom: 12px; color: var(--black); }
-  .yn-row { display: flex; gap: 10px; flex-wrap: wrap; }
-  .yn-btn { padding: 11px 26px; border-radius: 30px; border: 2px solid rgba(15,12,12,0.15); font-family: 'Mulish', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; transition: all 0.15s; }
-  .yn-btn:hover { transform: translateY(-1px); }
-  .yn-yes { background: var(--lime-tint); color: #226600; border-color: #00cc00; }
-  .yn-yes:hover { background: var(--lime); border-color: var(--lime); }
-  .yn-no { background: var(--sunset-tint); color: #993300; border-color: var(--sunset); }
-  .yn-no:hover { background: var(--sunset); color: #fff; border-color: var(--sunset); }
-
-  /* ── SCRIPT OUTPUT ── */
-  .script-block { display: none; margin-top: 16px; }
-  .script-block.visible { display: block; }
-  .script-block.loading { display: flex; align-items: center; gap: 12px; color: rgba(15,12,12,0.4); font-size: 13px; font-weight: 600; padding: 18px 0; }
-  .script-block .spin-sm { width: 16px; height: 16px; border: 2px solid rgba(15,12,12,0.15); border-top-color: var(--sunset); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
-
-  /* Output sections accordion style */
-  .out-section { background: var(--white); border: 1.5px solid rgba(15,12,12,0.09); border-radius: 12px; margin-bottom: 8px; overflow: hidden; transition: box-shadow 0.2s; }
-  .out-section:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
-  .out-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; cursor: pointer; user-select: none; }
-  .out-header:hover { background: rgba(15,12,12,0.02); }
-  .out-header-left { display: flex; align-items: center; gap: 10px; }
-  .out-phase { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(15,12,12,0.35); }
-  .out-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; }
-  .out-chevron { font-size: 12px; color: rgba(15,12,12,0.3); transition: transform 0.2s; }
-  .out-chevron.open { transform: rotate(180deg); }
-  .out-body { padding: 0 18px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.2s; }
-  .out-body.open { max-height: 3000px; padding: 4px 18px 18px; }
-  .out-divider { height: 1px; background: rgba(15,12,12,0.07); margin-bottom: 14px; }
-
-  /* SAY BOX */
-  .say-box { background: var(--ocean-tint); border-left: 4px solid var(--ocean); border-radius: 0 10px 10px 0; padding: 14px 16px; margin-bottom: 10px; }
-  .say-lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(15,12,12,0.4); margin-bottom: 7px; display: flex; align-items: center; justify-content: space-between; }
-  .say-txt { font-size: 13.5px; line-height: 1.8; color: var(--black); white-space: pre-line; }
-
-  /* TIP BOX */
-  .tip-box { background: var(--gold-tint); border-left: 4px solid var(--gold); border-radius: 0 10px 10px 0; padding: 12px 16px; margin-bottom: 10px; font-size: 13px; line-height: 1.6; color: #5a4400; }
-  .tip-lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #7a6000; margin-bottom: 5px; }
-
-  /* WARN BOX */
-  .warn-box { background: var(--sunset-tint); border-left: 4px solid var(--sunset); border-radius: 0 10px 10px 0; padding: 12px 16px; margin-bottom: 10px; font-size: 13px; line-height: 1.6; color: #661a00; }
-  .warn-lbl { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--sunset); margin-bottom: 5px; }
-
-  /* COPY BTN */
-  .copy-btn { background: transparent; border: 1.5px solid rgba(15,12,12,0.12); border-radius: 8px; padding: 6px 13px; font-family: 'Mulish', sans-serif; font-size: 11px; font-weight: 700; color: rgba(15,12,12,0.45); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; }
-  .copy-btn:hover { border-color: var(--ocean); color: var(--ocean); }
-  .copy-btn.copied { border-color: #00aa00; color: #00aa00; }
-
-  /* ── HINT BOX ── */
-  .hint-box { background: var(--ocean-tint); border-left: 4px solid var(--ocean); border-radius: 0 10px 10px 0; padding: 12px 16px; font-size: 12.5px; color: #1a3d6e; margin-bottom: 20px; line-height: 1.6; }
-
-  /* ── STATUS BAR ── */
-  .status-strip { background: rgba(15,12,12,0.04); border: 1.5px solid rgba(15,12,12,0.08); border-radius: 10px; padding: 10px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-size: 12.5px; font-weight: 700; color: rgba(15,12,12,0.5); }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(15,12,12,0.2); flex-shrink: 0; transition: background 0.3s; }
-  .status-dot.active { background: var(--gold); }
-  .status-dot.done { background: var(--lime); }
-  .status-dot.error { background: var(--sunset); }
-
-  /* ── BOTTOM NAV ── */
-  .bottom-nav { border-top: 2px solid rgba(15,12,12,0.08); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 860px; margin: 0 auto; }
-  .bottom-nav a { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--black); text-decoration: none; padding: 10px 20px; border: 2px solid rgba(15,12,12,0.15); border-radius: 30px; transition: all 0.15s; }
-  .bottom-nav a:hover { background: var(--black); color: var(--sunset); border-color: var(--black); }
-
-  @media (max-width: 640px) {
-    .topnav { padding: 14px 20px; }
-    .hero { padding: 36px 20px 32px; }
-    .container { padding: 24px 20px 60px; }
-    .fields-grid, .fields-grid.four { grid-template-columns: 1fr; }
-    .hero-steps { display: none; }
-    .bottom-nav { padding: 20px; }
-  }
+:root{--black:#0F0C0C;--white:#F0F1F4;--sunset:#FF5F00;--ocean:#4F97FC;--cosmo:#FF93D3;--lime:#00DF00;--gold:#FFCA00;--gold-t:#FFF3B0;--ocean-t:#D6E9FF;--cosmo-t:#FFE0F3;--lime-t:#C8FFB0;--sunset-t:#FFD9C0}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Mulish',sans-serif;background:var(--white);color:var(--black);min-height:100vh;font-size:14px}
+.topnav{background:var(--black);padding:14px 40px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;border-bottom:2px solid var(--sunset)}
+.topnav a{color:rgba(240,241,244,.5);text-decoration:none;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;transition:color .15s}
+.topnav a:hover{color:var(--sunset)}
+.topnav .sep{color:rgba(240,241,244,.2);font-size:12px}
+.topnav .current{color:var(--sunset);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px}
+.hero{background:var(--black);padding:52px 40px 44px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:360px;height:360px;border-radius:50%;background:var(--sunset);opacity:.06}
+.hero::after{content:'';position:absolute;left:-60px;bottom:-60px;width:240px;height:240px;border-radius:50%;background:var(--gold);opacity:.06}
+.hero-inner{position:relative;z-index:1;max-width:860px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--sunset);color:#fff;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:2.5px;padding:5px 14px;border-radius:30px;margin-bottom:16px}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:#fff}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,52px);font-weight:900;color:#fff;line-height:1.08;margin-bottom:10px}
+.hero h1 span{color:var(--gold)}
+.hero-sub{font-size:14px;color:rgba(240,241,244,.55);max-width:440px;line-height:1.6}
+.hero-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.chip{font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;background:rgba(255,255,255,.08);color:rgba(240,241,244,.7);border:1px solid rgba(255,255,255,.1)}
+.hero-steps{display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px 22px;min-width:200px}
+.hero-step{display:flex;align-items:center;gap:10px}
+.hero-step-num{width:22px;height:22px;border-radius:50%;background:var(--sunset);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hero-step-label{font-size:12px;color:rgba(240,241,244,.65);font-weight:600}
+.container{max-width:860px;margin:0 auto;padding:36px 40px 80px}
+.sec-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:2.5px;color:rgba(15,12,12,.35);margin-bottom:16px;margin-top:24px;display:flex;align-items:center;gap:10px}
+.sec-label::after{content:'';flex:1;height:1px;background:rgba(15,12,12,.1)}
+.card{background:#fff;border-radius:16px;border:1.5px solid rgba(15,12,12,.09);padding:24px 26px;margin-bottom:16px}
+.puter-badge{background:var(--sunset-t);border:2px solid var(--sunset);border-radius:16px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.puter-badge-icon{font-size:22px;flex-shrink:0}
+.puter-badge-text{flex:1;min-width:200px}
+.puter-badge-text strong{font-size:13px;font-weight:800;display:block;margin-bottom:3px;color:var(--black)}
+.puter-badge-text p{font-size:12px;color:#661a00;line-height:1.5}
+.puter-badge-text a{color:#991a00;font-weight:700}
+.signin-btn{background:var(--black);color:#fff;border:none;border-radius:30px;padding:9px 18px;font-family:'Mulish',sans-serif;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:background .2s;flex-shrink:0}
+.signin-btn:hover{background:#333}
+.hint-box{background:var(--ocean-t);border-left:4px solid var(--ocean);border-radius:0 10px 10px 0;padding:12px 16px;font-size:12.5px;color:#1a3d6e;margin-bottom:20px;line-height:1.6}
+.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fields-grid.four{grid-template-columns:1fr 1fr 1fr 1fr}
+.field label{display:block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(15,12,12,.45);margin-bottom:6px}
+.field input,.field select{width:100%;border:1.5px solid rgba(15,12,12,.12);border-radius:10px;padding:10px 13px;font-family:'Mulish',sans-serif;font-size:13.5px;color:var(--black);background:var(--white);outline:none;transition:border-color .2s,background .2s}
+.field input:focus,.field select:focus{border-color:var(--ocean);background:#fff;box-shadow:0 0 0 3px rgba(79,151,252,.1)}
+.hr{height:1px;background:rgba(15,12,12,.08);margin:18px 0}
+.run-btn{background:var(--black);color:#fff;border:none;border-radius:14px;padding:16px 24px;font-family:'Mulish',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:background .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:12px;position:relative;overflow:hidden;letter-spacing:.3px;width:100%}
+.run-btn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--sunset)}
+.run-btn:hover:not(:disabled){background:#1a1818;transform:translateY(-1px)}
+.run-btn:disabled{background:#666;cursor:not-allowed;transform:none}
+.run-btn .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.25);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;display:none;flex-shrink:0}
+.run-btn.loading .spinner{display:block}
+.run-btn.loading .btn-text{opacity:.7}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* LOADING OVERLAY */
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(15,12,12,.85);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.loading-overlay.visible{display:flex}
+.loading-card{background:#fff;border-radius:20px;padding:36px 40px;max-width:420px;width:90%;text-align:center}
+.loading-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;margin-bottom:8px}
+.loading-sub{font-size:13px;color:rgba(15,12,12,.5);line-height:1.6;margin-bottom:20px}
+.loading-bar-wrap{height:6px;background:rgba(15,12,12,.08);border-radius:6px;overflow:hidden;margin-bottom:16px}
+.loading-bar{height:100%;background:linear-gradient(90deg,var(--sunset),var(--gold));width:0%;transition:width .5s ease;border-radius:6px}
+.loading-step{font-size:12px;font-weight:700;color:rgba(15,12,12,.4);min-height:20px;transition:opacity .3s}
+.loading-step-icon{font-size:24px;margin-bottom:6px}
+.bottom-nav{border-top:2px solid rgba(15,12,12,.08);padding:24px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;max-width:860px;margin:0 auto}
+.bottom-nav a{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--black);text-decoration:none;padding:10px 20px;border:2px solid rgba(15,12,12,.15);border-radius:30px;transition:all .15s}
+.bottom-nav a:hover{background:var(--black);color:var(--sunset);border-color:var(--black)}
+/* YOUR NAME highlight */
+.your-name-field .field label{color:var(--sunset);font-size:12px}
+.your-name-field .field input{border-color:rgba(255,95,0,.3);background:var(--sunset-t)}
+.your-name-field .field input:focus{border-color:var(--sunset);box-shadow:0 0 0 3px rgba(255,95,0,.1)}
+@media(max-width:640px){.topnav{padding:14px 20px}.hero{padding:36px 20px 32px}.container{padding:24px 20px 60px}.fields-grid,.fields-grid.four{grid-template-columns:1fr 1fr}.hero-steps{display:none}}
 </style>
 </head>
 <body>
@@ -221,18 +90,18 @@
     <div>
       <div class="hero-badge"><div class="dot"></div>Batch Tool · Retention</div>
       <h1>Churn Call<br><span>Script Tool</span></h1>
-      <p class="hero-sub">Fill in the partner's info and walk through the call step by step. Each stage generates a tailored script — opening, acknowledgment, levers, and close.</p>
+      <p class="hero-sub">Fill in the partner's info, hit Generate, and get a fully interactive call guide downloaded to your computer — click through the flowchart live on the call.</p>
       <div class="hero-chips">
-        <div class="chip">Step-by-step flow</div>
+        <div class="chip">Generates in ~2 min</div>
         <div class="chip">Puter.js · No API key</div>
-        <div class="chip">SAVED framework</div>
+        <div class="chip">Downloads as interactive HTML</div>
       </div>
     </div>
     <div class="hero-steps">
-      <div class="hero-step"><div class="hero-step-num">1</div><div class="hero-step-label">Partner Info</div></div>
-      <div class="hero-step"><div class="hero-step-num">2</div><div class="hero-step-label">Churn Reason</div></div>
-      <div class="hero-step"><div class="hero-step-num">3</div><div class="hero-step-label">Levers 1 → 4</div></div>
-      <div class="hero-step"><div class="hero-step-num">4</div><div class="hero-step-label">Close or Cancel</div></div>
+      <div class="hero-step"><div class="hero-step-num">1</div><div class="hero-step-label">Fill in the form</div></div>
+      <div class="hero-step"><div class="hero-step-num">2</div><div class="hero-step-label">Hit Generate</div></div>
+      <div class="hero-step"><div class="hero-step-num">3</div><div class="hero-step-label">File downloads automatically</div></div>
+      <div class="hero-step"><div class="hero-step-num">4</div><div class="hero-step-label">Open it and run the call</div></div>
     </div>
   </div>
 </div>
@@ -241,41 +110,54 @@
 
   <div class="puter-badge" id="puterBadge">
     <div class="puter-badge-icon">🔑</div>
-    <div class="puter-badge-text" style="flex:1;min-width:200px">
+    <div class="puter-badge-text">
       <strong>Sign in with Puter to use AI generation</strong>
-      <p>This tool runs on <a href="https://developer.puter.com" target="_blank">Puter.js</a> — free AI, no API key. Sign in with a free Puter account to generate scripts.</p>
+      <p>This tool runs on <a href="https://developer.puter.com" target="_blank">Puter.js</a> — free AI, no API key needed. You may be prompted to sign in on first use.</p>
     </div>
     <button class="signin-btn" onclick="puterSignIn()">Sign in free</button>
   </div>
 
-  <div class="hint-box">Fill in the partner details below, then hit <strong>Generate Opening Script</strong>. Each step unlocks the next — follow the flow top to bottom during your call.</div>
+  <div class="hint-box">Fill in everything below and hit <strong>Generate Call Guide</strong>. The tool will generate all 13 scripts in the background and download a standalone interactive HTML file directly to your computer. Open that file in any browser to use it on your call.</div>
 
-  <!-- STATUS -->
-  <div class="status-strip" id="statusStrip">
-    <div class="status-dot" id="statusDot"></div>
-    <span id="statusTxt">Fill in partner info to begin</span>
+  <div class="sec-label">About You</div>
+  <div class="card">
+    <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:6px">Your Details</div>
+    <p style="font-size:13px;color:rgba(15,12,12,.5);margin-bottom:16px;line-height:1.5">This shows up on your call guide so you know it's yours.</p>
+    <div class="fields-grid">
+      <div class="field your-name-field">
+        <div class="field">
+          <label>Your Name ✦</label>
+          <input id="agentName" placeholder="e.g. Rick" oninput="checkForm()">
+        </div>
+      </div>
+      <div class="field">
+        <label>Your Role (optional)</label>
+        <input id="agentRole" placeholder="e.g. Partner Engagement Specialist">
+      </div>
+    </div>
   </div>
 
-  <!-- ── STEP 1: PARTNER INFO ── -->
-  <div class="sec-label">Step 1 — Partner Info</div>
-  <div class="card" id="step1card">
-    <div class="card-title">Partner Details <span class="card-tag step">Required</span></div>
+  <div class="sec-label">Partner Info</div>
+  <div class="card">
+    <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      Partner Details <span style="font-family:'Mulish',sans-serif;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:3px 10px;border-radius:20px;background:var(--sunset-t);color:#993300">Required</span>
+    </div>
     <div class="fields-grid">
-      <div class="field"><label>Partner Name</label><input id="pName" placeholder="e.g. Sarah" oninput="checkS1()"></div>
+      <div class="field"><label>Partner Name</label><input id="pName" placeholder="e.g. Sarah" oninput="checkForm()"></div>
       <div class="field"><label>Listing Type</label><input id="pListing" placeholder="e.g. Escape room, Axe throwing"></div>
       <div class="field">
         <label>Subscription Tier</label>
-        <select id="pTier" onchange="checkS1()">
+        <select id="pTier" onchange="checkForm()">
           <option value="">Select tier</option>
           <option value="Basic ($150/mo)">Basic — $150/mo</option>
           <option value="Core ($250/mo)">Core — $250/mo</option>
           <option value="Boost ($500/mo)">Boost — $500/mo</option>
         </select>
       </div>
-      <div class="field"><label>Time with Batch</label><input id="pTenure" placeholder="e.g. 6 months, 2 years" oninput="checkS1()"></div>
+      <div class="field"><label>Time with Batch</label><input id="pTenure" placeholder="e.g. 6 months, 2 years" oninput="checkForm()"></div>
     </div>
     <div class="hr"></div>
-    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(15,12,12,0.4);margin-bottom:12px">Metrics — Last 30–90 Days</div>
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(15,12,12,.4);margin-bottom:12px">Metrics — Last 30–90 Days</div>
     <div class="fields-grid four">
       <div class="field"><label>Page Views</label><input type="number" id="mViews" placeholder="e.g. 47" min="0"></div>
       <div class="field"><label>Impressions</label><input type="number" id="mImpr" placeholder="e.g. 232" min="0"></div>
@@ -294,151 +176,11 @@
       </div>
     </div>
     <div style="margin-top:20px">
-      <button class="run-btn" id="s1btn" onclick="runS1()" disabled>
+      <button class="run-btn" id="genBtn" onclick="runGenerate()" disabled>
         <div class="spinner"></div>
-        <span class="btn-text">Generate Opening Script</span>
+        <span class="btn-text">✦ Generate Call Guide</span>
       </button>
     </div>
-    <!-- Output -->
-    <div class="script-block" id="s1out"></div>
-  </div>
-
-  <!-- ── STEP 2: CHURN REASON ── -->
-  <div class="sec-label hidden" id="s2label">Step 2 — Churn Reason</div>
-  <div class="card hidden" id="step2card">
-    <div class="card-title">What reason did they give? <span class="card-tag step">Assess</span></div>
-    <p style="font-size:13px;color:rgba(15,12,12,0.55);margin-bottom:14px;line-height:1.6">Select the churn reason after they've explained themselves. This shapes the acknowledgment.</p>
-    <div class="pill-row" id="reasonPills">
-      <button class="pill" data-val="slow bookings" data-col="orange" onclick="pickReason(this)">Slow / No Bookings</button>
-      <button class="pill" data-val="budget concerns" data-col="blue" onclick="pickReason(this)">Budget Concerns</button>
-      <button class="pill" data-val="not seeing ROI" data-col="gold" onclick="pickReason(this)">Not Seeing ROI</button>
-      <button class="pill" data-val="seasonal slowdown" data-col="lime" onclick="pickReason(this)">Seasonal Slowdown</button>
-      <button class="pill" data-val="no time to manage" data-col="pink" onclick="pickReason(this)">No Time to Manage</button>
-      <button class="pill" data-val="other" data-col="black" onclick="pickReason(this)">Other</button>
-    </div>
-    <div class="other-wrap" id="otherWrap">
-      <textarea id="otherText" placeholder="Type their specific reason..."></textarea>
-    </div>
-    <div style="margin-top:16px">
-      <button class="run-btn blue" id="s2btn" onclick="runS2()" disabled>
-        <div class="spinner"></div>
-        <span class="btn-text">Generate Acknowledgment Script</span>
-      </button>
-    </div>
-    <div class="script-block" id="s2out"></div>
-  </div>
-
-  <!-- ── LEVER 1 ── -->
-  <div class="sec-label hidden" id="l1label">Step 3 — Lever 1</div>
-  <div class="card hidden" id="l1card">
-    <div class="card-title">Listing Boost Package <span class="card-tag lever">L1</span></div>
-    <div class="lever-info l1">
-      <span class="lever-badge">L1</span>
-      <div>
-        <div class="lever-title">Listing Boost Package</div>
-        <div class="lever-desc">Add media, listing optimization, ratings/reviews, blog post, UGC collection tool — all bundled, no extra cost.</div>
-      </div>
-    </div>
-    <button class="run-btn" id="l1genbtn" onclick="runLever(1)">
-      <div class="spinner"></div>
-      <span class="btn-text">Generate Lever 1 Script</span>
-    </button>
-    <div class="script-block" id="l1out"></div>
-    <div class="yn-wrap" id="l1yn">
-      <div class="yn-q">Did they accept this offer?</div>
-      <div class="yn-row">
-        <button class="yn-btn yn-yes" onclick="accepted('L1')">Yes, they accepted</button>
-        <button class="yn-btn yn-no" onclick="declined('L1')">No, move to Lever 2</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── LEVER 2 ── -->
-  <div class="sec-label hidden" id="l2label">Step 3 — Lever 2</div>
-  <div class="card hidden" id="l2card">
-    <div class="card-title">Monthly Payment Option <span class="card-tag lever">L2</span></div>
-    <div class="lever-info l2">
-      <span class="lever-badge">L2</span>
-      <div>
-        <div class="lever-title">Monthly Payment Option</div>
-        <div class="lever-desc">Switch from quarterly to monthly billing — lower commitment, more flexibility.</div>
-      </div>
-    </div>
-    <button class="run-btn blue" id="l2genbtn" onclick="runLever(2)">
-      <div class="spinner"></div>
-      <span class="btn-text">Generate Lever 2 Script</span>
-    </button>
-    <div class="script-block" id="l2out"></div>
-    <div class="yn-wrap" id="l2yn">
-      <div class="yn-q">Did they accept?</div>
-      <div class="yn-row">
-        <button class="yn-btn yn-yes" onclick="accepted('L2')">Yes, accepted</button>
-        <button class="yn-btn yn-no" onclick="declined('L2')">No, move to Lever 3</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── LEVER 3 ── -->
-  <div class="sec-label hidden" id="l3label">Step 3 — Lever 3</div>
-  <div class="card hidden" id="l3card">
-    <div class="card-title">Price Reduction <span class="card-tag lever">L3</span></div>
-    <div class="lever-info l3">
-      <span class="lever-badge">L3</span>
-      <div>
-        <div class="lever-title">Price Reduction</div>
-        <div class="lever-desc">Try in order: 25% off for 2 months → $150/mo → $99/mo floor. Each unlocks only after the previous is declined.</div>
-      </div>
-    </div>
-    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(15,12,12,0.4);margin-bottom:8px">Current offer:</div>
-    <div class="price-ladder">
-      <div class="price-opt unlocked active" id="p25" onclick="selectPrice('25pct')">25% off — 2 months</div>
-      <div class="price-opt" id="p150" onclick="selectPrice('150')">$150/mo — 3 months</div>
-      <div class="price-opt" id="p99" onclick="selectPrice('99')">$99/mo floor</div>
-    </div>
-    <button class="run-btn gold" id="l3genbtn" onclick="runLever(3)">
-      <div class="spinner"></div>
-      <span class="btn-text">Generate 25% Off Script</span>
-    </button>
-    <div class="script-block" id="l3out"></div>
-    <div class="yn-wrap" id="l3yn">
-      <div class="yn-q">Did they accept this price?</div>
-      <div class="yn-row">
-        <button class="yn-btn yn-yes" onclick="priceYes()">Yes, accepted</button>
-        <button class="yn-btn yn-no" onclick="priceNo()">No, try next price</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── LEVER 4 ── -->
-  <div class="sec-label hidden" id="l4label">Step 3 — Lever 4 (Final Offer)</div>
-  <div class="card hidden" id="l4card">
-    <div class="card-title">Bookable Email Partner <span class="card-tag final">L4 · Last Offer</span></div>
-    <div class="lever-info l4">
-      <span class="lever-badge">L4</span>
-      <div>
-        <div class="lever-title">Bookable Email Partner</div>
-        <div class="lever-desc">Convert their listing so customers can book directly through Batch. Both the partner and Batch can now see real booking numbers. Paired with $99/mo for 3 months.</div>
-      </div>
-    </div>
-    <button class="run-btn lime" id="l4genbtn" onclick="runLever(4)">
-      <div class="spinner"></div>
-      <span class="btn-text">Generate Lever 4 Script</span>
-    </button>
-    <div class="script-block" id="l4out"></div>
-    <div class="yn-wrap" id="l4yn">
-      <div class="yn-q">Did they accept?</div>
-      <div class="yn-row">
-        <button class="yn-btn yn-yes" onclick="accepted('L4')">Yes, accepted</button>
-        <button class="yn-btn yn-no" onclick="declined('L4')">No — proceed to cancellation</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── STEP 4: CLOSE / CANCEL ── -->
-  <div class="sec-label hidden" id="s4label">Step 4 — Close</div>
-  <div class="card hidden" id="step4card">
-    <div class="card-title" id="s4title">Closing Script <span class="card-tag done">Final Step</span></div>
-    <div class="script-block" id="s4out"></div>
   </div>
 
 </div>
@@ -447,40 +189,43 @@
   <a href="index.html">← Back to Hub</a>
 </div>
 
-<script>
-/* ── STATE ─── */
-const S = { name:'', listing:'', tier:'', tenure:'', views:'', impr:'', favs:'', itin:'', bookings:'', optimized:'', reason:'', currentPrice:'25pct' };
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-card">
+    <div class="loading-step-icon" id="loadingIcon">✍️</div>
+    <div class="loading-title">Building your call guide</div>
+    <div class="loading-sub" id="loadingSub">Generating all scripts for this call. This takes about 2 minutes. Sit tight.</div>
+    <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar"></div></div>
+    <div class="loading-step" id="loadingStep">Starting up...</div>
+  </div>
+</div>
 
-/* ── PUTER ─── */
+<script>
+/* ─── STATE ─── */
+const S={agentName:'',agentRole:'',name:'',listing:'',tier:'',tenure:'',views:'',impr:'',favs:'',itin:'',bookings:'',optimized:''};
+const GEN={};
+
+/* ─── AUTH ─── */
 async function checkAuth(){
-  try {
-    const u = await puter.auth.getUser();
-    if(u){ document.getElementById('puterBadge').style.display='none'; setStatus('Signed in. Fill in partner info to begin.','done'); }
-  } catch(e){ /* not yet signed in — Puter will prompt on first AI call */ }
+  try{const u=await puter.auth.getUser();if(u){document.getElementById('puterBadge').style.display='none';}}catch(e){}
 }
 async function puterSignIn(){
-  try { await puter.auth.signIn(); document.getElementById('puterBadge').style.display='none'; setStatus('Signed in. Fill in partner info to begin.','done'); } catch(e){ alert('Sign in failed. Please try again.'); }
+  try{await puter.auth.signIn();document.getElementById('puterBadge').style.display='none';}
+  catch(e){alert('Sign in failed. Please try again.');}
 }
-window.addEventListener('load', checkAuth);
+window.addEventListener('load',checkAuth);
 
-/* ── STATUS ─── */
-function setStatus(msg, state){
-  document.getElementById('statusTxt').textContent = msg;
-  const d = document.getElementById('statusDot');
-  d.className = 'status-dot' + (state==='active'?' active':state==='done'?' done':state==='error'?' error':'');
-}
-
-/* ── VALIDATION ─── */
-function checkS1(){
-  document.getElementById('s1btn').disabled = !(
-    document.getElementById('pName').value.trim() &&
-    document.getElementById('pTier').value &&
+function checkForm(){
+  document.getElementById('genBtn').disabled=!(
+    document.getElementById('agentName').value.trim()&&
+    document.getElementById('pName').value.trim()&&
+    document.getElementById('pTier').value&&
     document.getElementById('pTenure').value.trim()
   );
 }
-
-/* ── COLLECT ─── */
 function collect(){
+  S.agentName=document.getElementById('agentName').value.trim()||'Rick';
+  S.agentRole=document.getElementById('agentRole').value.trim()||'Partner Engagement Specialist';
   S.name=document.getElementById('pName').value.trim()||'the partner';
   S.listing=document.getElementById('pListing').value.trim();
   S.tier=document.getElementById('pTier').value;
@@ -493,349 +238,430 @@ function collect(){
   S.optimized=document.getElementById('pOptim').value;
 }
 function ctx(){
-  const r=S.reason==='other'?(document.getElementById('otherText').value||'other'):S.reason;
   return `Partner name: ${S.name}
 Listing type: ${S.listing||'not specified'}
 Subscription tier: ${S.tier||'unknown'}
 Time with Batch: ${S.tenure||'unknown'}
 Listing optimization status: ${S.optimized}
+Agent name: ${S.agentName}
 Metrics (last 30-90 days):
   Page views: ${S.views||'unknown'} (unique customers who clicked and reviewed the listing)
   Impressions: ${S.impr||'unknown'} (times the listing appeared in search results)
   Favorites: ${S.favs||'unknown'} (people who saved the listing)
   Itinerary adds: ${S.itin||'unknown'} (people who added it to their trip plans)
-  Bookings: ${S.bookings||'unknown'}
-Churn reason: ${r}`;
+  Bookings: ${S.bookings||'unknown'}`;
 }
 
-/* ── SYSTEM PROMPT ─── */
-const SYS = `You are a customer success script writer for Batch, a group experiences booking platform. Write warm, human, street-smart retention call scripts for agents doing churn prevention calls with experience providers.
+/* ─── SYSTEM PROMPT ─── */
+const SYS=`You are a customer success script writer for Batch, a group experiences booking platform. Write warm, human, street-smart retention call scripts for agents doing churn prevention calls with experience providers.
 
-WRITING RULES — follow every one:
-- No em dashes. Use commas or short sentences instead.
-- No AI language. No "certainly", "absolutely", "I understand your frustration", "I appreciate you reaching out", "great question", "of course", "I want to assure you"
-- Layman terms only. Never say "impressions", "SEO", "listing optimization", "UGC" as raw jargon — always explain in plain English what the thing means
-- Warm and direct. Like a real person, not a customer service bot
-- Short sentences. Real speech patterns
+RULES:
+- No em dashes. Use commas or short sentences.
+- No AI language. No "certainly", "absolutely", "I understand your frustration", "great question", "of course"
+- Layman terms only. Explain jargon: "impressions" = "times your listing showed up in search results", "SEO" = "how high you show up in search", "UGC" = "customer-uploaded content"
+- Warm and direct. Real person, not a customer service bot.
+- Short sentences. Real speech patterns.
 - Page views: "X unique customers clicked your listing and actually checked it out"
 - Impressions: "your listing showed up X times in search results"
 - Favorites: "X people saved your experience"
 - Itinerary adds: "X people added you to their trip plans"
 - Never compare this partner to other partners
-- When presenting offers: say "I'm not going to let you pay anything additional for this"
-- Never list offers one by one asking "how does that sound?" after each. Bundle into one package, ask once at the end
-- Use [NAME] as placeholder for partner name
+- Key phrase when presenting offers: "I'm not going to let you pay anything additional for this"
+- Never list offers one by one asking "how does that sound?" after each. Bundle as one package, ask once.
+- Use [NAME] as placeholder for partner name, [AGENT] for agent name
 
-Output ONLY clean HTML using EXACTLY these CSS classes (they already exist in the page stylesheet):
-- Section wrapper: <div class="out-section">
-- Clickable header: <div class="out-header" onclick="tog(this)"><div class="out-header-left"><div class="out-phase">PHASE LABEL</div><div class="out-title">Title</div></div><div class="out-chevron">▼</div></div>
-- Body: <div class="out-body"><div class="out-divider"></div> ...content... </div>
+Output ONLY clean HTML using EXACTLY these CSS classes:
 - What to say: <div class="say-box"><div class="say-lbl">Say this</div><div class="say-txt">script here</div></div>
 - Tip: <div class="tip-box"><div class="tip-lbl">Tip</div>content</div>
-- Warning: <div class="warn-box"><div class="warn-lbl">Don't say</div>content</div>
-Output ONLY the HTML. No markdown fences, no explanation outside HTML.`;
+- Warning: <div class="warn-box"><div class="warn-lbl">Do not say</div>content</div>
+- Sub-heading: <div class="section-hl">Heading</div>
+Output ONLY the HTML. No markdown, no explanation outside HTML.`;
 
-/* ── PUTER AI ─── */
-async function callAI(prompt){
-  const fullPrompt = SYS + '\n\n---\n\n' + prompt;
-  const response = await puter.ai.chat(fullPrompt, { model: 'claude-sonnet-4-6', stream: true });
-  let raw = '';
-  for await (const part of response) {
-    if (part?.text) raw += part.text;
+/* ─── PUTER ─── */
+async function waitForPuter(t=12000){
+  const s=Date.now();
+  while(typeof puter==='undefined'||typeof puter.ai==='undefined'){
+    if(Date.now()-s>t)throw new Error('Puter failed to load. Refresh and try again.');
+    await new Promise(r=>setTimeout(r,100));
   }
+}
+async function generate(prompt){
+  await waitForPuter();
+  const res=await puter.ai.chat(SYS+'\n\n---\n\n'+prompt,{model:'claude-sonnet-4-6',stream:true});
+  let raw='';
+  for await(const part of res){if(part?.text)raw+=part.text;}
   return raw.replace(/^```html?\s*/i,'').replace(/```\s*$/,'').trim();
 }
 
-/* ── UI HELPERS ─── */
-function showEl(id){ const e=document.getElementById(id); if(e){ e.classList.remove('hidden'); } }
-function tog(header){
-  const body=header.parentElement.querySelector('.out-body');
-  const chev=header.querySelector('.out-chevron');
-  if(!body) return;
-  body.classList.toggle('open');
-  if(chev) chev.classList.toggle('open');
+/* ─── LOADING UI ─── */
+function setLoading(pct,stepText,icon){
+  document.getElementById('loadingBar').style.width=pct+'%';
+  document.getElementById('loadingStep').textContent=stepText;
+  if(icon)document.getElementById('loadingIcon').textContent=icon;
 }
-function setLoading(id){
-  const e=document.getElementById(id);
-  e.className='script-block loading visible';
-  e.innerHTML='<div class="spin-sm"></div> Writing script...';
-}
-function setReady(id, html){
-  const e=document.getElementById(id);
-  e.className='script-block visible';
-  e.innerHTML=html;
-  // open all bodies by default
-  e.querySelectorAll('.out-body').forEach(b=>{
-    b.classList.add('open');
-    const chev=b.closest('.out-section')?.querySelector('.out-chevron');
-    if(chev) chev.classList.add('open');
-  });
-  // add copy buttons to say-boxes
-  e.querySelectorAll('.say-box').forEach(s=>{
-    const btn=document.createElement('button');
-    btn.className='copy-btn'; btn.innerHTML='⎘ Copy';
-    btn.onclick=()=>{
-      const t=s.querySelector('.say-txt')?.innerText||'';
-      navigator.clipboard.writeText(t).then(()=>{ btn.innerHTML='✓ Copied!'; btn.classList.add('copied'); setTimeout(()=>{ btn.innerHTML='⎘ Copy'; btn.classList.remove('copied'); },1800); });
-    };
-    s.appendChild(btn);
-  });
-}
-function setError(id, msg){
-  const e=document.getElementById(id);
-  e.className='script-block visible';
-  e.innerHTML=`<div style="background:#FDECEA;border:1.5px solid #F5C6C2;border-radius:10px;padding:12px 16px;color:#B02D2D;font-size:13px;font-weight:600">Error: ${msg}. Please try again.</div>`;
-}
-function startBtn(id){ const b=document.getElementById(id); if(b){ b.classList.add('loading'); b.disabled=true; } }
-function resetBtn(id){ const b=document.getElementById(id); if(b){ b.classList.remove('loading'); b.disabled=false; } }
-function showYN(id){ const e=document.getElementById(id); if(e) e.classList.add('show'); }
-function hideYN(id){ const e=document.getElementById(id); if(e) e.classList.remove('show'); }
 
-/* ── STEP 1: OPENING ─── */
-async function runS1(){
+/* ─── PROMPTS ─── */
+function prompts(c){
+  return[
+    ['open',`Generate the opening script for a churn retention call.\n${c}\nScript for when agent calls:\n- Warm greeting using [NAME]\n- Agent introduces themselves as [AGENT] from Batch\n- Acknowledge you already saw the cancellation request AND reviewed their account before calling\n- Ask: "Would you mind filling me in on what's been going on?" then stop talking\n- Short. No pitching yet. Let them talk.`],
+    ['value',`Generate the "show the value" script.\n${c}\nAfter partner explains, translate metrics into plain English. Make them feel the traffic is real. If listing not optimized, frame as opportunity you can fix together. Be specific. Skip unknown metrics. No offers yet.`],
+    ['reason_slow',`Acknowledgment script for churn reason: slow or no bookings.\n${c}\nAfter partner explains: genuine acknowledgment they feel they paid for something not working, they feel like they lost money. Acknowledge directly. Then transition into reviewing the account together as part of the process. Human, no corporate phrases.`],
+    ['reason_budget',`Acknowledgment script for churn reason: budget concerns.\n${c}\nAfter partner explains: money is tight and it is a real concern, not dismissive. They feel like they are paying for nothing. Acknowledge that directly. Then transition into account review. Human, no corporate phrases.`],
+    ['reason_roi',`Acknowledgment script for churn reason: not seeing ROI.\n${c}\nAfter partner explains: they have every right to question it if they cannot see results. Acknowledge that is fair, not an overreaction. Then transition into showing actual numbers. Human, no corporate phrases.`],
+    ['reason_seasonal',`Acknowledgment script for churn reason: seasonal slowdown.\n${c}\nAfter partner explains: acknowledge it feels pointless to keep paying during a slow period. Then explain why this is actually the worst time to cancel - they lose 3 months of built-up momentum right before peak season. Human, no corporate phrases.`],
+    ['reason_time',`Acknowledgment script for churn reason: no time to manage it.\n${c}\nAfter partner explains: acknowledge completely - they are already stretched and one more thing is too much. Do not dismiss it. Then: that is exactly why you are calling, because they should not have to manage this themselves. Human, no corporate phrases.`],
+    ['l1',`Lever 1 retention offer script.\n${c}\nListing Boost Package. At no extra cost you do ALL of this:\n- Add more photos/videos\n- Re-write description with better more searchable wording\n- Upload their Google reviews to their Batch listing\n- Create a blog post for them (another page that shows up in search results)\n- UGC tool: already activated, customers auto-upload photos after each experience\n- Complete their partner page on Batch (separate branded profile page)\nPresent as ONE bundle. Plain English. "I'm not going to let you pay anything additional for this." You and your team do all the work. Team starts right after call. Email in 24-48 hours. End: "How does that sound?"`],
+    ['l2',`Lever 2 script. Partner said no to Lever 1.\n${c}\nOffer: switch from quarterly to monthly billing. Lower commitment, more flexibility.\nAcknowledge not ready to go all in. Frame it: they still get the listing boost done, just month to month so not locked in. Short and direct. End: "How does that sound?"`],
+    ['l3',`Lever 3 price reduction script. Partner said no to Levers 1 and 2.\n${c}\nWrite THREE separate say-boxes labeled clearly:\n1. 25% off for 2 months. Lowering their rate while they build momentum.\n2. If no: $150/month for 3 months.\n3. If still no: $99/month for 3 months. This is as low as you go.\nFor each: if they cancel now they lose all ground they built. The lower price buys time. End each: "How does that sound?"`],
+    ['l4',`Lever 4 final offer script. Partner declined all previous offers.\n${c}\nConvert to Bookable Email Partner. Right now neither side can see exact bookings from Batch. Once converted, customers book directly through Batch, both sides see real booking numbers - actual proof of ROI. Pair with $99/mo for 3 months.\nFinal offer, make it count. Core pitch: right now they cannot see what Batch is sending them. This gives them proof. Honest, direct. End: "How does that sound?"`],
+    ['close',`Closing script for when partner accepts any offer.\n${c}\nUniversal close (works for any accepted offer):\n1. Confirm what you are doing for them right now\n2. Partner support team starts today\n3. Email in 24-48 hours showing exactly what was done\n4. Check-in one week before billing cycle ends to review results\n5. End: "I really appreciate your time [NAME], talk to you soon. Have a great day."\nShort. No fluff. Make the follow-up feel real.`],
+    ['cancel',`Cancellation script. Partner declined everything and wants to cancel.\n${c}\nCliff's exact approach:\n- Stop pitching. Accept their decision with dignity.\n- "I completely understand. Let me go ahead and pull up your subscription right now."\n- "Bear with me one second." (while pulling up Stripe)\n- "Alright, I have it here. Going to go ahead and cancel this now."\n- "I have set this to cancel at the end of your current billing period. Your listing stays fully active until [billing end date]. No new charges after that."\n- Close: "I really appreciate your time today [NAME], and I wish you a wonderful day." Do NOT say "Is there anything else I can help you with?"\n- Short and dignified.\nAdd a tip box with Stripe steps: Subscriptions, find their subscription, click the 3 dots, Cancel subscription, End of current period.`],
+  ];
+}
+
+/* ─── MAIN GENERATE ─── */
+async function runGenerate(){
   collect();
-  startBtn('s1btn');
-  setStatus(`Generating opening script for ${S.name}...`,'active');
-  setLoading('s1out');
-  const prompt=`Generate the opening + value script for a churn retention call.
+  const btn=document.getElementById('genBtn');
+  btn.classList.add('loading');btn.disabled=true;
+  document.getElementById('loadingOverlay').classList.add('visible');
+  setLoading(2,'Getting started...','✍️');
 
-${ctx()}
+  const c=ctx();
+  const ps=prompts(c);
+  const total=ps.length;
+  const stepLabels=['Opening script','Value script','Slow bookings response','Budget response','ROI response','Seasonal response','No time response','Lever 1 — Listing Boost','Lever 2 — Monthly Pay','Lever 3 — Price Drop','Lever 4 — Bookable Partner','Close script','Cancellation script'];
+  const stepIcons=['📞','📊','📉','💸','🤔','🌿','⏰','🎯','💳','💰','🔗','🎉','📋'];
 
-Write two sections:
-1. Opening (Sympathize): Agent calls the partner. Warm greeting, use their name. Acknowledge you saw the cancellation request and already pulled up their account before calling. Ask them to fill you in. Short. Don't retain yet.
-2. Value (Show the numbers): After they've talked, translate every metric into plain English. Show what the numbers mean for them. Make them feel the traffic is real. If the listing is not optimized, frame that as an opportunity you can fix. Be specific. Skip any metric that is unknown.
-
-Tailor to this specific partner's actual data.`;
-  try {
-    const html=await callAI(prompt);
-    setReady('s1out', html);
-    showEl('s2label'); showEl('step2card');
-    document.getElementById('step2card').scrollIntoView({behavior:'smooth',block:'start'});
-    setStatus('Opening script ready. Select the churn reason.','done');
-  } catch(e){ setError('s1out',e.message); resetBtn('s1btn'); setStatus('Error generating script.','error'); }
-}
-
-/* ── STEP 2: REASON ─── */
-function pickReason(btn){
-  document.querySelectorAll('#reasonPills .pill').forEach(b=>b.className='pill');
-  const col=btn.dataset.col;
-  btn.className='pill sel-'+col;
-  S.reason=btn.dataset.val;
-  document.getElementById('otherWrap').classList.toggle('show',S.reason==='other');
-  document.getElementById('s2btn').disabled=false;
-}
-async function runS2(){
-  const reason=S.reason==='other'?(document.getElementById('otherText').value||'other reason'):S.reason;
-  startBtn('s2btn');
-  setStatus(`Writing acknowledgment for: ${reason}...`,'active');
-  setLoading('s2out');
-  const prompt=`Generate the acknowledgment script for Phase 2 (Assess) of a churn retention call.
-
-${ctx()}
-
-Churn reason stated: ${reason}
-
-Write what the agent says AFTER the partner has explained their reason:
-1. Make them feel genuinely heard — real human acknowledgment, not fake "I hear you" customer service. They feel like they're paying for something that's not working.
-2. They feel like they lost money. Acknowledge that directly without sugarcoating.
-3. Transition into: you want to walk them through what you saw on their account as part of the process before proceeding. This keeps them on the line without sounding like a pitch.
-
-Human, no corporate phrases.`;
-  try {
-    const html=await callAI(prompt);
-    setReady('s2out', html);
-    showEl('l1label'); showEl('l1card');
-    document.getElementById('l1card').scrollIntoView({behavior:'smooth',block:'start'});
-    setStatus('Acknowledgment ready. Present Lever 1.','done');
-  } catch(e){ setError('s2out',e.message); resetBtn('s2btn'); setStatus('Error.','error'); }
-}
-
-/* ── LEVERS ─── */
-async function runLever(n){
-  const outId='l'+n+'out', genId='l'+n+'genbtn';
-  startBtn(genId);
-  setLoading(outId);
-  setStatus(`Generating Lever ${n} script...`,'active');
-  const reason=S.reason==='other'?(document.getElementById('otherText').value||'other'):S.reason;
-  let prompt='';
-
-  if(n===1){
-    prompt=`Generate the Lever 1 retention offer script.
-
-${ctx()}
-Churn reason: ${reason}
-
-Lever 1 is the Listing Boost Package. You do all of the following for them at no additional cost:
-- Add more photos and videos to their listing
-- Re-write and improve their listing description with better, more searchable wording
-- Upload any Google reviews they have directly to their Batch listing
-- Create a blog post for them (a separate page on Batch that also shows up in search results — more visibility)
-- The UGC collection tool: after every group experience, customers can upload their own photos and videos. The partner gets that content automatically. (Already activated — they may not know it.)
-- Complete their partner page on Batch (a branded profile page separate from their listing)
-
-Present this as ONE bundled package. Rules:
-- Explain what each thing means in plain English, not jargon
-- Say "I'm not going to let you pay anything additional for this"
-- Make it clear you and your team are doing all the work, not them
-- Paint the picture: multiple pages now working for them in search results
-- Tell them the team starts right after the call and they get an email in 24-48 hours
-- End with "How does that sound?"`;
-
-  } else if(n===2){
-    prompt=`Generate the Lever 2 script. The partner said no to the Lever 1 listing boost package.
-
-${ctx()}
-Churn reason: ${reason}
-
-Lever 2: Offer to switch from quarterly to monthly billing. Lower commitment, more flexibility.
-
-Acknowledge they're not ready to go all in yet. Offer monthly billing as a way to lower the commitment feel. Frame it as: they can still get the listing boost work done, but month to month so they're not locked in. Short, matter-of-fact. End with "How does that sound?"`;
-
-  } else if(n===3){
-    const pm={'25pct':'25% off for the next 2 months','150':'$150 per month for the next 3 months','99':'$99 per month for the next 3 months - this is the lowest we go'};
-    const pl={'25pct':'25% Off for 2 Months','150':'$150/mo for 3 Months','99':'$99/mo Floor'};
-    prompt=`Generate the Lever 3 price reduction script. Specific offer: ${pm[S.currentPrice]}.
-
-${ctx()}
-Churn reason: ${reason}
-Price offer: ${pl[S.currentPrice]}
-
-Be honest and direct. You want to keep their listing alive and you're willing to lower the price while it builds momentum. Frame it as: the listing is already doing something, and if they cancel now they lose all the ground they've built. The lower price just buys time for it to work. Short, no fluff. End with "How does that sound?"`;
-
-  } else if(n===4){
-    prompt=`Generate the Lever 4 script. The partner has declined all previous offers. This is the final retention offer.
-
-${ctx()}
-Churn reason: ${reason}
-
-Lever 4: Convert their listing from Batch Direct to a Bookable Email Partner. What this means: right now, customers cannot book directly through Batch, so neither the partner nor Batch can clearly see how many bookings are actually coming from Batch. Once converted, customers can place a real booking through Batch. Both the partner and Batch now see the exact number of bookings. The partner gets actual proof of ROI. Pair with $99/mo pricing for 3 months.
-
-This is the final offer — make it count. The core pitch: right now they have no way to see what Batch is actually sending them. This gives them that proof. Honest, direct. End with "How does that sound?"`;
-  }
-
-  try {
-    const html=await callAI(prompt);
-    setReady(outId, html);
-    showYN('l'+n+'yn');
-    setStatus(`Lever ${n} script ready.`,'done');
-  } catch(e){ setError(outId,e.message); resetBtn(genId); setStatus('Error.','error'); }
-}
-
-/* ── LEVER RESPONSES ─── */
-function accepted(lever){
-  hideYN('l'+lever.replace('L','').toLowerCase()+'yn');
-  setStatus('Offer accepted! Writing closing script...','active');
-  runClose('accepted', lever);
-}
-function declined(lever){
-  hideYN('l'+lever.replace('L','').toLowerCase()+'yn');
-  const map={L1:'l2',L2:'l3'};
-  if(lever==='L4'){
-    setStatus('Writing cancellation script...','active');
-    runClose('cancel',null);
-  } else {
-    const next=map[lever];
-    showEl(next+'label'); showEl(next+'card');
-    document.getElementById(next+'card').scrollIntoView({behavior:'smooth',block:'start'});
-    setStatus('Moving to next lever...');
+  try{
+    for(let i=0;i<ps.length;i++){
+      const[key,prompt]=ps[i];
+      setLoading(Math.round(((i)/total)*90)+2,`Writing: ${stepLabels[i]}...`,stepIcons[i]);
+      GEN[key]=await generate(prompt);
+    }
+    setLoading(97,'Assembling your guide...','📦');
+    await new Promise(r=>setTimeout(r,400));
+    setLoading(100,'Done! Downloading now...','🎉');
+    await new Promise(r=>setTimeout(r,600));
+    buildAndDownload();
+  }catch(e){
+    document.getElementById('loadingOverlay').classList.remove('visible');
+    alert('Error: '+e.message+'\n\nPlease try again.');
+    btn.classList.remove('loading');btn.disabled=false;
   }
 }
 
-/* ── L3 PRICE LADDER ─── */
-function selectPrice(p){
-  const el=document.getElementById({'25pct':'p25','150':'p150','99':'p99'}[p]);
-  if(!el||!el.classList.contains('unlocked')) return;
-  S.currentPrice=p;
-  document.querySelectorAll('.price-opt').forEach(o=>o.classList.remove('active'));
-  el.classList.add('active');
-  const lbl={'25pct':'Generate 25% Off Script','150':'Generate $150/mo Script','99':'Generate $99/mo Script'};
-  document.getElementById('l3genbtn').querySelector('.btn-text').textContent=lbl[p];
-  // reset output
-  const out=document.getElementById('l3out');
-  out.className='script-block'; out.innerHTML='';
-  resetBtn('l3genbtn');
-  hideYN('l3yn');
+/* ─── ESCAPE FOR TEMPLATE LITERAL EMBEDDING ─── */
+function esc(s){return(s||'').replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');}
+
+/* ─── BUILD & DOWNLOAD INTERACTIVE HTML ─── */
+function buildAndDownload(){
+  const date=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const fname=`call-guide-${S.name.toLowerCase().replace(/[^a-z0-9]/g,'-')}-${new Date().toISOString().slice(0,10)}.html`;
+
+  const html=`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Call Guide — ${S.name} — ${date}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--black:#0F0C0C;--white:#F0F1F4;--sunset:#FF5F00;--ocean:#4F97FC;--cosmo:#FF93D3;--lime:#00DF00;--gold:#FFCA00;--gold-t:#FFF3B0;--ocean-t:#D6E9FF;--cosmo-t:#FFE0F3;--lime-t:#C8FFB0;--sunset-t:#FFD9C0}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Mulish',sans-serif;background:var(--white);color:var(--black);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* HYPE BANNER */
+.hype-banner{background:var(--gold);padding:0;overflow:hidden;flex-shrink:0;position:relative;cursor:pointer;transition:all .2s}
+.hype-banner:hover{background:#f0bc00}
+.hype-inner{max-width:100%;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.hype-msg{font-family:'Playfair Display',serif;font-size:clamp(16px,2.5vw,22px);font-weight:900;color:var(--black);line-height:1.15}
+.hype-msg span{color:var(--sunset)}
+.hype-meta{font-size:12px;font-weight:700;color:rgba(15,12,12,.5);white-space:nowrap}
+.hype-dismiss{font-size:11px;font-weight:800;color:rgba(15,12,12,.4);background:rgba(15,12,12,.1);border:none;border-radius:20px;padding:4px 12px;cursor:pointer;font-family:'Mulish',sans-serif;white-space:nowrap;flex-shrink:0}
+.hype-dismiss:hover{background:rgba(15,12,12,.2)}
+
+/* HOW TO USE PANEL */
+.howto-banner{background:var(--black);padding:10px 32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.08)}
+.howto-steps{display:flex;gap:20px;flex-wrap:wrap}
+.howto-step{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(240,241,244,.5);font-weight:600}
+.howto-num{width:18px;height:18px;border-radius:50%;background:var(--sunset);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.howto-label{font-size:11px;color:rgba(240,241,244,.5)}
+
+/* TOP BAR */
+.topbar{background:var(--black);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:2px solid var(--sunset)}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.topbar-logo{font-family:'Playfair Display',serif;font-size:18px;color:#fff;font-weight:700}
+.topbar-sep{width:1px;height:24px;background:rgba(255,255,255,.15)}
+.topbar-info{display:flex;flex-direction:column;gap:1px}
+.topbar-title{font-size:11px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;line-height:1}
+.topbar-partner{font-size:11px;color:rgba(240,241,244,.45);font-weight:600;line-height:1}
+.badge-got-this{font-size:11px;font-weight:800;color:var(--gold);letter-spacing:1px;text-transform:uppercase;background:rgba(255,202,0,.12);border:1px solid rgba(255,202,0,.3);padding:5px 14px;border-radius:20px;white-space:nowrap}
+
+/* LAYOUT */
+.layout{display:flex;flex:1;overflow:hidden;min-height:0}
+
+/* LEFT FLOWCHART */
+.flow-panel{width:272px;flex-shrink:0;background:#fff;border-right:1.5px solid rgba(15,12,12,.09);overflow-y:auto;padding:14px 12px}
+.flow-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:rgba(15,12,12,.3);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(15,12,12,.07);padding-left:4px}
+
+/* NODES */
+.fn{border-radius:11px;padding:10px 12px;margin-bottom:5px;cursor:pointer;transition:all .15s;border:2px solid transparent;display:flex;align-items:flex-start;gap:9px;user-select:none}
+.fn:hover{transform:translateX(2px);box-shadow:0 3px 10px rgba(0,0,0,.07)}
+.fn.active{box-shadow:0 4px 14px rgba(0,0,0,.12)!important;transform:translateX(3px)!important}
+.fn-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.fn-text{flex:1;min-width:0}
+.fn-label{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;line-height:1.2;margin-bottom:1px}
+.fn-sub{font-size:10px;opacity:.55;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+
+/* CONNECTOR */
+.fc{display:flex;align-items:center;gap:5px;margin:1px 0 1px 18px}
+.fc-line{width:2px;height:12px;background:rgba(15,12,12,.08);border-radius:2px}
+.fc-lbl{font-size:9px;font-weight:700;color:rgba(15,12,12,.3);text-transform:uppercase;letter-spacing:.5px}
+
+/* SUB GROUPS */
+.fn-sub-group{margin:3px 0 3px 10px;display:none}
+.fn-sub-group.open{display:block}
+.fn-sub-node{border-radius:8px;padding:7px 10px;margin-bottom:3px;cursor:pointer;transition:all .15s;border:1.5px solid rgba(15,12,12,.07);background:rgba(15,12,12,.02);display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;user-select:none}
+.fn-sub-node:hover{background:rgba(15,12,12,.05);transform:translateX(1px)}
+.fn-sub-node.active{background:var(--cosmo-t);border-color:var(--cosmo)}
+
+.fn-lever-group{margin:3px 0 3px 10px;display:none}
+.fn-lever-group.open{display:block}
+.fn-lever-node{border-radius:8px;padding:7px 10px;margin-bottom:3px;cursor:pointer;transition:all .15s;border:1.5px solid;display:flex;align-items:flex-start;gap:7px;font-size:11.5px;font-weight:700;user-select:none}
+.fn-lever-node:hover{transform:translateX(1px)}
+.fn-lever-node.active{box-shadow:0 2px 8px rgba(0,0,0,.1)!important;transform:translateX(2px)!important}
+
+/* SCRIPT PANEL */
+.script-panel{flex:1;overflow-y:auto;background:var(--white);min-width:0}
+.script-inner{max-width:680px;margin:0 auto;padding:28px 28px 60px}
+.script-header{margin-bottom:22px;padding-bottom:16px;border-bottom:1.5px solid rgba(15,12,12,.08)}
+.script-eyebrow{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:rgba(15,12,12,.3);margin-bottom:5px}
+.script-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;line-height:1.1;margin-bottom:4px}
+.script-sub{font-size:13px;color:rgba(15,12,12,.45);line-height:1.5}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;text-align:center;gap:10px;padding:40px 20px}
+.empty-icon{font-size:44px;opacity:.25}
+.empty-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:rgba(15,12,12,.35)}
+.empty-sub{font-size:13px;color:rgba(15,12,12,.25);max-width:260px;line-height:1.6}
+
+/* SCRIPT CONTENT */
+.say-box{background:var(--ocean-t);border-left:4px solid var(--ocean);border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:10px;position:relative}
+.say-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:rgba(15,12,12,.35);margin-bottom:6px}
+.say-txt{font-size:13.5px;line-height:1.8;color:var(--black);white-space:pre-line}
+.tip-box{background:var(--gold-t);border-left:4px solid var(--gold);border-radius:0 10px 10px 0;padding:12px 16px;margin-bottom:10px;font-size:13px;line-height:1.6;color:#5a4400}
+.tip-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#7a6000;margin-bottom:5px}
+.warn-box{background:var(--sunset-t);border-left:4px solid var(--sunset);border-radius:0 10px 10px 0;padding:12px 16px;margin-bottom:10px;font-size:13px;line-height:1.6;color:#661a00}
+.warn-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--sunset);margin-bottom:5px}
+.section-hl{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin:16px 0 10px;color:var(--black)}
+.copy-btn{background:transparent;border:1.5px solid rgba(15,12,12,.12);border-radius:8px;padding:5px 12px;font-family:'Mulish',sans-serif;font-size:11px;font-weight:700;color:rgba(15,12,12,.4);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:5px;margin-top:5px}
+.copy-btn:hover{border-color:var(--ocean);color:var(--ocean)}
+.copy-btn.copied{border-color:#00aa00;color:#00aa00}
+
+@media(max-width:600px){
+  .flow-panel{width:220px}
+  .hype-inner{padding:12px 16px}
+  .howto-banner,.badge-got-this{display:none}
+  .script-inner{padding:20px 16px 60px}
 }
-function priceYes(){
-  hideYN('l3yn');
-  setStatus('Price accepted! Writing closing script...','active');
-  runClose('accepted','L3_'+S.currentPrice);
+</style>
+</head>
+<body>
+
+<!-- HYPE BANNER -->
+<div class="hype-banner" id="hypeBanner">
+  <div class="hype-inner">
+    <div class="hype-msg">You've got this, <span>${S.agentName}.</span> Now go keep that partner.</div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div class="hype-meta">${S.name} · ${S.tier} · ${date}</div>
+      <button class="hype-dismiss" onclick="document.getElementById('hypeBanner').style.display='none'">Dismiss</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOW TO USE -->
+<div class="howto-banner">
+  <div class="howto-steps">
+    <div class="howto-step"><div class="howto-num">1</div><div class="howto-label">Click any step in the left panel</div></div>
+    <div class="howto-step"><div class="howto-num">2</div><div class="howto-label">Read the script on the right</div></div>
+    <div class="howto-step"><div class="howto-num">3</div><div class="howto-label">Hit Copy to grab any line</div></div>
+    <div class="howto-step"><div class="howto-num">4</div><div class="howto-label">Pick the reason they gave under Acknowledgment</div></div>
+    <div class="howto-step"><div class="howto-num">5</div><div class="howto-label">Work down the levers until one sticks</div></div>
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">batch</div>
+    <div class="topbar-sep"></div>
+    <div class="topbar-info">
+      <div class="topbar-title">Churn Call Guide</div>
+      <div class="topbar-partner">${S.name} · ${S.tier} · ${S.tenure} with Batch</div>
+    </div>
+  </div>
+  <div class="badge-got-this">✦ You got this, ${S.agentName}!</div>
+</div>
+
+<div class="layout">
+
+  <!-- FLOWCHART -->
+  <div class="flow-panel">
+    <div class="flow-title">Call Flow</div>
+
+    <div class="fn" id="fn_open" style="background:var(--sunset-t);border-color:var(--sunset)" onclick="show('open','📞 Opening the Call','Phase 1 — Sympathize','Start here when the call connects. Keep it short.')">
+      <div class="fn-icon">📞</div>
+      <div class="fn-text"><div class="fn-label">Open the Call</div><div class="fn-sub">Start here</div></div>
+    </div>
+    <div class="fc"><div class="fc-line"></div><div class="fc-lbl">they talk</div></div>
+    <div class="fn" id="fn_value" style="background:var(--ocean-t);border-color:var(--ocean)" onclick="show('value','📊 Show the Numbers','Phase 3 — Value','After they explain, show them what their data actually means.')">
+      <div class="fn-icon">📊</div>
+      <div class="fn-text"><div class="fn-label">Show the Numbers</div><div class="fn-sub">After they vent</div></div>
+    </div>
+    <div class="fc"><div class="fc-line"></div><div class="fc-lbl">their reason</div></div>
+    <div class="fn" id="fn_reasons" style="background:var(--cosmo-t);border-color:var(--cosmo)" onclick="toggleGroup('reasons')">
+      <div class="fn-icon">💬</div>
+      <div class="fn-text"><div class="fn-label">Acknowledgment</div><div class="fn-sub">Pick what they said</div></div>
+      <span id="reasons_chev" style="font-size:10px;opacity:.35;flex-shrink:0;margin-top:3px;transition:transform .2s">▼</span>
+    </div>
+    <div class="fn-sub-group" id="reasons_group">
+      <div class="fn-sub-node" id="fn_reason_slow" onclick="show('reason_slow','📉 Slow / No Bookings','Acknowledgment','What to say after they say they got no bookings.')">📉 Slow / No Bookings</div>
+      <div class="fn-sub-node" id="fn_reason_budget" onclick="show('reason_budget','💸 Budget Concerns','Acknowledgment','What to say when money is the issue.')">💸 Budget Concerns</div>
+      <div class="fn-sub-node" id="fn_reason_roi" onclick="show('reason_roi','🤔 Not Seeing ROI','Acknowledgment','What to say when they question the value.')">🤔 Not Seeing ROI</div>
+      <div class="fn-sub-node" id="fn_reason_seasonal" onclick="show('reason_seasonal','🌿 Seasonal Slowdown','Acknowledgment','What to say when it is just a slow season.')">🌿 Seasonal Slowdown</div>
+      <div class="fn-sub-node" id="fn_reason_time" onclick="show('reason_time','⏰ No Time','Acknowledgment','What to say when they feel overwhelmed.')">⏰ No Time to Manage</div>
+    </div>
+    <div class="fc"><div class="fc-line"></div><div class="fc-lbl">try levers</div></div>
+    <div class="fn" id="fn_levers" style="background:rgba(255,95,0,.05);border-color:rgba(255,95,0,.2)" onclick="toggleGroup('levers')">
+      <div class="fn-icon">🎯</div>
+      <div class="fn-text"><div class="fn-label">Retention Levers</div><div class="fn-sub">Use in order, stop on yes</div></div>
+      <span id="levers_chev" style="font-size:10px;opacity:.35;flex-shrink:0;margin-top:3px;transition:transform .2s">▼</span>
+    </div>
+    <div class="fn-lever-group" id="levers_group">
+      <div class="fn-lever-node" id="fn_l1" style="background:var(--sunset-t);border-color:var(--sunset)" onclick="show('l1','🎯 Lever 1 — Listing Boost Package','Offer First','Present this first. Bundle everything together.')">
+        <span style="font-size:14px">🎯</span>
+        <div><div>L1 — Listing Boost</div><div style="font-size:9px;opacity:.5;margin-top:1px;font-weight:500">Lead with this always</div></div>
+      </div>
+      <div class="fn-lever-node" id="fn_l2" style="background:var(--ocean-t);border-color:var(--ocean)" onclick="show('l2','💳 Lever 2 — Monthly Payments','If L1 Declined','Offer monthly billing to lower the commitment feel.')">
+        <span style="font-size:14px">💳</span>
+        <div><div>L2 — Monthly Pay</div><div style="font-size:9px;opacity:.5;margin-top:1px;font-weight:500">If L1 is declined</div></div>
+      </div>
+      <div class="fn-lever-node" id="fn_l3" style="background:var(--gold-t);border-color:var(--gold)" onclick="show('l3','💰 Lever 3 — Price Reduction','If L2 Declined','25% off first, then $150/mo, then $99 floor.')">
+        <span style="font-size:14px">💰</span>
+        <div><div>L3 — Price Drop</div><div style="font-size:9px;opacity:.5;margin-top:1px;font-weight:500">25% → $150 → $99 floor</div></div>
+      </div>
+      <div class="fn-lever-node" id="fn_l4" style="background:var(--lime-t);border-color:#00cc00" onclick="show('l4','🔗 Lever 4 — Bookable Email Partner','Final Offer','Last card. If this doesn\\'t work, proceed to cancel.')">
+        <span style="font-size:14px">🔗</span>
+        <div><div>L4 — Bookable Partner</div><div style="font-size:9px;opacity:.5;margin-top:1px;font-weight:500">Final offer</div></div>
+      </div>
+    </div>
+    <div class="fc"><div class="fc-line"></div><div class="fc-lbl">outcome</div></div>
+    <div style="display:flex;gap:5px">
+      <div class="fn" id="fn_close" style="flex:1;background:var(--lime-t);border-color:#00cc00" onclick="show('close','🎉 Offer Accepted','Close the Call','They said yes. Now confirm, set expectations, and hang up clean.')">
+        <div class="fn-icon" style="font-size:14px">🎉</div>
+        <div class="fn-text"><div class="fn-label" style="font-size:12px">Yes — Close</div></div>
+      </div>
+      <div class="fn" id="fn_cancel" style="flex:1;background:#FDECEA;border-color:#F5C6C2" onclick="show('cancel','📋 Cancellation Script','Cancel','They declined everything. Handle with dignity.')">
+        <div class="fn-icon" style="font-size:14px">📋</div>
+        <div class="fn-text"><div class="fn-label" style="font-size:12px">No — Cancel</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT PANEL -->
+  <div class="script-panel" id="scriptPanel">
+    <div class="script-inner">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">👈</div>
+        <div class="empty-title">Pick a step on the left</div>
+        <div class="empty-sub">Click any node in the call flow and the script for that moment shows up here.</div>
+      </div>
+      <div id="scriptContent" style="display:none">
+        <div class="script-header">
+          <div class="script-eyebrow" id="sc_eyebrow"></div>
+          <div class="script-title" id="sc_title"></div>
+          <div class="script-sub" id="sc_sub"></div>
+        </div>
+        <div id="sc_body"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SCRIPTS={
+  open:\`${esc(GEN['open']||'')}\`,
+  value:\`${esc(GEN['value']||'')}\`,
+  reason_slow:\`${esc(GEN['reason_slow']||'')}\`,
+  reason_budget:\`${esc(GEN['reason_budget']||'')}\`,
+  reason_roi:\`${esc(GEN['reason_roi']||'')}\`,
+  reason_seasonal:\`${esc(GEN['reason_seasonal']||'')}\`,
+  reason_time:\`${esc(GEN['reason_time']||'')}\`,
+  l1:\`${esc(GEN['l1']||'')}\`,
+  l2:\`${esc(GEN['l2']||'')}\`,
+  l3:\`${esc(GEN['l3']||'')}\`,
+  l4:\`${esc(GEN['l4']||'')}\`,
+  close:\`${esc(GEN['close']||'')}\`,
+  cancel:\`${esc(GEN['cancel']||'')}\`,
+};
+
+function show(key,title,eyebrow,sub){
+  document.querySelectorAll('.fn,.fn-sub-node,.fn-lever-node').forEach(n=>n.classList.remove('active'));
+  const el=document.getElementById('fn_'+key);
+  if(el)el.classList.add('active');
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('scriptContent').style.display='block';
+  document.getElementById('sc_eyebrow').textContent=eyebrow;
+  document.getElementById('sc_title').textContent=title;
+  document.getElementById('sc_sub').textContent=sub;
+  const body=document.getElementById('sc_body');
+  body.innerHTML=SCRIPTS[key]||'<p style="color:#aaa;font-size:13px;padding:10px 0">Script not available.</p>';
+  body.querySelectorAll('.say-box').forEach(s=>{
+    if(s.querySelector('.copy-btn'))return;
+    const b=document.createElement('button');
+    b.className='copy-btn';b.textContent='Copy';
+    b.onclick=()=>{
+      navigator.clipboard.writeText(s.querySelector('.say-txt')?.innerText||'').then(()=>{
+        b.textContent='Copied!';b.classList.add('copied');
+        setTimeout(()=>{b.textContent='Copy';b.classList.remove('copied');},1600);
+      });
+    };
+    s.appendChild(b);
+  });
+  document.getElementById('scriptPanel').scrollTop=0;
 }
-function priceNo(){
-  hideYN('l3yn');
-  const order=['25pct','150','99'];
-  const idx=order.indexOf(S.currentPrice);
-  if(idx<order.length-1){
-    const next=order[idx+1];
-    S.currentPrice=next;
-    const idMap={'25pct':'p25','150':'p150','99':'p99'};
-    document.getElementById(idMap[next]).classList.add('unlocked');
-    selectPrice(next);
-    setStatus(`Next price: ${next==='150'?'$150/mo':'$99/mo'}. Generate the script.`);
-  } else {
-    showEl('l4label'); showEl('l4card');
-    document.getElementById('l4card').scrollIntoView({behavior:'smooth',block:'start'});
-    setStatus('All prices declined. Moving to Lever 4.');
-  }
+
+function toggleGroup(id){
+  const g=document.getElementById(id+'_group');
+  const c=document.getElementById(id+'_chev');
+  const open=g.classList.toggle('open');
+  if(c){c.style.transform=open?'rotate(180deg)':'rotate(0deg)';}
 }
 
-/* ── CLOSING / CANCEL ─── */
-async function runClose(type, lever){
-  showEl('s4label'); showEl('step4card');
-  document.getElementById('s4title').innerHTML = type==='cancel'
-    ? 'Cancellation Script <span class="card-tag step">Final Step</span>'
-    : 'Closing Script <span class="card-tag done">Offer Accepted</span>';
-  setLoading('s4out');
-  document.getElementById('step4card').scrollIntoView({behavior:'smooth',block:'start'});
+// Boot straight into the opening
+show('open','📞 Opening the Call','Phase 1 — Sympathize','Start here when the call connects. Keep it short.');
+document.getElementById('fn_open').classList.add('active');
+<\/script>
+</body>
+</html>`;
 
-  const leverLabels={
-    L1:'Listing Boost Package (media, optimization, ratings, blog post, UGC tool)',
-    L2:'Monthly payment option',
-    L3_25pct:'25% off for 2 months',
-    L3_150:'$150/month for 3 months',
-    L3_99:'$99/month floor for 3 months',
-    L4:'Bookable email partner conversion at $99/mo for 3 months'
-  };
-  const reason=S.reason==='other'?(document.getElementById('otherText').value||'other'):S.reason;
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=fname;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 
-  let prompt='';
-  if(type==='accepted'){
-    prompt=`Generate the closing script for a successful retention call.
-
-${ctx()}
-Offer accepted: ${leverLabels[lever]||lever}
-
-Write the closing:
-1. Confirm what you're doing for them right now
-2. Tell them the partner support team starts today
-3. They'll get an email in 24-48 hours showing exactly what was done
-4. Schedule a check-in one week before the end of their billing cycle to review results together
-5. End warmly and briefly: "I really appreciate your time [NAME], talk to you soon. Have a great day."
-No fluff. Short. Make the follow-up feel real.`;
-  } else {
-    prompt=`Generate the cancellation script. The partner declined every offer and wants to cancel.
-
-${ctx()}
-Churn reason: ${reason}
-
-Follow Cliff's exact approach:
-- Stop pitching. Accept their decision with dignity.
-- Say: "I completely understand. Let me go ahead and pull up your subscription right now."
-- Give them a beat while you pull up Stripe. Say "Bear with me one second."
-- After finding it: "Alright, I have it here. Going to go ahead and cancel this now."
-- Explain: "I've set this to cancel at the end of your current billing period. Your listing stays fully active until [billing end date]. No new charges after that."
-- Close warmly. Do NOT say "Is there anything else I can help you with today?" — you did not help them stay and it highlights that. Say instead: "I really appreciate your time today [NAME], and I wish you a wonderful day."
-- Keep it short and dignified.
-
-Add a tip box with the Stripe steps: Subscriptions → find their sub → 3 dots → Cancel subscription → End of current period.`;
-  }
-
-  try {
-    const html=await callAI(prompt);
-    setReady('s4out', html);
-    setStatus(type==='cancel'?'Cancellation script ready. Handle Stripe and close warmly.':'Closing script ready. Great save!', type==='cancel'?'error':'done');
-  } catch(e){ setError('s4out',e.message); setStatus('Error.','error'); }
+  // Hide overlay, re-enable button
+  setTimeout(()=>{
+    document.getElementById('loadingOverlay').classList.remove('visible');
+    document.getElementById('genBtn').classList.remove('loading');
+    document.getElementById('genBtn').disabled=false;
+    document.getElementById('genBtn').querySelector('.btn-text').textContent='✦ Generate Call Guide';
+  },800);
 }
 </script>
+<script src="https://js.puter.com/v2/"></script>
 </body>
 </html>
