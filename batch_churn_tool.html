@@ -453,10 +453,13 @@ const S = { name:'', listing:'', tier:'', tenure:'', views:'', impr:'', favs:'',
 
 /* ── PUTER ─── */
 async function checkAuth(){
-  try { const u = await puter.auth.getUser(); if(u){ document.getElementById('puterBadge').style.display='none'; setStatus('Ready. Fill in partner info.',''); } } catch(e){}
+  try {
+    const u = await puter.auth.getUser();
+    if(u){ document.getElementById('puterBadge').style.display='none'; setStatus('Signed in. Fill in partner info to begin.','done'); }
+  } catch(e){ /* not yet signed in — Puter will prompt on first AI call */ }
 }
 async function puterSignIn(){
-  try { await puter.auth.signIn(); document.getElementById('puterBadge').style.display='none'; setStatus('Signed in. Fill in partner info.','done'); } catch(e){ alert('Sign in failed. Try again.'); }
+  try { await puter.auth.signIn(); document.getElementById('puterBadge').style.display='none'; setStatus('Signed in. Fill in partner info to begin.','done'); } catch(e){ alert('Sign in failed. Please try again.'); }
 }
 window.addEventListener('load', checkAuth);
 
@@ -534,8 +537,12 @@ Output ONLY the HTML. No markdown fences, no explanation outside HTML.`;
 
 /* ── PUTER AI ─── */
 async function callAI(prompt){
-  const res = await puter.ai.chat(prompt, { model:'claude-sonnet-4-5', system:SYS });
-  const raw = typeof res==='string'?res:(res?.message?.content?.[0]?.text||res?.text||'');
+  const fullPrompt = SYS + '\n\n---\n\n' + prompt;
+  const response = await puter.ai.chat(fullPrompt, { model: 'claude-sonnet-4-6', stream: true });
+  let raw = '';
+  for await (const part of response) {
+    if (part?.text) raw += part.text;
+  }
   return raw.replace(/^```html?\s*/i,'').replace(/```\s*$/,'').trim();
 }
 
@@ -685,7 +692,7 @@ Lever 2: Offer to switch from quarterly to monthly billing. Lower commitment, mo
 Acknowledge they're not ready to go all in yet. Offer monthly billing as a way to lower the commitment feel. Frame it as: they can still get the listing boost work done, but month to month so they're not locked in. Short, matter-of-fact. End with "How does that sound?"`;
 
   } else if(n===3){
-    const pm={'25pct':'25% off for the next 2 months','150':'$150 per month for the next 3 months','99':'$99 per month for the next 3 months — this is the lowest we go'};
+    const pm={'25pct':'25% off for the next 2 months','150':'$150 per month for the next 3 months','99':'$99 per month for the next 3 months - this is the lowest we go'};
     const pl={'25pct':'25% Off for 2 Months','150':'$150/mo for 3 Months','99':'$99/mo Floor'};
     prompt=`Generate the Lever 3 price reduction script. Specific offer: ${pm[S.currentPrice]}.
 
@@ -736,12 +743,12 @@ function declined(lever){
 
 /* ── L3 PRICE LADDER ─── */
 function selectPrice(p){
-  const el=document.getElementById({25pct:'p25',150:'p150',99:'p99'}[p]);
+  const el=document.getElementById({'25pct':'p25','150':'p150','99':'p99'}[p]);
   if(!el||!el.classList.contains('unlocked')) return;
   S.currentPrice=p;
   document.querySelectorAll('.price-opt').forEach(o=>o.classList.remove('active'));
   el.classList.add('active');
-  const lbl={25pct:'Generate 25% Off Script',150:'Generate $150/mo Script',99:'Generate $99/mo Script'};
+  const lbl={'25pct':'Generate 25% Off Script','150':'Generate $150/mo Script','99':'Generate $99/mo Script'};
   document.getElementById('l3genbtn').querySelector('.btn-text').textContent=lbl[p];
   // reset output
   const out=document.getElementById('l3out');
@@ -761,7 +768,7 @@ function priceNo(){
   if(idx<order.length-1){
     const next=order[idx+1];
     S.currentPrice=next;
-    const idMap={25pct:'p25',150:'p150',99:'p99'};
+    const idMap={'25pct':'p25','150':'p150','99':'p99'};
     document.getElementById(idMap[next]).classList.add('unlocked');
     selectPrice(next);
     setStatus(`Next price: ${next==='150'?'$150/mo':'$99/mo'}. Generate the script.`);
