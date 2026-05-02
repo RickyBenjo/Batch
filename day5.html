@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 5 — Disputes, Billing & Week Wrap · Batch Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0F0C0C; --white: #F0F1F4; --sunset: #FF5F00; --ocean: #4F97FC;
+    --cosmo: #FF93D3; --lime: #00DF00; --gold: #FFCA00; --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF; --cosmo-tint: #FFE0F3; --lime-tint: #C8FFB0; --sunset-tint: #FFD9C0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Mulish', sans-serif; background: var(--white); color: var(--black); font-size: 14px; line-height: 1.6; }
+
+  .topnav { background: var(--black); padding: 14px 40px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--sunset); }
+  .topnav a { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.15s; }
+  .topnav a:hover { color: var(--sunset); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--sunset); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+
+  .tab-nav { background: var(--black); padding: 0 40px; display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 46px; z-index: 99; }
+  .tab-btn { padding: 12px 18px; font-size: 12px; font-weight: 700; color: rgba(240,241,244,0.45); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.15s; font-family: 'Mulish', sans-serif; letter-spacing: 0.3px; }
+  .tab-btn:hover { color: rgba(240,241,244,0.8); }
+  .tab-btn.active { color: var(--sunset); border-bottom-color: var(--sunset); }
+
+  .hero { background: var(--black); padding: 52px 40px 44px; position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; right: -60px; top: -60px; width: 300px; height: 300px; border-radius: 50%; background: var(--sunset); opacity: 0.07; }
+  .hero::before { content: ''; position: absolute; left: -60px; bottom: -60px; width: 200px; height: 200px; border-radius: 50%; background: var(--gold); opacity: 0.06; }
+  .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-badge { display: inline-block; background: var(--sunset); color: #fff; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; padding: 5px 14px; border-radius: 30px; margin-bottom: 16px; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 48px); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 10px; }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); margin-bottom: 24px; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(240,241,244,0.7); border: 1px solid rgba(255,255,255,0.1); }
+
+  .page-body { max-width: 900px; margin: 0 auto; padding: 36px 40px 80px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 3px solid; }
+  .sec-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .sec-head h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+
+  .card { background: #fff; border-radius: 14px; border: 1.5px solid rgba(15,12,12,0.09); padding: 20px 22px; margin-bottom: 14px; }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 13.5px; color: #555; line-height: 1.65; }
+  .card ul { padding-left: 18px; }
+  .card li { margin-bottom: 4px; }
+
+  .callout { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; border-left: 4px solid; }
+  .callout.gold { background: var(--gold-tint); border-color: var(--gold); }
+  .callout.blue { background: var(--ocean-tint); border-color: var(--ocean); }
+  .callout.pink { background: var(--cosmo-tint); border-color: var(--cosmo); }
+  .callout.green { background: var(--lime-tint); border-color: #00b800; }
+  .callout.orange { background: var(--sunset-tint); border-color: var(--sunset); }
+  .callout strong { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+  .callout p, .callout li { font-size: 13.5px; line-height: 1.6; }
+  .callout ul { padding-left: 16px; }
+  .callout li { margin-bottom: 3px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  .ctable { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; border-radius: 12px; overflow: hidden; }
+  .ctable th { background: var(--black); color: var(--white); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .ctable td { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+  .ctable tr:last-child td { border-bottom: none; }
+  .ctable tr:nth-child(even) td { background: rgba(240,241,244,0.5); }
+  .check { color: #00aa00; font-weight: 700; }
+  .cross { color: #cc2200; font-weight: 700; }
+
+  .steps { }
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--black); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-body { flex: 1; }
+  .step-body strong { font-size: 13.5px; display: block; margin-bottom: 2px; }
+  .step-body span { font-size: 12.5px; color: #666; }
+
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .tag.gold { background: var(--gold); color: var(--black); }
+  .tag.blue { background: var(--ocean); color: #fff; }
+  .tag.orange { background: var(--sunset); color: #fff; }
+  .tag.green { background: var(--lime); color: var(--black); }
+  .tag.pink { background: var(--cosmo); color: var(--black); }
+
+  .warning { background: #fff3e0; border: 2px solid var(--sunset); border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; }
+  .warning .w-title { font-weight: 800; color: var(--sunset); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .warning p, .warning li { font-size: 13px; line-height: 1.65; }
+  .warning ul { padding-left: 16px; }
+
+  .phase-card { border-radius: 14px; padding: 16px 18px; border: 2px solid; margin-bottom: 10px; display: flex; gap: 16px; align-items: flex-start; }
+  .phase-label { font-family: 'Playfair Display', serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; flex-shrink: 0; width: 70px; margin-top: 2px; }
+  .phase-body h4 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+  .phase-body p { font-size: 13px; color: #555; line-height: 1.6; }
+
+  .script-box { background: var(--black); border-radius: 14px; padding: 18px 22px; margin-bottom: 14px; }
+  .script-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--sunset); margin-bottom: 10px; }
+  .script-text { font-size: 13.5px; color: rgba(240,241,244,0.85); line-height: 1.8; font-style: italic; }
+  .script-note { font-size: 11.5px; color: rgba(240,241,244,0.4); margin-top: 8px; }
+
+  .case-study { border-radius: 14px; border: 2px solid; padding: 18px 20px; margin-bottom: 14px; }
+  .case-study .cs-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .case-study .cs-badge { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; padding: 3px 12px; border-radius: 20px; }
+  .case-study .cs-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; }
+  .case-study p, .case-study li { font-size: 13.5px; color: #555; line-height: 1.65; }
+  .case-study ul { padding-left: 16px; }
+  .case-study li { margin-bottom: 4px; }
+  .case-study h4 { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; margin: 10px 0 5px; color: #333; }
+
+  .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .do-box { background: var(--lime-tint); border: 2px solid #00b800; border-radius: 14px; padding: 16px 18px; }
+  .dont-box { background: #ffe8e8; border: 2px solid #cc2200; border-radius: 14px; padding: 16px 18px; }
+  .do-box h4 { color: #005500; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .dont-box h4 { color: #cc2200; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .do-box li, .dont-box li { font-size: 12.5px; line-height: 1.65; margin-bottom: 4px; }
+  .do-box ul, .dont-box ul { padding-left: 16px; }
+  @media (max-width: 600px) { .do-dont { grid-template-columns: 1fr; } }
+
+  .week-summary { background: var(--black); border-radius: 18px; padding: 28px 32px; color: var(--white); margin-bottom: 16px; }
+  .week-summary h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 18px; }
+  .week-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  .week-stat { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px 14px; }
+  .week-stat .ws-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(240,241,244,0.4); margin-bottom: 5px; }
+  .week-stat .ws-val { font-size: 14px; font-weight: 700; color: var(--white); line-height: 1.4; }
+  .week-stat .ws-val.gold { color: var(--gold); }
+  .week-stat .ws-val.blue { color: var(--ocean); }
+  .week-stat .ws-val.green { color: var(--lime); }
+  .week-stat .ws-val.orange { color: var(--sunset); }
+  .week-stat .ws-val.pink { color: var(--cosmo); }
+
+  .bottom-nav { border-top: 2px solid rgba(15,12,12,0.08); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 900px; margin: 0 auto; }
+  .bottom-nav a { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--black); text-decoration: none; padding: 10px 20px; border: 2px solid rgba(15,12,12,0.15); border-radius: 30px; transition: all 0.15s; }
+  .bottom-nav a:hover { background: var(--black); color: var(--sunset); border-color: var(--black); }
+  .bottom-nav .disabled { opacity: 0.35; pointer-events: none; }
+
+  @media (max-width: 600px) {
+    .topnav, .tab-nav { padding-left: 20px; padding-right: 20px; }
+    .page-body { padding: 24px 20px 60px; }
+    .bottom-nav { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html">Training Hub</a>
+  <span class="sep">›</span>
+  <span class="current">Day 5 — Disputes, Billing & Week Wrap</span>
+</nav>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="show('aftercall', this)">After-Call Workflow</button>
+  <button class="tab-btn" onclick="show('retention', this)">Retention Tiers</button>
+  <button class="tab-btn" onclick="show('stripe', this)">Stripe Billing</button>
+  <button class="tab-btn" onclick="show('disputes', this)">Dispute Management</button>
+  <button class="tab-btn" onclick="show('policies', this)">Partner Policies</button>
+  <button class="tab-btn" onclick="show('casestudies', this)">Case Studies</button>
+  <button class="tab-btn" onclick="show('weekwrap', this)">Week Wrap</button>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Day 5 · May 1, 2026</div>
+    <h1>Disputes, Billing<br>& Week Wrap</h1>
+    <p class="hero-sub">After-call Airtable workflow, structured retention tiers, Stripe price reversion process, dispute management with evidence builder, Batch Partner Policies, real churn call case studies, and Week 1 close-out.</p>
+    <div class="hero-chips">
+      <div class="chip">Parts 1–5 covered</div>
+      <div class="chip">Live call shadowing covered</div>
+      <div class="chip">3 churn case studies</div>
+      <div class="chip">Stefan's April churn analysis</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- AFTER-CALL WORKFLOW -->
+  <div class="section visible" id="sec-aftercall">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>After-Call Workflow</h2>
+    </div>
+
+    <div class="callout orange">
+      <strong>Core Rule: Record First, Execute Second</strong>
+      <p>Right after every call, submit the Airtable cross-team request form before doing anything else. This keeps a paper trail of what was promised, who's responsible, and what's been completed — so nothing falls through the cracks between calls.</p>
+    </div>
+
+    <div class="card">
+      <h3>Step-by-Step: After Every Churn Call</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Go to Airtable → Cross-Team Request Form</strong><span>Select Partner Experience Team (for all partner support tasks, including after-call work). Select Member Experience Team only for customer/booking issues.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Find the Vendor ID</strong><span>Go to the partner's profile page in the Vendor Directory. The ID is in the URL. Copy it directly — don't retype.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Fill in Request Details</strong><span>State what was offered and accepted. List each task separately: "Listing optimization — all experiences," "Ratings &amp; reviews upload," "Blog post creation," "UGC tool activation," "Media shuffle." Specify which listing(s) if the partner has more than one.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Set Priority Level</strong><span><strong>On-fire</strong> = needs to happen today. <strong>High priority</strong> = 24–48 hours (use this for after-call tasks — it matches what you told the partner). <strong>Low priority</strong> = normal queue.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Submit + Notify in Slack</strong><span>After submitting, tag the specific teammates in Slack with the Airtable request link. Don't just message — create the record first, then notify. Never rely on Slack alone (no paper trail).</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Assign Directly (Don't Let Teammates Cherry-Pick)</strong><span>In the Airtable request, assign the task to a specific teammate. This prevents confusion, avoidance, and uneven distribution.</span></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-body"><strong>For Cancellations: Send Intercom Message Immediately</strong><span>Use the Intercom macro (backslash → "cancel" → select PX Cancellation at End of Subscription Term). Edit the billing end date. Send within 2–3 minutes of ending the call. No need to compose from scratch.</span></div></div>
+        <div class="step"><div class="step-num">8</div><div class="step-body"><strong>Prepare for Next Call</strong><span>The Airtable request should take 1–3 minutes. The Intercom cancellation message should take 2–3 minutes. After both, move straight into pre-call prep for the next partner — 10-minute buffer before each call.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Status Tracking in the Core Engagement Sheet</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Field</th><th>When to Mark Yes</th><th>Notes</th></tr>
+        <tr><td>Photos Updated</td><td>Only after partner has actually uploaded new photos/videos</td><td>Don't mark yes just because you asked them to</td></tr>
+        <tr><td>Reviews Requested</td><td>After you've asked partner for their review link</td><td>Mark yes even if they haven't added yet</td></tr>
+        <tr><td>Profile Completed</td><td>After logo, about, socials, website are all filled</td><td>All fields must be done — not partial</td></tr>
+        <tr><td>Blog Post</td><td>After post is published</td><td>Ask partner for assets first; drafting takes time</td></tr>
+        <tr><td>Listing Optimization</td><td>After CoStar re-optimization is done and saved</td><td>—</td></tr>
+        <tr><td>UGC Tool</td><td>After tool is activated and partner is notified</td><td>It's already active — just needs the intro email</td></tr>
+        <tr><td>Resolve Date</td><td><strong>Only when ALL fields above are yes</strong></td><td>Don't add resolve date for partial completion</td></tr>
+      </table>
+    </div>
+
+    <div class="callout blue">
+      <strong>Waiting for Partner vs. In Progress</strong>
+      <p>If you've done your part but the partner hasn't uploaded photos or added reviews yet, mark the field as <strong>Waiting for Partner</strong> (not yes, not in progress). This lets you come back to these records during slow periods and follow up proactively — "Hey, just checking in, we're still waiting on those photos so we can finalize your optimization."</p>
+    </div>
+
+    <div class="card">
+      <h3>Airtable Request: Multi-Listing Partners</h3>
+      <ul>
+        <li>If a partner has multiple listings, always specify <strong>which listing(s)</strong> the task applies to</li>
+        <li>Example: "Listing optimization — <em>Listing 1: [URL] and Listing 2: [URL]</em>"</li>
+        <li>Without this, teammates may optimize all listings when only one was discussed — wasted work</li>
+        <li>Or worse, they may skip some, assuming someone else will handle it</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>After-Call Task: Full Execution Checklist (Humpty Key Example)</h3>
+      <ul>
+        <li><strong>Re-optimize both listings</strong> — run CoStar on each, update title, description, tags</li>
+        <li><strong>Copy ratings</strong> — use "Add to Listing" button to transfer up to 80 reviews from one listing to the other</li>
+        <li><strong>Send blog post email macro</strong> — ask for blog assets (photos, story, key details)</li>
+        <li><strong>Send UGC Collection Tool intro email</strong> — use new macro with screenshots and tool link (create this macro if not yet available)</li>
+        <li><strong>Shuffle media</strong> — rearrange photos and videos for visual diversity; alternate video and photo; best photo first</li>
+        <li><strong>Notify partner via email</strong> — either one consolidated email OR individual emails per offer (your call as supervisor)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- RETENTION TIERS -->
+  <div class="section" id="sec-retention">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Retention Tiers — Updated System</h2>
+    </div>
+
+    <div class="callout gold">
+      <strong>What Changed</strong>
+      <p>The 1-month pause offer has been <strong>eliminated</strong>. It created extra work (manually pausing/unpausing Stripe) and partners who took it usually churned anyway. Replaced with a structured 3-tier system with more durable retention value.</p>
+    </div>
+
+    <div class="card">
+      <h3>Tier 1 — Free Modules (Always First)</h3>
+      <p style="margin-bottom: 10px; font-size: 13.5px; color: #555;">Activate via the <strong>BPM Module checkbox</strong> in the partner's Airtable record. These are included in the subscription — you're unlocking them, not adding cost.</p>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Signal Strength</th><th>Modules to Offer</th></tr>
+        <tr><td><strong>Strong Signal</strong> (5+ itinerary adds)</td><td>All 3: Content Creator Network + UGC Collection + City Demand Data</td></tr>
+        <tr><td><strong>Medium Signal</strong> (1–4 itinerary adds)</td><td>All 3: Content Creator Network + UGC Collection + City Demand Data</td></tr>
+        <tr><td><strong>Weak Signal</strong> (0 itinerary adds)</td><td>City Demand Data only — shows them where the market is heading</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Tier 2 — Quarterly-to-Monthly Billing Switch</h3>
+      <ul>
+        <li><strong>When to offer:</strong> Partner cites cash flow concerns, or they are outside their commitment period</li>
+        <li><strong>When NOT to offer:</strong> If a partner is still within a commitment period and pays quarterly — switching them to monthly lets them cancel after one month's payment and dispute the rest</li>
+        <li><strong>What it does:</strong> Reduces the financial commitment burden without reducing the subscription price</li>
+        <li><strong>How:</strong> Change billing cycle in Stripe — don't delete and recreate the subscription</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Tier 3 — Temporary Price Reduction (Max 3 Months)</h3>
+      <ul>
+        <li><strong>Starting offer:</strong> 25% discount (e.g., $150/mo → $112.50)</li>
+        <li><strong>Price floor:</strong> Never discount a partner already at $99/mo — nothing lower exists</li>
+        <li><strong>Maximum duration:</strong> 3 months, tracked in the Pricing Reversion Task tab</li>
+        <li><strong>Discount timing:</strong> Ideally offered at the 7-day-before-billing-end meeting, after showing improved metrics — discount reinforces staying, not substitutes for value</li>
+        <li><strong>If they push for more:</strong> Escalate to $150/mo flat, then $99/mo — in that order</li>
+        <li><strong>Seasonal partners:</strong> If they cancel anyway, advise them to return 3 months before peak season to rebuild SEO and audience</li>
+      </ul>
+    </div>
+
+    <div class="callout blue">
+      <strong>Offer Timing Matters</strong>
+      <p>Don't offer discounts immediately when a partner requests cancellation — it signals desperation and undermines your credibility. The first 6 months of their commitment should be used to prove value and build leverage. Only offer pricing concessions when you have data showing improvement, or when all other levers have been refused.</p>
+    </div>
+  </div>
+
+  <!-- STRIPE BILLING -->
+  <div class="section" id="sec-stripe">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Stripe Billing & Price Reversion</h2>
+    </div>
+
+    <div class="callout blue">
+      <strong>Why the Old Process Was Broken</strong>
+      <p>The previous workflow deleted the old Stripe product and created a new one at the discounted price. When it was time to revert, there was no record of the original price, and the manual tracking was inconsistent. The new process edits the existing product in-place and uses a dedicated tracking tab.</p>
+    </div>
+
+    <div class="card">
+      <h3>New Process: Temporary Price Cut in Stripe</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Find the Partner's Subscription in Stripe</strong><span>Open Stripe → search partner name or email → open their subscription.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Edit the Existing Price (Do NOT Delete)</strong><span>Click on the current product price → Edit → change the amount directly (e.g., $250 → $187.50 for 25% off). Do not delete the product and add a new one.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Schedule the Change</strong><span>Apply on a custom date — set it to the end of the current billing cycle so they start the discount on their next bill, not mid-cycle.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Log in the Pricing Reversion Task Tab</strong><span>In the Google Sheet, record: partner name, original price, discounted price, start date, and reversion date (3 months out). This is your reminder to undo the discount.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Email Partner ~1 Week Before Reversion</strong><span>Send a heads-up: "Just a reminder that your promotional rate ends on [date] and your subscription will return to $[original] on [date]. Here's what we've accomplished together in the last 3 months…" Frame it as a natural transition, not a price hike.</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>On Reversion Date: Edit Price Back</strong><span>Repeat step 2 in reverse — edit the price back to original. Check the Pricing Reversion Task tab weekly so nothing is missed.</span></div></div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Never Delete &amp; Re-Add a Stripe Product</div>
+      <p>Deleting the product creates a new subscription record, loses billing history context, and makes it harder to track reversion. Always edit the existing price in place. The paper trail stays intact and reversions are cleaner.</p>
+    </div>
+
+    <div class="card">
+      <h3>Cancellation in Stripe — Quick Recap</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Find subscription → Click 3 dots → Cancel Subscription</strong><span></span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Always choose "End of Current Period"</strong><span>Never cancel immediately unless partner specifically demands it and you've confirmed with Stefan. They paid for the time — they keep it.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Note the billing end date</strong><span>Tell the partner on the call, confirm in the Intercom cancellation message.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Add a note in Stripe</strong><span>Brief note: why they cancelled, what was offered, outcome. Useful for Stefan's analysis and future dispute prevention.</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISPUTE MANAGEMENT -->
+  <div class="section" id="sec-disputes">
+    <div class="sec-head" style="border-color: var(--cosmo);">
+      <div class="sec-dot" style="background: var(--cosmo);"></div>
+      <h2>Dispute Management</h2>
+    </div>
+
+    <div class="callout pink">
+      <strong>Tool: Batch Dispute Evidence Builder</strong>
+      <p>Use the Evidence Builder before deciding whether to counter or accept a dispute. It assesses win probability based on the type of dispute, time elapsed, services provided, and documentation available. Only counter if the evidence supports it — accepting a losing dispute is better than submitting weak evidence.</p>
+    </div>
+
+    <div class="card">
+      <h3>Process: When a Partner Files a Dispute</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Run the Dispute Evidence Builder</strong><span>Assess win probability. Identify the dispute type (fraudulent, product not received, services not rendered, etc.).</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Call the Partner First</strong><span>Before submitting any counter evidence, call the partner directly. Request that they withdraw the dispute. Offer support for their underlying concerns. Most disputes are really retention problems in disguise.</span></div></div>
+        <div class="step"><div class="step-num">3a</div><div class="step-body"><strong>If Partner Withdraws the Dispute</strong><span>Confirm via email immediately. Document the withdrawal. Proceed with retention offers as normal.</span></div></div>
+        <div class="step"><div class="step-num">3b</div><div class="step-body"><strong>If Partner Refuses and Wants to Cancel</strong><span>Cancel their account but inform them you will still counter the dispute, citing Batch Partner Policies. Don't let a cancellation mean you forfeit the dispute.</span></div></div>
+        <div class="step"><div class="step-num">3c</div><div class="step-body"><strong>If Partner Refuses but Doesn't Cancel</strong><span>Counter the dispute using the Evidence Builder output. Submit all relevant documentation: listing activity, communications history, billing records, services rendered.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Add a Detailed Note in Stripe</strong><span>Regardless of outcome, add a note explaining the decision — accepted or countered, and why. This creates a paper trail for Stefan and any future disputes from the same partner.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Dispute Types and Default Decisions</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Dispute Type</th><th>Default Approach</th><th>Key Consideration</th></tr>
+        <tr><td><strong>Fraudulent</strong></td><td>Assess case-by-case</td><td>Was the charge valid? Did they receive the service? How long were they active?</td></tr>
+        <tr><td><strong>Product/Service Not Received</strong></td><td>Counter if service was provided</td><td>Do you have listing activity, emails, and optimization records to prove value was delivered?</td></tr>
+        <tr><td><strong>Misunderstanding of Charges</strong></td><td>Call first, try to resolve</td><td>Often a retention problem — partner didn't understand what they were paying for</td></tr>
+        <tr><td><strong>Unauthorized Charge</strong></td><td>Investigate thoroughly</td><td>Check if the correct contact signed up; review all Stripe records</td></tr>
+      </table>
+    </div>
+
+    <div class="case-study" style="background: #fff3e0; border-color: var(--sunset);">
+      <div class="cs-header">
+        <div class="cs-badge" style="background: var(--sunset); color: #fff;">Case Study</div>
+        <div class="cs-name">Morena Miami Tan — Accepted Dispute</div>
+      </div>
+      <h4>The Situation</h4>
+      <p>Partner disputed a $200 charge as "fraudulent." Investigation revealed they had paid for 5 months (~$1,000 total) before their listing went live on April 29. The disputed charge was from April 11 — 18 days before their listing was even published.</p>
+      <h4>The Decision: Accept the Dispute</h4>
+      <p>Rationale: Batch failed to deliver the onboarding/support service they were paying for during that 18-day window. The partner received no value from that specific charge, making the refund justified — even though they technically labelled it "fraudulent." Accepting was the right call morally and legally.</p>
+      <h4>Lesson</h4>
+      <p>The dispute label doesn't always match the underlying issue. Look at what actually happened: did we provide the service? If no — accept. If yes — counter with evidence.</p>
+    </div>
+
+    <div class="card">
+      <h3>What "Win Probability" Actually Means</h3>
+      <ul>
+        <li><strong>High win probability:</strong> You have listing activity records, email logs, optimization history, and the partner was active and using the platform</li>
+        <li><strong>Low win probability:</strong> Partner never had their listing live, there's minimal communication history, or there's evidence of a service failure on Batch's side</li>
+        <li><strong>The current win rate is ~6%</strong> — this is very low and signals that disputes aren't being handled with enough documentation upfront</li>
+        <li>Adding Stripe notes after every call is one of the key ways to build better dispute evidence going forward</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PARTNER POLICIES -->
+  <div class="section" id="sec-policies">
+    <div class="sec-head" style="border-color: var(--lime);">
+      <div class="sec-dot" style="background: var(--lime);"></div>
+      <h2>Batch Partner Policies</h2>
+    </div>
+
+    <div class="callout green">
+      <strong>Where to Find Them</strong>
+      <p>Admin Panel → Submit Service Request → click the <strong>"Batch Partner Policies"</strong> hyperlink. Review these before any dispute or commitment enforcement conversation.</p>
+    </div>
+
+    <div class="card">
+      <h3>Key Policy Clauses</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Policy</th><th>What It Means</th><th>How to Use It</th></tr>
+        <tr>
+          <td><strong>14-Day Cancellation Notice</strong></td>
+          <td>Partners must give 14 days' notice before cancelling</td>
+          <td>Powerful tool to gain time for retention efforts. "Per our partner policy, we do require 14 days' notice — which gives me time to put together a proper optimization plan for you before your listing deactivates."</td>
+        </tr>
+        <tr>
+          <td><strong>Commitment Terms (3/6/12 months)</strong></td>
+          <td>Partners agreed to a minimum commitment period when signing up</td>
+          <td>Reframe as an SEO investment: "The reason for the commitment period is that SEO takes 3 months to compound. We want to make sure you've had enough time to actually see results before making a decision." Never weaponize it — use it as context.</td>
+        </tr>
+        <tr>
+          <td><strong>No Refund Policy</strong></td>
+          <td>Default is no refunds on subscription payments</td>
+          <td>This is the baseline — but the retention playbook overrides it (prorated refunds approved by Stefan for special cases). Never promise refunds without Stefan approval.</td>
+        </tr>
+        <tr>
+          <td><strong>Non-Disclosure / Confidentiality</strong></td>
+          <td>Partners agreed not to disclose platform details</td>
+          <td>Rarely enforced due to lack of legal resources — but exists in the policy. Reference only if partner is publicly disparaging the platform.</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Enforcing the 12-Month Commitment — When to Use It</h3>
+      <ul>
+        <li><strong>Use it once:</strong> Enforce the commitment on the first call. Schedule the cancellation for the end of the commitment term and fill that window with high-value optimizations.</li>
+        <li><strong>Don't use it twice:</strong> If a partner has already tried to cancel before and you enforced the policy then, do not enforce it again. Process the cancellation immediately — otherwise it looks predatory.</li>
+        <li><strong>High frustration = immediate cancel:</strong> If a partner is extremely upset or claims they were misled, processing the cancellation immediately (even within commitment) is better than enforcing a policy and destroying the relationship or risking a dispute.</li>
+        <li><strong>Enforcement creates a window:</strong> A 6-month remaining commitment = 6 months to demonstrate value, convert them to bookable, and prevent the eventual churn.</li>
+      </ul>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Refunds Always Require Stefan Approval</div>
+      <p>Never promise a refund on a call without Stefan's sign-off. On the call, say: "I'll submit that to our team for review and follow up with you within 24–48 hours regarding the decision." Don't say "I'll see what I can do" — it sounds like a yes that may not come through.</p>
+    </div>
+  </div>
+
+  <!-- CASE STUDIES -->
+  <div class="section" id="sec-casestudies">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Live Call Case Studies</h2>
+    </div>
+
+    <div class="callout blue">
+      <strong>Context: Live Shadowing</strong>
+      <p>These are real churn calls handled on May 1. Each illustrates a different scenario and decision framework. Study the reasoning behind each outcome — not just what was done, but why.</p>
+    </div>
+
+    <div class="case-study" style="background: #ffe8e8; border-color: #cc2200;">
+      <div class="cs-header">
+        <div class="cs-badge" style="background: #cc2200; color: #fff;">Churned</div>
+        <div class="cs-name">Blumonsense — Immediate Cancellation</div>
+      </div>
+      <h4>The Situation</h4>
+      <p>Core partner at $105.33/month with 3 Fair Harbor listings. Cited "no ROI" and "too expensive." Zero bookings in 435 days. Profile was incomplete — no logo, missing reviews and videos. Also had a prior cancellation request in July 2025.</p>
+      <h4>Decision: Process Immediate Cancellation (May 18)</h4>
+      <p>The prior cancellation request was the key signal — this partner had already mentally checked out almost a year ago and was pushed to stay. A hard-save attempt would come across as predatory. Respect the decision. Scheduled for May 18 (end of current period).</p>
+      <h4>Lesson</h4>
+      <p>Prior cancellation attempts signal a firm decision. Don't fight it twice — it damages the relationship and wastes call time. Send the cancellation confirmation email with Batch Partner Policy reference (no refunds clause).</p>
+    </div>
+
+    <div class="case-study" style="background: var(--lime-tint); border-color: #00b800;">
+      <div class="cs-header">
+        <div class="cs-badge" style="background: #00aa00; color: #fff;">Saved (6-Month Window)</div>
+        <div class="cs-name">Camp Tiki — Churn Delay &amp; Optimization</div>
+      </div>
+      <h4>The Situation</h4>
+      <p>Partner at $150/month on a 12-month commitment. Requested cancellation immediately after a $825 semi-annual payment (with $75 discount already applied). Cited "too expensive" and "not seeing enough ROI." Cancellation requested just after a large payment — emotional, not purely rational.</p>
+      <h4>Decision: Enforce Commitment, Schedule for October 31</h4>
+      <p>Still within the 12-month term. Enforced the commitment — cancellation scheduled for end of period (Oct 31). To justify the remaining 6 months, immediately offered a full, high-value optimization package:</p>
+      <ul>
+        <li>Copy 80 reviews from one listing to another</li>
+        <li>Reshuffle media to refresh content</li>
+        <li>Activate UGC Collection Tool (QR codes, prizes)</li>
+        <li>Create a blog post</li>
+        <li>Re-optimize listings with new keywords</li>
+      </ul>
+      <h4>Outcome</h4>
+      <p>Partner accepted the plan. 6-month window created to demonstrate value. Schedule 30/60/90-day follow-ups to track progress and build the case for renewal.</p>
+      <h4>Lesson</h4>
+      <p>Enforce the commitment once — and immediately back it up with action. The commitment gives you time; the optimization package gives you a reason to use it.</p>
+    </div>
+
+    <div class="case-study" style="background: #ffe8e8; border-color: #cc2200;">
+      <div class="cs-header">
+        <div class="cs-badge" style="background: #cc2200; color: #fff;">Churned (Waived Commitment)</div>
+        <div class="cs-name">Borgz — Immediate Cancellation</div>
+      </div>
+      <h4>The Situation</h4>
+      <p>Partner at $99/month on a 12-month commitment. Claimed a misunderstanding about the monthly payment structure — said they didn't know they'd be billed monthly for 12 months. Profile incomplete (no videos, no reviews). Weak signal: zero impressions.</p>
+      <h4>Decision: Immediate Cancellation (May 29) — Commitment Waived</h4>
+      <p>Zero impressions means no SEO traction at all — there's nothing to point to. The "misled" claim, even if not fully accurate, made enforcing the policy too risky. A partner who feels deceived will file a dispute. Processing the cancellation immediately cost less than a potential dispute loss.</p>
+      <h4>Lesson</h4>
+      <p>When a partner claims they were misled and there's genuinely no performance data to show them, enforcing the commitment makes Batch look predatory. Cut the loss cleanly. Send the cancellation confirmation email (Katelyn).</p>
+    </div>
+
+    <div class="card">
+      <h3>Stefan's April Churn Analysis — Key Findings</h3>
+      <p style="margin-bottom: 10px; font-size: 13.5px; color: #555;">Stefan's analysis of 103 churned partners in April:</p>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Finding</th><th>What It Means</th></tr>
+        <tr><td>59% cohort churned</td><td>More than half of the tracked group left — retention is the #1 priority</td></tr>
+        <tr><td>91% had published listings</td><td>Setup is NOT the problem. Partners are leaving after going live, not before. They just can't see the ROI.</td></tr>
+        <tr><td>Only 35% of listings fully optimized</td><td>65% of churned partners had unoptimized listings — this is why QA for recently live partners matters so much</td></tr>
+        <tr><td>Main gaps: reviews and videos</td><td>Social proof and content are what converts impressions to bookings — these are the first things to fix</td></tr>
+        <tr><td>15 partners never published after paying</td><td>Paid full subscriptions, never went live — onboarding failure. These partners need proactive follow-up within 14 days of sign-up.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- WEEK WRAP -->
+  <div class="section" id="sec-weekwrap">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Week 1 Wrap-Up & What's Next</h2>
+    </div>
+
+    <div class="week-summary">
+      <h3>Week 1 in Numbers</h3>
+      <div class="week-grid">
+        <div class="week-stat"><div class="ws-label">Training Days</div><div class="ws-val gold">5 days</div></div>
+        <div class="week-stat"><div class="ws-label">Sessions</div><div class="ws-val gold">8 sessions</div></div>
+        <div class="week-stat"><div class="ws-label">Tools Built</div><div class="ws-val green">4 tools</div></div>
+        <div class="week-stat"><div class="ws-label">Live Calls Shadowed</div><div class="ws-val blue">3 calls (May 1)</div></div>
+        <div class="week-stat"><div class="ws-label">Churn Cases Reviewed</div><div class="ws-val orange">3 cases</div></div>
+        <div class="week-stat"><div class="ws-label">First Solo Calls</div><div class="ws-val pink">Start May 4</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>What Week 2 Looks Like</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Day</th><th>Focus</th><th>Details</th></tr>
+        <tr><td><strong>Mon May 4</strong></td><td>Shadow Cliff's calls + First solo calls</td><td>Shadow at least one call, then immediately start making independent calls. Learn by doing.</td></tr>
+        <tr><td><strong>Tue–Fri</strong></td><td>Independent execution</td><td>Rick runs calls independently. Cliff available for questions but less direct oversight than Week 1.</td></tr>
+        <tr><td><strong>Daily ~4–5pm CST</strong></td><td>Check-in + training</td><td>Cliff and Rick meet to review complex scenarios, discuss outcomes, handle edge cases.</td></tr>
+        <tr><td><strong>End of Week 2</strong></td><td>Performance assessment</td><td>Cliff assesses Rick's call performance and formalizes reporting procedures for partner support.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Week 2 Workflow Structure (Daily)</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Pre-Call Block</strong><span>Pull data on partners with upcoming calls. 10-minute prep per call. Have solution list ready.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Call Block</strong><span>Target: 13–15 calls per day. Work through the churn call list. Use the Churn Call Script Tool during calls.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>After-Call Block</strong><span>Submit Airtable requests (1–3 min each). Send Intercom cancellation messages if applicable. Prepare for next call.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Inbox Block (10–11am CST)</strong><span>Review and respond to Intercom messages. Clear partner emails. Handle non-urgent follow-ups.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Daily Check-In (4–5pm CST)</strong><span>Debrief with Cliff. Surface hard cases, edge cases, questions. Additional training on complex scenarios.</span></div></div>
+      </div>
+    </div>
+
+    <div class="callout green">
+      <strong>Day 7 Coming Up: Batchification &amp; Claude AI Tools</strong>
+      <p>Next week's training will include a deep dive into batchification (listing optimization using CoStar prompts) and hands-on use of Claude AI tools — including generating performance emails, running SEO prompts, and reviewing AI outputs. Materials and call scripts will be provided before Monday.</p>
+    </div>
+
+    <div class="card">
+      <h3>Pending Action Items from Week 1</h3>
+      <ul>
+        <li><strong>Rick:</strong> Add "direct link clicks" and "referrals" to the listing performance tool</li>
+        <li><strong>Rick:</strong> Update the churn playbook with new commitment enforcement rules</li>
+        <li><strong>Rick:</strong> Review call recordings Cliff sends before May 4</li>
+        <li><strong>Rick:</strong> Create UGC Collection Tool email macro with screenshots and link</li>
+        <li><strong>Rick:</strong> Show the training hub to Stefan</li>
+        <li><strong>Rick:</strong> Complete Humpty Key after-call tasks (re-optimize 2 listings, copy 60 reviews, send blog/UGC emails, shuffle media)</li>
+        <li><strong>Rick:</strong> Equip Kring, Felix, Irvin with AI/automation tools</li>
+        <li><strong>Cliff:</strong> Finalize Pricing Reversion Task tab in Google Sheet</li>
+        <li><strong>Cliff:</strong> Send dispute call script and SOP to Rick</li>
+        <li><strong>Cliff:</strong> Email Kyra (Blumonsense) cancellation confirmation with policies</li>
+        <li><strong>Cliff:</strong> Create Airtable requests for Camp Tiki optimizations; schedule 30/60/90-day follow-ups</li>
+        <li><strong>Cliff:</strong> Email Katelyn (Borgz) cancellation confirmation</li>
+        <li><strong>Cliff:</strong> Schedule meeting with Stefan re: April churn analysis</li>
+      </ul>
+    </div>
+
+    <div class="callout pink">
+      <strong>Cliff's Note to Rick</strong>
+      <p>By Day 2 of training, Cliff was confident enough to move forward with his departure, knowing Batch would be in capable hands. Rick's immediate creation of tools and ability to absorb complex information at speed gave Cliff the assurance he needed. Cliff's projection: team grows from 11 headcount today to 21–22 by January/February next year, with potential for 27–28 if onboarding and sales are added to the scope. That growth depends on how Rick and Stefan execute — and Rick is already ahead of schedule.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <a href="day4.html">← Day 4</a>
+  <a href="index.html">Training Hub</a>
+  <a href="#" class="disabled">Day 6 — Coming Soon →</a>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('visible');
+  btn.classList.add('active');
+  window.scrollTo({ top: document.querySelector('.page-body').offsetTop - 100, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
