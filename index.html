@@ -3,294 +3,638 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Batch Training — Partner Engagement Specialist</title>
+<title>Day 4 — Listing QA & Churn Calls · Batch Training</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --black: #0F0C0C;
-    --white: #F0F1F4;
-    --sunset: #FF5F00;
-    --ocean: #4F97FC;
-    --cosmo: #FF93D3;
-    --lime: #00DF00;
-    --gold: #FFCA00;
-    --gold-tint: #FFF3B0;
-    --ocean-tint: #D6E9FF;
-    --cosmo-tint: #FFE0F3;
-    --lime-tint: #C8FFB0;
-    --sunset-tint: #FFD9C0;
+    --black: #0F0C0C; --white: #F0F1F4; --sunset: #FF5F00; --ocean: #4F97FC;
+    --cosmo: #FF93D3; --lime: #00DF00; --gold: #FFCA00; --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF; --cosmo-tint: #FFE0F3; --lime-tint: #C8FFB0; --sunset-tint: #FFD9C0;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Mulish', sans-serif; background: var(--white); color: var(--black); min-height: 100vh; }
+  body { font-family: 'Mulish', sans-serif; background: var(--white); color: var(--black); font-size: 14px; line-height: 1.6; }
 
-  .hero { background: var(--black); padding: 64px 48px 56px; position: relative; overflow: hidden; }
-  .hero::before { content: ''; position: absolute; width: 500px; height: 500px; border-radius: 50%; background: var(--gold); opacity: 0.07; right: -120px; top: -180px; }
-  .hero::after { content: ''; position: absolute; width: 300px; height: 300px; border-radius: 50%; background: var(--ocean); opacity: 0.07; left: -80px; bottom: -120px; }
+  .topnav { background: var(--black); padding: 14px 40px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--lime); }
+  .topnav a { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.15s; }
+  .topnav a:hover { color: var(--lime); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--lime); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+
+  .tab-nav { background: var(--black); padding: 0 40px; display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 46px; z-index: 99; }
+  .tab-btn { padding: 12px 18px; font-size: 12px; font-weight: 700; color: rgba(240,241,244,0.45); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.15s; font-family: 'Mulish', sans-serif; letter-spacing: 0.3px; }
+  .tab-btn:hover { color: rgba(240,241,244,0.8); }
+  .tab-btn.active { color: var(--lime); border-bottom-color: var(--lime); }
+
+  .hero { background: var(--black); padding: 52px 40px 44px; position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; right: -60px; top: -60px; width: 300px; height: 300px; border-radius: 50%; background: var(--lime); opacity: 0.07; }
+  .hero::before { content: ''; position: absolute; left: -60px; bottom: -60px; width: 200px; height: 200px; border-radius: 50%; background: var(--gold); opacity: 0.06; }
   .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
-  .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: var(--gold); color: var(--black); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; padding: 6px 16px; border-radius: 30px; margin-bottom: 24px; }
-  .hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--black); }
-  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 6vw, 64px); font-weight: 900; color: #fff; line-height: 1.05; margin-bottom: 16px; }
-  .hero h1 span { color: var(--gold); }
-  .hero-sub { font-size: 16px; color: rgba(240,241,244,0.6); max-width: 480px; line-height: 1.6; margin-bottom: 36px; }
-  .hero-meta { display: flex; gap: 24px; flex-wrap: wrap; }
-  .meta-pill { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 30px; padding: 8px 18px; font-size: 13px; color: rgba(240,241,244,0.8); font-weight: 600; }
-  .meta-pill .icon { width: 8px; height: 8px; border-radius: 50%; }
+  .hero-badge { display: inline-block; background: var(--lime); color: var(--black); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; padding: 5px 14px; border-radius: 30px; margin-bottom: 16px; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 48px); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 10px; }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); margin-bottom: 24px; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(240,241,244,0.7); border: 1px solid rgba(255,255,255,0.1); }
 
-  .progress-bar { background: rgba(255,255,255,0.06); border-top: 1px solid rgba(255,255,255,0.08); padding: 20px 48px; display: flex; align-items: center; gap: 16px; }
-  .progress-bar-inner { max-width: 900px; margin: 0 auto; width: 100%; display: flex; align-items: center; gap: 16px; }
-  .progress-label { font-size: 12px; color: rgba(240,241,244,0.5); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
-  .progress-track { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
-  .progress-fill { height: 100%; width: 40%; background: var(--gold); border-radius: 10px; transition: width 0.5s ease; }
-  .progress-count { font-size: 12px; color: rgba(240,241,244,0.5); font-weight: 700; white-space: nowrap; }
+  .page-body { max-width: 900px; margin: 0 auto; padding: 36px 40px 80px; }
+  .section { display: none; }
+  .section.visible { display: block; }
 
-  .main { max-width: 900px; margin: 0 auto; padding: 52px 48px 80px; }
-  .section-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; color: rgba(15,12,12,0.35); margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(15,12,12,0.1); }
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 3px solid; }
+  .sec-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .sec-head h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
 
-  .day-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin-bottom: 56px; }
-  .day-card { border-radius: 18px; border: 2px solid transparent; padding: 24px; text-decoration: none; color: var(--black); position: relative; overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s ease; display: block; }
-  .day-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.12); }
-  .day-card.available { cursor: pointer; }
-  .day-card.locked { cursor: default; opacity: 0.55; pointer-events: none; }
-  .day-card.locked:hover { transform: none; box-shadow: none; }
-  .day-card::before { content: ''; position: absolute; top: -30px; right: -30px; width: 100px; height: 100px; border-radius: 50%; opacity: 0.15; }
-  .day-card.c-gold { background: var(--gold-tint); border-color: var(--gold); }
-  .day-card.c-gold::before { background: var(--gold); }
-  .day-card.c-blue { background: var(--ocean-tint); border-color: var(--ocean); }
-  .day-card.c-blue::before { background: var(--ocean); }
-  .day-card.c-pink { background: var(--cosmo-tint); border-color: var(--cosmo); }
-  .day-card.c-pink::before { background: var(--cosmo); }
-  .day-card.c-green { background: var(--lime-tint); border-color: #00cc00; }
-  .day-card.c-green::before { background: var(--lime); }
-  .day-card.c-orange { background: var(--sunset-tint); border-color: var(--sunset); }
-  .day-card.c-orange::before { background: var(--sunset); }
-  .day-card.c-gray { background: #f0f0ee; border-color: #ccc; }
-  .day-num { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; opacity: 0.5; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1.5px; }
-  .day-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; line-height: 1.25; margin-bottom: 10px; }
-  .day-desc { font-size: 12.5px; line-height: 1.6; opacity: 0.65; margin-bottom: 16px; }
-  .day-tags { display: flex; flex-wrap: wrap; gap: 5px; }
-  .day-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 3px 10px; border-radius: 20px; background: rgba(15,12,12,0.08); color: rgba(15,12,12,0.6); }
-  .day-status { position: absolute; top: 20px; right: 20px; font-size: 18px; }
-  .day-date { font-size: 11px; font-weight: 700; opacity: 0.45; margin-top: 14px; display: block; }
+  .card { background: #fff; border-radius: 14px; border: 1.5px solid rgba(15,12,12,0.09); padding: 20px 22px; margin-bottom: 14px; }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 13.5px; color: #555; line-height: 1.65; }
+  .card ul { padding-left: 18px; }
+  .card li { margin-bottom: 4px; }
 
-  .quick-ref { background: var(--black); border-radius: 20px; padding: 36px 40px; color: var(--white); margin-bottom: 48px; }
-  .quick-ref h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 24px; color: #fff; }
-  .ref-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
-  .ref-item { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; }
-  .ref-item .ref-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(240,241,244,0.4); margin-bottom: 6px; }
-  .ref-item .ref-val { font-size: 14px; font-weight: 700; color: var(--white); line-height: 1.4; }
-  .ref-item .ref-val.gold { color: var(--gold); }
-  .ref-item .ref-val.blue { color: var(--ocean); }
-  .ref-item .ref-val.green { color: var(--lime); }
-  .ref-item .ref-val.pink { color: var(--cosmo); }
-  .ref-item .ref-val.orange { color: var(--sunset); }
+  .callout { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; border-left: 4px solid; }
+  .callout.gold { background: var(--gold-tint); border-color: var(--gold); }
+  .callout.blue { background: var(--ocean-tint); border-color: var(--ocean); }
+  .callout.pink { background: var(--cosmo-tint); border-color: var(--cosmo); }
+  .callout.green { background: var(--lime-tint); border-color: #00b800; }
+  .callout.orange { background: var(--sunset-tint); border-color: var(--sunset); }
+  .callout strong { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+  .callout p, .callout li { font-size: 13.5px; line-height: 1.6; }
+  .callout ul { padding-left: 16px; }
+  .callout li { margin-bottom: 3px; }
 
-  footer { border-top: 1px solid rgba(15,12,12,0.08); padding: 28px 48px; text-align: center; font-size: 12px; color: rgba(15,12,12,0.35); }
-  footer strong { color: rgba(15,12,12,0.6); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+
+  .ctable { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; border-radius: 12px; overflow: hidden; }
+  .ctable th { background: var(--black); color: var(--white); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .ctable td { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+  .ctable tr:last-child td { border-bottom: none; }
+  .ctable tr:nth-child(even) td { background: rgba(240,241,244,0.5); }
+  .check { color: #00aa00; font-weight: 700; }
+  .cross { color: #cc2200; font-weight: 700; }
+
+  .steps { }
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--black); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-body { flex: 1; }
+  .step-body strong { font-size: 13.5px; display: block; margin-bottom: 2px; }
+  .step-body span { font-size: 12.5px; color: #666; }
+
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .tag.gold { background: var(--gold); color: var(--black); }
+  .tag.blue { background: var(--ocean); color: #fff; }
+  .tag.orange { background: var(--sunset); color: #fff; }
+  .tag.green { background: var(--lime); color: var(--black); }
+  .tag.pink { background: var(--cosmo); color: var(--black); }
+
+  .warning { background: #fff3e0; border: 2px solid var(--sunset); border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; }
+  .warning .w-title { font-weight: 800; color: var(--sunset); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .warning p, .warning li { font-size: 13px; line-height: 1.65; }
+  .warning ul { padding-left: 16px; }
+
+  .phase-card { border-radius: 14px; padding: 16px 18px; border: 2px solid; margin-bottom: 10px; display: flex; gap: 16px; align-items: flex-start; }
+  .phase-label { font-family: 'Playfair Display', serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; flex-shrink: 0; width: 70px; margin-top: 2px; }
+  .phase-body h4 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+  .phase-body p { font-size: 13px; color: #555; line-height: 1.6; }
+
+  .script-box { background: var(--black); border-radius: 14px; padding: 18px 22px; margin-bottom: 14px; }
+  .script-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--lime); margin-bottom: 10px; }
+  .script-text { font-size: 13.5px; color: rgba(240,241,244,0.85); line-height: 1.8; font-style: italic; }
+  .script-note { font-size: 11.5px; color: rgba(240,241,244,0.4); margin-top: 8px; }
+
+  .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .do-box { background: var(--lime-tint); border: 2px solid #00b800; border-radius: 14px; padding: 16px 18px; }
+  .dont-box { background: #ffe8e8; border: 2px solid #cc2200; border-radius: 14px; padding: 16px 18px; }
+  .do-box h4 { color: #005500; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .dont-box h4 { color: #cc2200; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .do-box li, .dont-box li { font-size: 12.5px; line-height: 1.65; margin-bottom: 4px; }
+  .do-box ul, .dont-box ul { padding-left: 16px; }
+  @media (max-width: 600px) { .do-dont { grid-template-columns: 1fr; } }
+
+  .bottom-nav { border-top: 2px solid rgba(15,12,12,0.08); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 900px; margin: 0 auto; }
+  .bottom-nav a { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--black); text-decoration: none; padding: 10px 20px; border: 2px solid rgba(15,12,12,0.15); border-radius: 30px; transition: all 0.15s; }
+  .bottom-nav a:hover { background: var(--black); color: var(--lime); border-color: var(--black); }
+  .bottom-nav .disabled { opacity: 0.35; pointer-events: none; }
 
   @media (max-width: 600px) {
-    .hero { padding: 40px 24px 36px; }
-    .progress-bar { padding: 16px 24px; }
-    .main { padding: 36px 24px 60px; }
-    footer { padding: 24px; }
-    .quick-ref { padding: 24px; }
+    .topnav, .tab-nav { padding-left: 20px; padding-right: 20px; }
+    .page-body { padding: 24px 20px 60px; }
+    .bottom-nav { padding: 20px; }
   }
 </style>
 </head>
 <body>
 
+<nav class="topnav">
+  <a href="index.html">Training Hub</a>
+  <span class="sep">›</span>
+  <span class="current">Day 4 — Listing QA & Churn Calls</span>
+</nav>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="show('qa', this)">Listing QA</button>
+  <button class="tab-btn" onclick="show('supervisor', this)">Supervisor Role</button>
+  <button class="tab-btn" onclick="show('precall', this)">Pre-Call Prep</button>
+  <button class="tab-btn" onclick="show('framework', this)">Call Framework</button>
+  <button class="tab-btn" onclick="show('scripts', this)">Scripts & Phrases</button>
+  <button class="tab-btn" onclick="show('levers', this)">Retention Levers</button>
+  <button class="tab-btn" onclick="show('seasonal', this)">Seasonal Partners</button>
+  <button class="tab-btn" onclick="show('cancel', this)">Cancellation Process</button>
+</div>
+
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-eyebrow"><div class="dot"></div>Batch · Partner Engagement Specialist</div>
-    <h1>Training<br><span>Notes Hub</span></h1>
-    <p class="hero-sub">10-day onboarding curriculum. Click any completed day to review your notes. Days in progress will unlock as training continues.</p>
-    <div class="hero-meta">
-      <div class="meta-pill"><div class="icon" style="background: var(--gold);"></div> Trainee: Rick</div>
-      <div class="meta-pill"><div class="icon" style="background: var(--ocean);"></div> Supervisor: Cliff</div>
-      <div class="meta-pill"><div class="icon" style="background: var(--lime);"></div> Started: April 27, 2026</div>
+    <div class="hero-badge">Day 4 · April 30, 2026</div>
+    <h1>Listing QA & Churn Calls</h1>
+    <p class="hero-sub">Full listing QA standards for NeoWork listings, supervisor role overview, the complete churn call framework with scripts, all retention levers, and the Stripe cancellation process.</p>
+    <div class="hero-chips">
+      <div class="chip">Parts 1–2 covered</div>
+      <div class="chip">Supervisor role fast-tracked</div>
+      <div class="chip">Churn Playbook deep dive</div>
     </div>
   </div>
 </div>
 
-<div class="progress-bar">
-  <div class="progress-bar-inner">
-    <span class="progress-label">Progress</span>
-    <div class="progress-track"><div class="progress-fill"></div></div>
-    <span class="progress-count">4 / 10 days</span>
+<div class="page-body">
+
+  <!-- LISTING QA -->
+  <div class="section visible" id="sec-qa">
+    <div class="sec-head" style="border-color: var(--lime);">
+      <div class="sec-dot" style="background: var(--lime);"></div>
+      <h2>NeoWork Listing QA</h2>
+    </div>
+
+    <div class="callout green">
+      <strong>Where to Work</strong>
+      <p>Go to Vendor Directory → Recently Live → NeoWork tab. Start from the <strong>oldest listings (bottom)</strong> — dating back to March 24. Handle Basic and Core partners only. Boost goes to Aislin. Party Pro goes to Rachel.</p>
+    </div>
+
+    <div class="card">
+      <h3>Full QA Checklist — In Order</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Experience Title</strong><span>Title Case: connecting words (and, on, in, at, from) must be lowercase. All other words capitalized. 40–70 characters. No "number one experience" — use "highly recommended" or "highly sought" instead.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Batch City</strong><span>Verify city matches the listing. Check the booking URL and description for confirmation.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Booking URL</strong><span>Must include <code>utm_source=batch</code> parameter. Open and test the link — confirm it goes to the correct city and correct experience. Critical for multi-location partners.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Duration</strong><span>Verify against partner's website or listing description.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Starting Price</strong><span>Check for accuracy. Partners sometimes list lower pricing on Batch to attract bookings — this is acceptable.</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Location</strong><span>Must always be the partner's location — never the customer's. Verify the address matches the partner's actual business.</span></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-body"><strong>About This Experience</strong><span>Scan for red flag words: typos, misspellings, duplicate sections. Remove any duplicate "What You'll Do" headers. No need for deep edits unless issues found.</span></div></div>
+        <div class="step"><div class="step-num">8</div><div class="step-body"><strong>Media Library</strong><span>Check all videos and images for external watermarks. Alternate videos and photos — no consecutive videos. Disperse similar-looking photos. Best photo goes first. No blurry content.</span></div></div>
+        <div class="step"><div class="step-num">9</div><div class="step-body"><strong>Attachments</strong><span>Menus, maps, schedules, documents only. Disclaimers belong here — never in media. Empty attachments are fine.</span></div></div>
+        <div class="step"><div class="step-num">10</div><div class="step-body"><strong>Ratings and Reviews</strong><span>Minimum 10 required. If fewer, ask partner to send links or add them directly. Explain why reviews matter.</span></div></div>
+        <div class="step"><div class="step-num">11</div><div class="step-body"><strong>FAQs</strong><span>Copy from partner's website. Skip any FAQ that directly contradicts the listing (e.g., different pricing). One question, one answer per line item.</span></div></div>
+        <div class="step"><div class="step-num">12</div><div class="step-body"><strong>Booking Notes</strong><span>Review if present. Empty is fine.</span></div></div>
+        <div class="step"><div class="step-num">13</div><div class="step-body"><strong>Availability</strong><span>Must be empty for Batch Direct partners. Only populate for email or web partners.</span></div></div>
+        <div class="step"><div class="step-num">14</div><div class="step-body"><strong>Admin Tags</strong><span>Add relevant experience tags. Most partners have far too few. Use CoStar to generate suggestions.</span></div></div>
+        <div class="step"><div class="step-num">15</div><div class="step-body"><strong>Partner Profile Page</strong><span>Check for logo, about section, website, Facebook (ID only), Instagram, TikTok, public phone number.</span></div></div>
+        <div class="step"><div class="step-num">16</div><div class="step-body"><strong>Optimize About Section</strong><span>Run CoStar on the description. Re-optimize title if needed.</span></div></div>
+        <div class="step"><div class="step-num">17</div><div class="step-body"><strong>Send Partner Email</strong><span>Inform partner of optimizations done and list opportunities for further improvement.</span></div></div>
+        <div class="step"><div class="step-num">18</div><div class="step-body"><strong>Mark Complete in Tracker</strong><span>Add your name. Add a checkmark only after all steps are done.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Media Standards — Detailed Rules</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Rule</th><th>Detail</th></tr>
+        <tr><td><strong>Watermarks</strong></td><td>External creator watermarks (TikTok, Facebook, YouTube, other accounts): permanently delete OR crop out. Partner's own watermark: acceptable to keep.</td></tr>
+        <tr><td><strong>Children</strong></td><td>Never in adult-oriented listings (bachelorette, bachelor parties). In wholesome family experiences: allowed but NEVER in first 4 photos.</td></tr>
+        <tr><td><strong>Video viewing</strong></td><td>Watch every video fully — no muting, no skipping. Check for watermarks, inappropriate content, blurry quality throughout.</td></tr>
+        <tr><td><strong>Video arrangement</strong></td><td>Alternate video and photo — never 3 consecutive videos. Keeps engagement high.</td></tr>
+        <tr><td><strong>Similar photos</strong></td><td>Disperse throughout listing — do not cluster together.</td></tr>
+        <tr><td><strong>Best photo</strong></td><td>Place first. Prefer photos showing people enjoying the experience over product-only shots.</td></tr>
+        <tr><td><strong>Prohibited in media</strong></td><td>Menus, maps, schedules, documents, disclaimers — these go in Attachments only.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Booking URL — Why UTM Matters</h3>
+      <ul>
+        <li>Without <code>utm_source=batch</code>: booking recorded as <strong>direct traffic</strong> — partner gets no credit for Batch referral</li>
+        <li>With <code>utm_source=batch</code>: booking recorded as a <strong>Batch referral</strong> — partner sees Batch's value</li>
+        <li>If the URL is just a contact page with no UTM, request the partner's proper referral link via Intercom</li>
+        <li>Always open and test the link — multi-location partners may have a Chicago URL that loads Los Angeles by default</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Partner Profile — Facebook ID Rule</h3>
+      <ul>
+        <li>Do NOT paste the full Facebook URL into the partner profile field</li>
+        <li>Copy only the ID portion after <code>facebook.com/</code> — e.g., if URL is <code>facebook.com/YatsChicago</code>, enter only <code>YatsChicago</code></li>
+        <li>If the Facebook page shows "content not available," do not add it</li>
+        <li>Public phone number: only add if officially listed as a public contact — never add internal business numbers</li>
+      </ul>
+    </div>
+
+    <div class="callout gold">
+      <strong>QA Email vs Proactive Outreach Email — Key Difference</strong>
+      <p>The QA email focuses on what was optimized AND what opportunities remain (add reviews, videos, social links). This is different from the proactive outreach email from Day 3 which focused on showcasing performance metrics. Both end with the same goal: show the partner Batch is actively working for them.</p>
+    </div>
   </div>
+
+  <!-- SUPERVISOR ROLE -->
+  <div class="section" id="sec-supervisor">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Supervisor Role Overview</h2>
+    </div>
+
+    <div class="callout blue">
+      <strong>Fast-Track Approach</strong>
+      <p>Rick is being fast-tracked into the supervisor role. New training methodology: <strong>introduce one task, Rick executes it on 2–5 tickets, discuss learnings, then move to the next task.</strong> Builds practical competency quickly without overwhelming upfront.</p>
+    </div>
+
+    <div class="card">
+      <h3>Core Supervisor Responsibilities</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Responsibility</th><th>Details</th></tr>
+        <tr><td><strong>Weekly Huddles</strong></td><td>15–30 minutes every Monday or Friday. Align team on weekly goals and tasks.</td></tr>
+        <tr><td><strong>Task Reprioritization</strong></td><td>Weekly or monthly based on volume fluctuations. Each task surges and drops unpredictably.</td></tr>
+        <tr><td><strong>QA</strong></td><td>2 QAs per agent per week standard. Due to varied tasks, rotate which tasks are QA'd each week.</td></tr>
+        <tr><td><strong>Coaching</strong></td><td>Regular and celebratory — not just for issues. Kring can handle coaching if Rick is at capacity.</td></tr>
+        <tr><td><strong>Customer Escalations</strong></td><td>Irvin currently primary handler. Rick can take over if desired. Escalate genuine issues to Stefan.</td></tr>
+        <tr><td><strong>Refund Approvals</strong></td><td>Supervisor manually approves all customer refunds.</td></tr>
+        <tr><td><strong>Stefan Communications</strong></td><td>Proactive, specific, data-driven. No fluff. Numbers and facts only — Stefan's New York style.</td></tr>
+        <tr><td><strong>Performance Reviews</strong></td><td>6-month and annual reviews with salary increases. Cliff will share scorecard template.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>What Rick Oversees</h3>
+      <ul>
+        <li><strong>Customer support</strong> (Felix, Irvin primary handlers)</li>
+        <li><strong>Partner support</strong> (Core/Basic — Rick, Kring, team)</li>
+        <li><strong>Admin tasks</strong> (listing QA, optimizations, blog posts)</li>
+        <li><strong>Phone calls</strong> (churn/retention calls)</li>
+        <li><strong>Coaching</strong> (teammates, delegate to Kring when needed)</li>
+        <li><strong>Communications with Stefan</strong> (capacity reports, metrics, decisions)</li>
+      </ul>
+    </div>
+
+    <div class="callout orange">
+      <strong>Biggest Challenge: Productivity Tracking</strong>
+      <p>Tickets come from multiple disconnected sources: Intercom, Google Sheets, Airtable, Aircall, HubSpot. No single unified view. Rick's automation and AI tool skills are directly valuable here — consolidating tracking is a high-priority opportunity to demonstrate immediate impact to Stefan.</p>
+    </div>
+
+    <div class="card">
+      <h3>Converting Partners Boosts Customer Support Volume</h3>
+      <p style="font-size: 13.5px; color: #555;">When partners are converted from Batch Direct to email/bookable, customers start booking through Batch instead of partner websites. This means more customer inquiries, booking questions, and support tickets flow into the team's Intercom. This is actually a good problem — it means the platform is generating real bookings and the team's work is creating measurable volume. Plan for this when requesting headcount from Stefan.</p>
+    </div>
+  </div>
+
+  <!-- PRE-CALL PREP -->
+  <div class="section" id="sec-precall">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Pre-Call Preparation</h2>
+    </div>
+
+    <div class="callout gold">
+      <strong>10-Minute Buffer Before Every Call</strong>
+      <p>Pull all data before the call starts. Never search during the call — it makes you sound unprepared and undermines credibility. The partner should feel like you already know their account inside out.</p>
+    </div>
+
+    <div class="card">
+      <h3>Data to Pull in 10 Minutes</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>How long have they been with Batch?</strong><span>Check Vendor Directory timestamp. Context: 5 years with weak numbers is concerning; 90 days with weak numbers is expected.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Subscription tier and price</strong><span>$99 / $150 / $200 / $250 / $300 — determines what discount levers are available</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Performance metrics (last 90 days)</strong><span>Itinerary adds, favorites, page views, impressions. Translate into layman's terms before the call.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Is the listing optimized?</strong><span>Even if yes, can be re-optimized. Check tags, media arrangement, description quality.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Is the partner page complete?</strong><span>Logo, about, social links, website. Incomplete = retention offer opportunity.</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Are they using the UGC collection tool?</strong><span>Check Media Library for "uploaded by user" entries. If not using it — it's already activated for them.</span></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-body"><strong>Is this a seasonal business?</strong><span>Ask Claude/ChatGPT: "When is peak season for [listing type] in [city]?" Then check historical data for that period.</span></div></div>
+        <div class="step"><div class="step-num">8</div><div class="step-body"><strong>Original reason for joining Batch</strong><span>Check HubSpot for early communications. Often unavailable — focus on current complaint instead.</span></div></div>
+        <div class="step"><div class="step-num">9</div><div class="step-body"><strong>Preload your solution list</strong><span>Write down: what's missing on their listing, what you'll offer, possible discounts. Keep it on one document during the call.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Translating Metrics Into Layman's Terms</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Technical Term</th><th>Say Instead</th></tr>
+        <tr><td>232 impressions</td><td>"Your listing showed up 232 times in search results."</td></tr>
+        <tr><td>30 page views</td><td>"30 real Batch users in your market clicked and reviewed your experience."</td></tr>
+        <tr><td>5 itinerary adds</td><td>"5 customers added your listing to their party plans — these are people seriously considering booking, usually within 30 to 90 days."</td></tr>
+        <tr><td>UGC collection tool</td><td>"Your guests have a chance to win a surprise when they scan the QR code and upload photos — it builds your content for free."</td></tr>
+        <tr><td>SEO optimization</td><td>"We're adding keywords so more customers find you when they search."</td></tr>
+        <tr><td>Partner page</td><td>"It's a new page we created for you — another way customers can find your listing through search."</td></tr>
+      </table>
+    </div>
+
+    <div class="callout pink">
+      <strong>UGC Tool Framing</strong>
+      <p>The UGC collection tool is already activated for all partners by default — but most don't know it. Frame it as: <em>"We've activated it for you."</em> This sounds like added value rather than something they already had sitting unused.</p>
+    </div>
+  </div>
+
+  <!-- CALL FRAMEWORK -->
+  <div class="section" id="sec-framework">
+    <div class="sec-head" style="border-color: var(--cosmo);">
+      <div class="sec-dot" style="background: var(--cosmo);"></div>
+      <h2>Churn Call Framework</h2>
+    </div>
+
+    <div class="callout pink">
+      <strong>Core Principle</strong>
+      <p>You drive the call. The partner is angry. After they rant, it's your turn to present — confidently, comprehensively, without asking for permission after every item. Make them feel heard first, then show up as the expert who has already reviewed their account.</p>
+    </div>
+
+    <div class="phase-card" style="background: var(--ocean-tint); border-color: var(--ocean);">
+      <div class="phase-label" style="color: #1a4d8f;">Phase 1</div>
+      <div class="phase-body">
+        <h4>Open the Call</h4>
+        <p>Introduce yourself. Ask if it's a good time. Tell them you've already reviewed their account before calling. Keep this brief — the goal is to transition quickly to letting them speak.</p>
+      </div>
+    </div>
+
+    <div class="phase-card" style="background: var(--cosmo-tint); border-color: var(--cosmo);">
+      <div class="phase-label" style="color: #882255;">Phase 2</div>
+      <div class="phase-body">
+        <h4>Let Them Rant — Target Their Emotions</h4>
+        <p>Say: "I see you submitted a cancellation request — would you mind filling me in?" Then stop talking. Let them complain fully. After they finish: appreciate their honesty specifically and personally. Do NOT use generic customer service acknowledgment lines.</p>
+      </div>
+    </div>
+
+    <div class="phase-card" style="background: var(--gold-tint); border-color: var(--gold);">
+      <div class="phase-label" style="color: #886600;">Phase 3</div>
+      <div class="phase-body">
+        <h4>Assess and Show Value</h4>
+        <p>Present their performance data in layman's terms. Identify their churn type: no bookings, slow ROI, budget, seasonal slowdown, or time/complexity. Frame metrics as proof that things are working — or be honest if the numbers are weak.</p>
+      </div>
+    </div>
+
+    <div class="phase-card" style="background: var(--lime-tint); border-color: #00b800;">
+      <div class="phase-label" style="color: #005500;">Phase 4</div>
+      <div class="phase-body">
+        <h4>Present the Full Optimization Package</h4>
+        <p>Present ALL optimization items at once as one comprehensive package — not one at a time. Show how dedicated you are. Cover: listing optimization, partner page, blog post, UGC tool, ratings/reviews, media. End with: "I'm not going to let you pay for anything additional."</p>
+      </div>
+    </div>
+
+    <div class="phase-card" style="background: var(--sunset-tint); border-color: var(--sunset);">
+      <div class="phase-label" style="color: #993300;">Phase 5</div>
+      <div class="phase-body">
+        <h4>Consolidate and Set Follow-Up</h4>
+        <p>Tell them your team will start immediately and they'll receive an email within 24–48 hours. Schedule a meeting one week before their billing cycle ends to review results together. Ask: "How does that sound?"</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Common Churn Reasons and How to Address Each</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Churn Type</th><th>Response Strategy</th></tr>
+        <tr><td><strong>No bookings</strong></td><td>Explain that Batch Direct sends traffic, not bookings. Show impressions and page views as proof of visibility. Offer to convert to email/bookable partner so they can see actual booking ROI.</td></tr>
+        <tr><td><strong>Slow ROI</strong></td><td>SEO takes 3 months to compound. Show where they are in the timeline. If past 3 months with zero results, be honest — offer optimization as last attempt.</td></tr>
+        <tr><td><strong>Budget concerns</strong></td><td>Save discount offers for after optimization pitch. First show value, then offer 25% off or $99/month.</td></tr>
+        <tr><td><strong>Seasonal slowdown</strong></td><td>Identify their peak season. Explain that maintaining the listing now builds the audience needed 3 months before peak season starts.</td></tr>
+        <tr><td><strong>Time/complexity concerns</strong></td><td>Emphasize: "I'll do the work for you. You don't need to touch anything." Bundle all tasks as things the team handles.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- SCRIPTS AND PHRASES -->
+  <div class="section" id="sec-scripts">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Scripts & Key Phrases</h2>
+    </div>
+
+    <div class="script-box">
+      <div class="script-label">Opening the Call</div>
+      <div class="script-text">"Hey [Name], this is Rick from Batch. How are you doing today? ... Great. So I'm reaching out because I see you submitted a cancellation request, and I wanted to personally connect with you. I've actually reviewed your account before this call. Is this a good time to chat? ... Perfect. Would you mind filling me in on what's been going on?"</div>
+      <div class="script-note">Then stop. Let them talk. Don't interrupt.</div>
+    </div>
+
+    <div class="script-box">
+      <div class="script-label">After They Rant — Emotional Target</div>
+      <div class="script-text">"First of all, I really appreciate you being this honest with me. I genuinely needed to hear this — the specific things that are affecting your decision. That's exactly the kind of feedback that helps us do better for you."</div>
+      <div class="script-note">Do NOT say: "Thank you for letting me know." Generic = dismissed.</div>
+    </div>
+
+    <div class="script-box">
+      <div class="script-label">Presenting Metrics</div>
+      <div class="script-text">"So I was looking at your account before this call and here's what I see. In the last 90 days, your listing showed up [X] times in search results — that's your listing appearing every single day in front of customers actively looking for experiences in your area. On top of that, [X] real Batch users clicked your listing and reviewed it. Those are people who stopped, looked, and considered your experience."</div>
+    </div>
+
+    <div class="script-box">
+      <div class="script-label">Presenting the Optimization Package</div>
+      <div class="script-text">"Here's what I want to do for you. I've already looked at your listing and I see a few things that, if we fix them now, will make a real difference. I'm going to re-optimize your listing with better keywords and descriptions so you show up higher in search. We've also created a partner page for you on Batch — that's a second page working alongside your listing to pull in even more visibility. And I want to create a blog post for you — completely free — that gives you a third page pointing customers toward your experience. I'm going to do all of this for you, and I'm not going to let you pay for anything additional. This is on us."</div>
+      <div class="script-note">Present all items together — don't pause and ask "how does that sound" after each one.</div>
+    </div>
+
+    <div class="script-box">
+      <div class="script-label">Consolidating and Setting the Follow-Up</div>
+      <div class="script-text">"My team is going to get started on all of this right away. Expect an email from us within the next 24 to 48 hours — we'll walk you through everything we've done and what we still need from you, because we want to work side by side with you on this. And then I'd love to schedule a meeting with you one week before your billing date so we can look at the numbers together and see what improved. How does that sound?"</div>
+    </div>
+
+    <div class="script-box">
+      <div class="script-label">Ending a Cancelled Call Positively</div>
+      <div class="script-text">"I've gone ahead and cancelled your subscription in our system. Your listing will stay active until [billing end date] at no additional charge, and then it will be deactivated. I really appreciate your time today, [Name], and I genuinely wish you all the best."</div>
+      <div class="script-note">Do NOT say "Is there anything else I can help you with?" — you didn't help them. End warmly and directly.</div>
+    </div>
+
+    <div class="do-dont">
+      <div class="do-box">
+        <h4>Do Say</h4>
+        <ul>
+          <li>"I'm not going to let you pay for anything additional."</li>
+          <li>"Would you mind filling me in?"</li>
+          <li>"I appreciate how honest you've been with me."</li>
+          <li>"Your listing showed up X times in search results."</li>
+          <li>"How does that sound?"</li>
+          <li>"My team will start immediately."</li>
+        </ul>
+      </div>
+      <div class="dont-box">
+        <h4>Never Say</h4>
+        <ul>
+          <li>"This is free." (say "at no additional cost" instead)</li>
+          <li>"Partners on your tier typically see..." (comparisons hurt)</li>
+          <li>"That's strange, most partners do well." (invalidating)</li>
+          <li>"What you're seeing is normal for this time of year." (dismissive)</li>
+          <li>"That's fair, let me put it in context for you." (condescending)</li>
+          <li>"Is there anything else I can help you with?" (after a cancellation)</li>
+          <li>"I totally hear that and want to figure out why together." (passive)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- RETENTION LEVERS -->
+  <div class="section" id="sec-levers">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Retention Levers — Updated Sequence</h2>
+    </div>
+
+    <div class="callout orange">
+      <strong>Key Rule: Never Offer Levers One at a Time</strong>
+      <p>Presenting one item, then asking "how does that sound?" — then the next item — gives partners repeated chances to say no. Present the full optimization package as one bundle first. Only move to pricing levers if they refuse the package.</p>
+    </div>
+
+    <div class="card">
+      <h3>The Full Lever Sequence</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Lever</th><th>What It Is</th><th>When to Offer</th><th>Who Delivers</th></tr>
+        <tr>
+          <td><span class="tag green">Lever 1</span></td>
+          <td>Full optimization package (listing, partner page, blog post, UGC, ratings, media)</td>
+          <td>Always — first and primary offer</td>
+          <td>Rick on the call</td>
+        </tr>
+        <tr>
+          <td><span class="tag blue">Lever 2</span></td>
+          <td>Switch from quarterly to monthly subscription billing</td>
+          <td>If partner is concerned about upfront cost — reduces commitment burden</td>
+          <td>Rick on the call</td>
+        </tr>
+        <tr>
+          <td><span class="tag gold">Lever 3</span></td>
+          <td>25% discount for 2 months, then $150/month, then $99/month</td>
+          <td>After Levers 1 and 2 are refused — escalate pricing offers in this order</td>
+          <td>Rick on the call</td>
+        </tr>
+        <tr>
+          <td><span class="tag pink">Lever 4</span></td>
+          <td>Email/bookable partner conversion — see actual booking ROI inside Batch</td>
+          <td>Final offer — can combine with $99/month to close</td>
+          <td>Rick on the call</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Optimization Package Contents</h3>
+      <ul>
+        <li><strong>Listing re-optimization</strong> — keywords, title, description (CoStar)</li>
+        <li><strong>Partner page completion</strong> — logo, about, social links, website</li>
+        <li><strong>Blog post</strong> — free, creates a 3rd indexed page for visibility</li>
+        <li><strong>UGC collection tool activation</strong> — "We've activated it for you"</li>
+        <li><strong>Ratings and reviews upload</strong> — ask partner to send Google review link</li>
+        <li><strong>Media optimization</strong> — arrangement, alternating, best photo first</li>
+      </ul>
+      <p style="margin-top: 10px; font-size: 12.5px; color: #888;">Present all of these together as one comprehensive package. Never list them one by one and ask for approval each time.</p>
+    </div>
+
+    <div class="callout blue">
+      <strong>Why Email/Bookable Conversion is the Cream on Top</strong>
+      <p>Batch Direct partners can't see which bookings came from Batch — so they feel they're getting nothing. Converting to email/bookable lets them see actual booking records inside Batch. This solves the root problem: <strong>transparent ROI</strong>. Saved for last because once they see real bookings, the value becomes undeniable.</p>
+    </div>
+
+    <div class="card">
+      <h3>Discount Timing Strategy</h3>
+      <ul>
+        <li><strong>Lever 3 order:</strong> 25% off for 2 months first, then offer $150/month, then $99/month — escalate only if refused</li>
+        <li><strong>Ideal timing:</strong> Offer discounts at the 7-day-before-billing-end meeting, after showing improved metrics</li>
+        <li><strong>Why wait:</strong> By then you have data showing optimization worked — the discount reinforces staying, not replacing value</li>
+        <li><strong>If they refuse optimization immediately (70% of cases):</strong> Move through Levers 2, 3, and 4 on the first call</li>
+        <li><strong>No more free months:</strong> Eliminated — creates extra work for partners who churn anyway</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SEASONAL PARTNERS -->
+  <div class="section" id="sec-seasonal">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Seasonal Partners</h2>
+    </div>
+
+    <div class="callout blue">
+      <strong>The 3+3 Month Rule</strong>
+      <p>SEO takes 3 months to compound. For customers to book during peak season, they plan 1–3 months ahead. So the partner needs to be <strong>live and optimized 3–6 months before their peak season</strong> to build an audience in time.</p>
+    </div>
+
+    <div class="card">
+      <h3>How to Identify and Handle Seasonal Partners</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Identify peak season</strong><span>Ask the partner directly, OR use Claude/ChatGPT: "When is peak season for [listing type] in [city] in the US?"</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Check historical data</strong><span>Filter performance metrics to their peak season months. If peak season shows zero results, the partner likely should churn — don't make false promises.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Frame the current period correctly</strong><span>If they're in off-season: "Right now is actually the best time to build your audience for peak season in [month]. The listings that rank highest in June are the ones that were active and optimized in March."</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Offer lower pricing to keep listing alive</strong><span>During off-season: offer $99/month to maintain the listing. Explain that canceling now means starting from scratch when peak season returns.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Recommend continuous media additions</strong><span>Keep adding pictures/videos during off-season. The UGC tool helps collect these from customers automatically.</span></div></div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Never Say "What You're Seeing Is Normal"</div>
+      <p>This sounds dismissive and will make the partner angrier. Instead frame it proactively: "This type of listing peaks in [month]. Right now is actually the critical window to build the audience that will convert bookings when your season starts." The message is the same — but you're giving them a reason to stay, not excusing poor results.</p>
+    </div>
+  </div>
+
+  <!-- CANCELLATION PROCESS -->
+  <div class="section" id="sec-cancel">
+    <div class="sec-head" style="border-color: var(--cosmo);">
+      <div class="sec-dot" style="background: var(--cosmo);"></div>
+      <h2>Cancellation Process</h2>
+    </div>
+
+    <div class="callout pink">
+      <strong>When to Cancel</strong>
+      <p>Only proceed to cancellation if the partner refuses all optimization offers AND all retention levers. Do not keep pitching after they've said no to everything — proceed to Stripe immediately and end the call professionally.</p>
+    </div>
+
+    <div class="card">
+      <h3>Stripe Cancellation — Step by Step</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Tell the partner</strong><span>"I understand. Let me go ahead and cancel your subscription now. Please bear with me for just a moment."</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Open Stripe</strong><span>Find the partner's subscription. Click the three dots next to "Update Subscription."</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Select "Cancel Subscription"</strong><span>Choose "End of Current Period" — not immediate. This keeps the listing active through the paid period.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Confirm cancellation</strong><span>Note the billing end date (e.g., paid April 26, ends May 26).</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Inform the partner</strong><span>"Your subscription has been cancelled. Your listing will stay active until [date] at no additional charge. After that, it will be fully deactivated and you won't be billed again."</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>End the call warmly</strong><span>"I really appreciate your time today, [Name], and I wish you all the best." Click end. Do not ask if there's anything else you can help with.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>What NOT to Do After Cancellation is Confirmed</h3>
+      <ul>
+        <li>Do NOT continue doing optimization work for a confirmed churning partner — wasted effort per Stefan's direction</li>
+        <li>Do NOT ask "Is there anything else I can help you with?" — you didn't help them keep their listing</li>
+        <li>Do NOT offer more discounts after they've confirmed — respect their decision</li>
+        <li>Do NOT cancel immediately — always use "end of current period" to give them the time they paid for</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Two-Call Model for Churn</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Call</th><th>Timing</th><th>Purpose</th><th>Levers Available</th></tr>
+        <tr>
+          <td><strong>Call 1</strong></td>
+          <td>When churn request comes in</td>
+          <td>Acknowledge, show value, present full optimization package</td>
+          <td>Lever 1 (optimization) + Lever 2 (monthly billing)</td>
+        </tr>
+        <tr>
+          <td><strong>Call 2</strong></td>
+          <td>7 days before billing end date</td>
+          <td>Review improved metrics, make final offer, or confirm cancellation</td>
+          <td>Levers 3 (25% off, $150, $99) + Lever 4 (email/bookable)</td>
+        </tr>
+      </table>
+      <p style="font-size: 12px; color: #888; margin-top: 10px;">If partner refuses optimization on Call 1 (70% of cases): skip to pricing levers immediately on the same call. No need to wait for Call 2.</p>
+    </div>
+  </div>
+
 </div>
 
-<div class="main">
-  <div class="section-label">Training Schedule</div>
-  <div class="day-grid">
-
-    <a href="day1.html" class="day-card c-gold available">
-      <div class="day-status">✅</div>
-      <div class="day-num">Day 1</div>
-      <div class="day-title">Platform Foundation</div>
-      <div class="day-desc">What Batch is, how it works, partner vs customer roles, subscription tiers, listing models, and all core tools.</div>
-      <div class="day-tags"><span class="day-tag">Platform</span><span class="day-tag">Tiers</span><span class="day-tag">Tools</span><span class="day-tag">Workflow</span></div>
-      <span class="day-date">April 27, 2026</span>
-    </a>
-
-    <a href="day2.html" class="day-card c-blue available">
-      <div class="day-status">✅</div>
-      <div class="day-num">Day 2</div>
-      <div class="day-title">Partner Health & Deep Dives</div>
-      <div class="day-desc">All 5 booking methods, listing health framework, CoStar SEO prompt, retention levers, HubSpot navigation, and Airtable workflows.</div>
-      <div class="day-tags"><span class="day-tag">Booking Types</span><span class="day-tag">SEO</span><span class="day-tag">HubSpot</span><span class="day-tag">Retention</span></div>
-      <span class="day-date">April 28, 2026</span>
-    </a>
-
-    <a href="day3.html" class="day-card c-pink available">
-      <div class="day-status">✅</div>
-      <div class="day-num">Day 3</div>
-      <div class="day-title">Ticket Handling & Intercom</div>
-      <div class="day-desc">Churn case study, Intercom deep dive, proactive outreach workflow, updated retention policy, and the shift to proactive engagement.</div>
-      <div class="day-tags"><span class="day-tag">Intercom</span><span class="day-tag">Churn</span><span class="day-tag">Outreach</span><span class="day-tag">Retention</span></div>
-      <span class="day-date">April 29, 2026</span>
-    </a>
-
-    <a href="day4.html" class="day-card c-green available">
-      <div class="day-status">✅</div>
-      <div class="day-num">Day 4</div>
-      <div class="day-title">Listing QA & Churn Calls</div>
-      <div class="day-desc">Full listing QA standards, supervisor role overview, the complete churn call framework with scripts, retention levers, and Stripe cancellation process.</div>
-      <div class="day-tags"><span class="day-tag">QA</span><span class="day-tag">Call Scripts</span><span class="day-tag">Retention</span><span class="day-tag">Stripe</span></div>
-      <span class="day-date">April 30, 2026</span>
-    </a>
-
-    <div class="day-card c-orange locked">
-      <div class="day-status">🔒</div>
-      <div class="day-num">Day 5</div>
-      <div class="day-title">Disputes & Billing</div>
-      <div class="day-desc">Handling "product not received" disputes, evidence gathering, Stripe refund process, and partner agreement gaps.</div>
-      <div class="day-tags"><span class="day-tag">Disputes</span><span class="day-tag">Stripe</span><span class="day-tag">Legal</span></div>
-      <span class="day-date">To follow</span>
-    </div>
-
-    <div class="day-card c-blue locked">
-      <div class="day-status">🔒</div>
-      <div class="day-num">Day 6</div>
-      <div class="day-title">Live Calls Practice</div>
-      <div class="day-desc">Shadowing real partner calls, applying the pre-call checklist, call scripts, and post-call documentation.</div>
-      <div class="day-tags"><span class="day-tag">Aircall</span><span class="day-tag">Scripts</span><span class="day-tag">Live</span></div>
-      <span class="day-date">To follow</span>
-    </div>
-
-    <div class="day-card c-pink locked">
-      <div class="day-status">🔒</div>
-      <div class="day-num">Day 7</div>
-      <div class="day-title">Claude AI & Batchification</div>
-      <div class="day-desc">Hands-on with Claude Batch tools, running batchification prompts, generating performance emails, and reviewing outputs.</div>
-      <div class="day-tags"><span class="day-tag">Claude AI</span><span class="day-tag">SEO</span><span class="day-tag">Emails</span></div>
-      <span class="day-date">To follow</span>
-    </div>
-
-    <div class="day-card c-gold locked">
-      <div class="day-status">🔒</div>
-      <div class="day-num">Day 8</div>
-      <div class="day-title">Advanced Partner Scenarios</div>
-      <div class="day-desc">Complex case studies, escalation paths, working with Boost/Party Pro accounts, and cross-team coordination.</div>
-      <div class="day-tags"><span class="day-tag">Escalations</span><span class="day-tag">Cases</span><span class="day-tag">Team</span></div>
-      <span class="day-date">To follow</span>
-    </div>
-
-    <div class="day-card c-green locked">
-      <div class="day-status">🔒</div>
-      <div class="day-num">Day 9</div>
-      <div class="day-title">Performance & Reporting</div>
-      <div class="day-desc">Building daily reports, tracking KPIs, using Airtable views, Google Sheets, and communicating results to leadership.</div>
-      <div class="day-tags"><span class="day-tag">Airtable</span><span class="day-tag">Reporting</span><span class="day-tag">KPIs</span></div>
-      <span class="day-date">To follow</span>
-    </div>
-
-    <div class="day-card c-orange locked">
-      <div class="day-status">🔒</div>
-      <div class="day-num">Day 10</div>
-      <div class="day-title">Graduation & Go-Live</div>
-      <div class="day-desc">Full workflow recap, account assignment, solo call practice, and signing off on independent partner support responsibilities.</div>
-      <div class="day-tags"><span class="day-tag">Recap</span><span class="day-tag">Solo</span><span class="day-tag">Live</span></div>
-      <span class="day-date">To follow</span>
-    </div>
-
-  </div>
-
-  <!-- TOOLS SECTION -->
-  <div class="section-label">Tools</div>
-  <div class="day-grid" style="margin-bottom: 56px;">
-
-    <a href="listing-optimizer.html" class="day-card c-green available" style="border-width: 2px;">
-      <div class="day-status">🛠️</div>
-      <div class="day-num">Tool</div>
-      <div class="day-title">Listing Optimizer</div>
-      <div class="day-desc">Paste any partner listing and auto-generate SEO keywords, an optimized title and description, a partner email, and a rewritten profile.</div>
-      <div class="day-tags"><span class="day-tag">SEO</span><span class="day-tag">CoStar</span><span class="day-tag">Claude AI</span><span class="day-tag">5 Tasks</span></div>
-      <span class="day-date">Live · ~5 min per listing</span>
-    </a>
-
-    <a href="partner-update-email-generator.html" class="day-card c-blue available" style="border-width: 2px;">
-      <div class="day-status">✉️</div>
-      <div class="day-num">Tool</div>
-      <div class="day-title">Partner Update Email Generator</div>
-      <div class="day-desc">Fill in the partner's metrics, what you optimized, and what you're recommending — get a warm, plain-language update email ready to send in seconds.</div>
-      <div class="day-tags"><span class="day-tag">Outreach</span><span class="day-tag">Email</span><span class="day-tag">Puter.js</span><span class="day-tag">No API Key</span></div>
-      <span class="day-date">Live · ~1 min per partner</span>
-    </a>
-
-    <a href="neowork-listing-qa.html" class="day-card c-orange available" style="border-width: 2px;">
-      <div class="day-status">🔍</div>
-      <div class="day-num">Tool</div>
-      <div class="day-title">NeoWork Listing QA</div>
-      <div class="day-desc">Full QA workflow for Basic and Core listings — checklist, category reference, routing guide, and an AI-powered partner email generator all in one place.</div>
-      <div class="day-tags"><span class="day-tag">QA</span><span class="day-tag">Checklist</span><span class="day-tag">Claude AI</span><span class="day-tag">Email</span></div>
-      <span class="day-date">Live · Basic & Core partners</span>
-    </a>
-
-    <a href="batch_churn_tool.html" class="day-card c-pink available" style="border-width: 2px;">
-      <div class="day-status">📞</div>
-      <div class="day-num">Tool</div>
-      <div class="day-title">Churn Call Script Tool</div>
-      <div class="day-desc">Fill in the partner's info and metrics, then walk through the call step by step — opening, acknowledgment, all 4 retention levers, and a tailored close or cancellation script.</div>
-      <div class="day-tags"><span class="day-tag">Retention</span><span class="day-tag">Call Script</span><span class="day-tag">SAVED</span><span class="day-tag">Puter.js</span></div>
-      <span class="day-date">Live · Use during calls</span>
-    </a>
-
-  </div>
-
-  <!-- QUICK REFERENCE -->
-  <div class="section-label">Quick Reference</div>
-  <div class="quick-ref">
-    <h2>Key Numbers & Facts</h2>
-    <div class="ref-grid">
-      <div class="ref-item"><div class="ref-label">Platform Cities</div><div class="ref-val gold">30+ US cities</div></div>
-      <div class="ref-item"><div class="ref-label">Customer Base</div><div class="ref-val gold">3+ million</div></div>
-      <div class="ref-item"><div class="ref-label">Active Partners</div><div class="ref-val blue">~1,500 total</div></div>
-      <div class="ref-item"><div class="ref-label">Rick's Focus</div><div class="ref-val blue">~1,100 Core/Basic</div></div>
-      <div class="ref-item"><div class="ref-label">Basic Tier Price</div><div class="ref-val green">$99–$300/mo</div></div>
-      <div class="ref-item"><div class="ref-label">Commission (Direct)</div><div class="ref-val green">0%</div></div>
-      <div class="ref-item"><div class="ref-label">SEO Lock-in Period</div><div class="ref-val orange">3 months</div></div>
-      <div class="ref-item"><div class="ref-label">Daily Call Target</div><div class="ref-val orange">13–15 calls</div></div>
-      <div class="ref-item"><div class="ref-label">Strong Signal</div><div class="ref-val pink">5+ itinerary adds</div></div>
-      <div class="ref-item"><div class="ref-label">Dispute Win Rate</div><div class="ref-val pink">~6% (needs fix)</div></div>
-      <div class="ref-item"><div class="ref-label">Booking Methods</div><div class="ref-val gold">5 types</div></div>
-      <div class="ref-item"><div class="ref-label">Min. Listing Photos</div><div class="ref-val blue">5 photos + 1 video</div></div>
-      <div class="ref-item"><div class="ref-label">CoStar Workflow</div><div class="ref-val green">5 tasks, ~5 min</div></div>
-      <div class="ref-item"><div class="ref-label">Churn Levers</div><div class="ref-val orange">4 levels</div></div>
-      <div class="ref-item"><div class="ref-label">Free Month Offer</div><div class="ref-val orange">Eliminated</div></div>
-      <div class="ref-item"><div class="ref-label">Outreach Backlog</div><div class="ref-val pink">434 partners</div></div>
-      <div class="ref-item"><div class="ref-label">Inbox Block</div><div class="ref-val blue">10–11 AM CST</div></div>
-      <div class="ref-item"><div class="ref-label">Title Length</div><div class="ref-val gold">40–70 chars</div></div>
-      <div class="ref-item"><div class="ref-label">Min. Reviews</div><div class="ref-val green">10 ratings</div></div>
-      <div class="ref-item"><div class="ref-label">Pre-Call Buffer</div><div class="ref-val blue">10 minutes</div></div>
-    </div>
-  </div>
-
+<div class="bottom-nav">
+  <a href="day3.html">← Day 3</a>
+  <a href="index.html">Training Hub</a>
+  <a href="day5.html">Day 5 →</a>
 </div>
 
-<footer>
-  <strong>Batch Partner Engagement Specialist</strong> · Training Notes · Rick · Supervised by Cliff · Started April 27, 2026
-</footer>
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('visible');
+  btn.classList.add('active');
+  window.scrollTo({ top: document.querySelector('.page-body').offsetTop - 100, behavior: 'smooth' });
+}
+</script>
 
 </body>
 </html>
