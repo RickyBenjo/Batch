@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 6 — Go-Live: Calls, MBR & Transition · Batch Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0F0C0C; --white: #F0F1F4; --sunset: #FF5F00; --ocean: #4F97FC;
+    --cosmo: #FF93D3; --lime: #00DF00; --gold: #FFCA00; --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF; --cosmo-tint: #FFE0F3; --lime-tint: #C8FFB0; --sunset-tint: #FFD9C0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Mulish', sans-serif; background: var(--white); color: var(--black); font-size: 14px; line-height: 1.6; }
+
+  .topnav { background: var(--black); padding: 14px 40px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--ocean); }
+  .topnav a { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.15s; }
+  .topnav a:hover { color: var(--ocean); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--ocean); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+
+  .tab-nav { background: var(--black); padding: 0 40px; display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 46px; z-index: 99; }
+  .tab-btn { padding: 12px 18px; font-size: 12px; font-weight: 700; color: rgba(240,241,244,0.45); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.15s; font-family: 'Mulish', sans-serif; letter-spacing: 0.3px; }
+  .tab-btn:hover { color: rgba(240,241,244,0.8); }
+  .tab-btn.active { color: var(--ocean); border-bottom-color: var(--ocean); }
+
+  .hero { background: var(--black); padding: 52px 40px 44px; position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; right: -60px; top: -60px; width: 300px; height: 300px; border-radius: 50%; background: var(--ocean); opacity: 0.07; }
+  .hero::before { content: ''; position: absolute; left: -60px; bottom: -60px; width: 220px; height: 220px; border-radius: 50%; background: var(--gold); opacity: 0.06; }
+  .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-badge { display: inline-block; background: var(--ocean); color: #fff; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; padding: 5px 14px; border-radius: 30px; margin-bottom: 16px; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 48px); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 10px; }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); margin-bottom: 24px; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(240,241,244,0.7); border: 1px solid rgba(255,255,255,0.1); }
+
+  .page-body { max-width: 900px; margin: 0 auto; padding: 36px 40px 80px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 3px solid; }
+  .sec-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .sec-head h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+
+  .card { background: #fff; border-radius: 14px; border: 1.5px solid rgba(15,12,12,0.09); padding: 20px 22px; margin-bottom: 14px; }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 13.5px; color: #555; line-height: 1.65; }
+  .card ul { padding-left: 18px; }
+  .card li { margin-bottom: 4px; }
+
+  .callout { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; border-left: 4px solid; }
+  .callout.gold { background: var(--gold-tint); border-color: var(--gold); }
+  .callout.blue { background: var(--ocean-tint); border-color: var(--ocean); }
+  .callout.pink { background: var(--cosmo-tint); border-color: var(--cosmo); }
+  .callout.green { background: var(--lime-tint); border-color: #00b800; }
+  .callout.orange { background: var(--sunset-tint); border-color: var(--sunset); }
+  .callout strong { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+  .callout p, .callout li { font-size: 13.5px; line-height: 1.6; }
+  .callout ul { padding-left: 16px; }
+  .callout li { margin-bottom: 3px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  .ctable { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; border-radius: 12px; overflow: hidden; }
+  .ctable th { background: var(--black); color: var(--white); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .ctable td { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+  .ctable tr:last-child td { border-bottom: none; }
+  .ctable tr:nth-child(even) td { background: rgba(240,241,244,0.5); }
+  .check { color: #00aa00; font-weight: 700; }
+  .cross { color: #cc2200; font-weight: 700; }
+
+  .steps { }
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--black); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-body { flex: 1; }
+  .step-body strong { font-size: 13.5px; display: block; margin-bottom: 2px; }
+  .step-body span { font-size: 12.5px; color: #666; }
+
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .tag.gold { background: var(--gold); color: var(--black); }
+  .tag.blue { background: var(--ocean); color: #fff; }
+  .tag.orange { background: var(--sunset); color: #fff; }
+  .tag.green { background: var(--lime); color: var(--black); }
+  .tag.pink { background: var(--cosmo); color: var(--black); }
+
+  .warning { background: #fff3e0; border: 2px solid var(--sunset); border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; }
+  .warning .w-title { font-weight: 800; color: var(--sunset); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .warning p, .warning li { font-size: 13px; line-height: 1.65; }
+  .warning ul { padding-left: 16px; }
+
+  .win-banner { background: var(--gold-tint); border: 2px solid var(--gold); border-radius: 14px; padding: 18px 22px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; }
+  .win-banner .win-icon { font-size: 32px; flex-shrink: 0; }
+  .win-banner .win-body strong { font-size: 15px; font-weight: 800; display: block; margin-bottom: 4px; }
+  .win-banner .win-body p { font-size: 13px; color: #665500; }
+
+  .bottom-nav { border-top: 2px solid rgba(15,12,12,0.08); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 900px; margin: 0 auto; }
+  .bottom-nav a { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--black); text-decoration: none; padding: 10px 20px; border: 2px solid rgba(15,12,12,0.15); border-radius: 30px; transition: all 0.15s; }
+  .bottom-nav a:hover { background: var(--black); color: var(--ocean); border-color: var(--black); }
+  .bottom-nav .disabled { opacity: 0.35; pointer-events: none; }
+
+  @media (max-width: 600px) {
+    .topnav, .tab-nav { padding-left: 20px; padding-right: 20px; }
+    .page-body { padding: 24px 20px 60px; }
+    .bottom-nav { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html">Training Hub</a>
+  <span class="sep">›</span>
+  <span class="current">Day 6 — Go-Live: Calls, MBR & Transition</span>
+</nav>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="show('golive', this)">First Live Calls</button>
+  <button class="tab-btn" onclick="show('callnotes', this)">Call Notes & Logging</button>
+  <button class="tab-btn" onclick="show('mbr', this)">April MBR Insights</button>
+  <button class="tab-btn" onclick="show('stefan', this)">Stefan's Expectations</button>
+  <button class="tab-btn" onclick="show('calendar', this)">Calendar & HubSpot Setup</button>
+  <button class="tab-btn" onclick="show('churnlog', this)">Churn Log & Tracker</button>
+  <button class="tab-btn" onclick="show('transition', this)">Cliff's Handoff</button>
+  <button class="tab-btn" onclick="show('ops', this)">Ops & Access Updates</button>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Day 6 · May 4, 2026</div>
+    <h1>Go-Live: Calls,<br>MBR & Transition</h1>
+    <p class="hero-sub">First live churn calls completed. April MBR with Stefan. Key insights on productivity expectations, the supervisor transition plan, and HubSpot calendar setup.</p>
+    <div class="hero-chips">
+      <div class="chip">Parts 1–6 covered</div>
+      <div class="chip">First save: Bluebill Charters</div>
+      <div class="chip">April MBR presented</div>
+      <div class="chip">Cliff's transition underway</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- FIRST LIVE CALLS -->
+  <div class="section visible" id="sec-golive">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>First Live Churn Calls</h2>
+    </div>
+
+    <div class="win-banner">
+      <div class="win-icon">🎉</div>
+      <div class="win-body">
+        <strong>First Save — Bluebill Charters</strong>
+        <p>Rick's first successful churn save on Day 6. Offered $99/month and successfully retained the partner. Logged in the May Retention tracker. Celebrate small wins — it delays burnout and builds momentum.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Call 1 — La Vida Luxury (Churn Loss)</h3>
+      <ul>
+        <li>Partner's frustration was about <strong>after-sales process</strong>, not billing — specifically, the difficulty of cancelling and poor termination experience</li>
+        <li>When they signed up, they didn't receive proper check-in from the team</li>
+        <li>Rick offered: monthly billing switch, then $150 discount</li>
+        <li>Partner had already received a discount previously — rejected all offers</li>
+        <li>Partner was <strong>fully decided on cancellation</strong> — nothing would change their mind</li>
+        <li>Result: <span class="tag orange">Churn Loss</span> — scheduled cancellation to end of current billing period</li>
+        <li>Rick sent cancellation confirmation screenshot via Intercom to the latest conversation thread</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Call 2 — Bluebill Charters (Save)</h3>
+      <ul>
+        <li>Partner's concern: no bookings showing up, felt the platform wasn't working</li>
+        <li>Rick immediately offered $99/month — partner hesitated but stayed</li>
+        <li>Rick highlighted that the partner had favorites added, meaning potential bookings within 30–90 days</li>
+        <li>Result: <span class="tag green">Churn Save</span> at $99/month</li>
+        <li>Next steps: listing optimization assigned as after-call task</li>
+      </ul>
+    </div>
+
+    <div class="callout gold">
+      <strong>Key Lesson from Call 1</strong>
+      <p>When a partner is bulo na (fully decided), do not drag it out. Proceed directly to cancellation — this prevents bad reviews on Trustpilot and preserves the relationship. If they have zero itinerary ads after 90 days and are upset, let them cancel gracefully. The only partners worth saving are those with at least some traction (itinerary adds, favorites, referral clicks).</p>
+    </div>
+
+    <div class="card">
+      <h3>Cancellation Documentation — Step by Step</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Tag the call in Aircall</strong><span>Use: churn loss / churn save / churn delayed / churn follow-up</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Add notes using Stefan's template</strong><span>Turn result + signal type + what was offered + outcome. Keep it concise.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Cancel in Stripe</strong><span>End of current period — never immediate. Confirm the billing end date.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Send confirmation via Intercom</strong><span>Reply in the latest active conversation thread. Include cancellation screenshot if partner has trust issues.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Update the Churn Log (Nail It Scale It tracker)</strong><span>Add entry under the current week — date, partner name, result, offer accepted</span></div></div>
+      </div>
+    </div>
+
+    <div class="callout blue">
+      <strong>Which Conversation Thread to Use in Intercom</strong>
+      <p>Always reply in the partner's <strong>most recent active conversation</strong>. If their last conversation was 3+ months ago with no recent activity, don't reply there — find or start the current one. Cancellation confirmations should go where the partner is most likely to see them.</p>
+    </div>
+  </div>
+
+  <!-- CALL NOTES & LOGGING -->
+  <div class="section" id="sec-callnotes">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Call Notes & Logging</h2>
+    </div>
+
+    <div class="callout gold">
+      <strong>Add Notes to Every Intercom Conversation</strong>
+      <p>Each Intercom conversation must have a pinned note showing exactly where you are in the process. This prevents you from re-reading the entire thread every time. As conversations evolve (proactive outreach → cancellation request → churn call), update the note.</p>
+    </div>
+
+    <div class="card">
+      <h3>Intercom Conversation Note Format</h3>
+      <ul>
+        <li><strong>Current status:</strong> What type of conversation is this right now? (Proactive outreach / Cancellation request / Churn follow-up / Optimization update)</li>
+        <li><strong>Last action:</strong> What was the last thing done or sent?</li>
+        <li><strong>Next step:</strong> What needs to happen next and when?</li>
+        <li><strong>Signal level:</strong> Weak / Medium / Strong</li>
+      </ul>
+      <p style="margin-top: 10px; font-size: 12.5px; color: #888;">Example: "Proactive outreach sent May 2. Partner replied requesting cancellation May 3. Churn call scheduled May 4. Offered monthly + $150 — declined. Scheduled cancellation May 19."</p>
+    </div>
+
+    <div class="card">
+      <h3>Daily Task Priority Order</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Intercom conversations</strong><span>Reply to partners, follow up on open threads, add/update notes per conversation</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Airtable requests tab</strong><span>Check requests assigned to you — follow up on pending items</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Recently live listings (Airtable uploads)</strong><span>Work from the oldest unreviewed listing. Don't try to do all — quality over quantity.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Core engagement outreach</strong><span>Send 1–2 proactive emails to underperforming partners from the Google Sheet</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Scheduled calls</strong><span>Prepare 10 minutes before each call. Leave call tasks for the 5–7 PM block.</span></div></div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Never Edit Calendar Invite Notes</div>
+      <p>When reviewing an upcoming scheduled call in HubSpot, do <strong>not</strong> click "Edit" and add your prep notes there. Any notes added to the calendar invite are visible to the partner and they will receive an email notification. Use a separate document or the Churn Call Tool for pre-call prep.</p>
+    </div>
+  </div>
+
+  <!-- APRIL MBR -->
+  <div class="section" id="sec-mbr">
+    <div class="sec-head" style="border-color: var(--cosmo);">
+      <div class="sec-dot" style="background: var(--cosmo);"></div>
+      <h2>April MBR — Key Insights</h2>
+    </div>
+
+    <div class="callout pink">
+      <strong>What is the MBR?</strong>
+      <p>Monthly Business Review — a regular meeting with Stefan, Dulci, and Luis where the team presents performance data, task volumes, team metrics, and flags operational issues. Rick will lead these going forward. Stefan is data-driven and direct. Come with numbers, not feelings.</p>
+    </div>
+
+    <div class="card">
+      <h3>April Performance Highlights</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Metric</th><th>April Result</th><th>Context</th></tr>
+        <tr><td>Top performer</td><td>Felix Igaya</td><td>Highest conversation volume at 385 — but carries disproportionate load</td></tr>
+        <tr><td>2nd place</td><td>Irvin</td><td>More balanced volume, CSAT 75.90</td></tr>
+        <tr><td>3rd place</td><td>Kring</td><td>Highest CSAT/CX score despite lower volume</td></tr>
+        <tr><td>Median response time</td><td>Best ever</td><td>Improving every month — but team was also at highest workload</td></tr>
+        <tr><td>Total conversations (April)</td><td>~2,000</td><td>Intercom assigned + replied + order fulfillment across Felix, Irvin, Kring</td></tr>
+        <tr><td>Churn calls per week</td><td>6.1 avg</td><td>Stefan flagged this as low — opportunity to increase volume</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Stefan's Math — Capacity Analysis</h3>
+      <p style="margin-bottom: 10px; font-size: 13.5px;">Stefan broke down the 2,000 tickets across 3 agents to challenge the "understaffed" narrative:</p>
+      <ul>
+        <li>2,000 tasks / 3 agents = 666 tasks/month per agent</li>
+        <li>666 / 4 weeks = 166 tasks/week per agent</li>
+        <li>166 / 5 days = 33 tasks/day per agent</li>
+        <li>33 tasks x 12 minutes average = 396 minutes = <strong>6.6 hours/day</strong></li>
+        <li>With 8-hour shift minus lunch/breaks = team appears <strong>adequately staffed</strong> on paper</li>
+      </ul>
+      <p style="margin-top: 10px; font-size: 12.5px; color: #888; font-style: italic;">The gap: this math excludes portal work (listing edits, QA, optimization) which has zero Airtable tracking. The team's actual per-task time is 20–25 minutes for optimization tasks, not 10–12. Luis acknowledged the portal tracking gap.</p>
+    </div>
+
+    <div class="callout orange">
+      <strong>The Real Gap: Portal Work Is Invisible</strong>
+      <p>Everything done inside the admin portal (listing edits, QA, optimization, tag updates, media arrangement) has <strong>zero productivity tracking</strong>. Luis confirmed this. Until this is solved, the team cannot fully prove capacity constraints with data. This is Rick's most important operational improvement to push for with Stefan and Luis.</p>
+    </div>
+
+    <div class="card">
+      <h3>MBR Action Items Raised</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Issue</th><th>Owner</th><th>Status</th></tr>
+        <tr><td>Churn requests not flowing to Airtable from portal</td><td>Luis / John</td><td>Luis will investigate and build a trigger — ETA end of day</td></tr>
+        <tr><td>Jake's old calendar links still active and taking bookings</td><td>Luis</td><td>Luis to review all HubSpot meeting links and delete/transfer</td></tr>
+        <tr><td>Airtable view creation permissions</td><td>Luis</td><td>Team can create and duplicate views. New fields: request to Luis first.</td></tr>
+        <tr><td>CSAT not yet activated in Intercom</td><td>Cliff/Rick</td><td>Cliff recommends activating — captures partner ratings and comments for coaching</td></tr>
+        <tr><td>Conversation load distribution (Felix carrying too much)</td><td>Luis</td><td>Luis can switch from "fewest open" to Round Robin assignment</td></tr>
+        <tr><td>Portal productivity tracking gap</td><td>Luis / John</td><td>No current solution — needs to be built or tracked manually</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Stefan's Cancellation Policy (Clarified in MBR)</h3>
+      <ul>
+        <li><strong>If a partner has zero itinerary ads after 90 days and wants to cancel:</strong> Let them cancel at end of commitment cycle. Don't force a conversation.</li>
+        <li><strong>If a partner is very upset and refuses a call:</strong> Don't drag it out. Let them cancel — preventing a bad Trustpilot review is more valuable than a forced save attempt.</li>
+        <li><strong>If a partner has at least some itinerary adds:</strong> That's where a conversation makes sense — there's real traction worth saving.</li>
+        <li><strong>Refunds:</strong> Cancellation does not automatically mean a refund. They just stop being billed at the end of the cycle.</li>
+        <li><strong>No need to escalate to Stefan</strong> for routine cancellations — proceed and document.</li>
+      </ul>
+    </div>
+
+    <div class="callout green">
+      <strong>Stefan's Proactive Focus for Neoworks Team</strong>
+      <p>When not handling tickets or queues, the team should focus on <strong>historic Core partners who have been on the platform 60+ days</strong> without ratings, photos, videos, or blog posts. Pull their Google reviews and upload them. Let partners know what was done. 90% of the Batch audience is bachelorette-focused — listings not tailored to this audience will struggle to get traction regardless of optimization.</p>
+    </div>
+  </div>
+
+  <!-- STEFAN'S EXPECTATIONS -->
+  <div class="section" id="sec-stefan">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Stefan's Communication Style & Expectations</h2>
+    </div>
+
+    <div class="callout orange">
+      <strong>How Stefan Communicates</strong>
+      <p>Direct, blunt, numbers-first. New York style. He does not want feelings, context, or explanations before the data. Lead with the number. Then explain it. If he asks a question, answer it directly — don't circle back to setup. Match his energy: be specific, be fast, be concrete.</p>
+    </div>
+
+    <div class="card">
+      <h3>What Stefan Wants to See from Rick</h3>
+      <ul>
+        <li><strong>Granular productivity data:</strong> How long does each task take? How many tasks per agent per day? What's the actual capacity?</li>
+        <li><strong>Task-level breakdowns:</strong> Optimization = X minutes. Ratings upload = X minutes. Blog post = X minutes. Build this from real experience, not estimates.</li>
+        <li><strong>Honest numbers:</strong> If it takes 20 minutes, say 20 minutes. Under-promising and over-delivering is the strategy — not padding time.</li>
+        <li><strong>Proactive updates:</strong> Don't wait to be asked. Tell Stefan what the team is doing, what gaps exist, and what you need — before he asks.</li>
+        <li><strong>Level 4–5 communication:</strong> Executive-level framing. Data first, context after, ask/recommendation at the end.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>The Productivity Tracking Problem — Rick's #1 Priority</h3>
+      <p style="margin-bottom: 10px; font-size: 13.5px;">Stefan's current view is that the team is adequately staffed. The missing piece is portal work visibility. Rick's immediate goal is to build the case with real data:</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Time yourself on each task type</strong><span>Optimization, QA, ratings upload, email, blog post. Get real numbers.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Push Luis for portal tracking</strong><span>Request that John build a way to see how many listing edits/updates were done per agent per day.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Add occupancy and shrinkage to the capacity model</strong><span>Stefan's math ignores training time, ramp-up curve, context-switching, and buffer between tasks.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Present at next MBR with full task breakdown</strong><span>Show: tasks done, time per task, total hours, vs Stefan's model. Let the data make the case.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Why Felix Has the Highest Volume (And Why That's a Problem)</h3>
+      <ul>
+        <li>Felix is on the <strong>earliest shift slot</strong> — handles the overnight backlog when it's largest</li>
+        <li>The system assigns conversations to whoever has the fewest open — Felix processes faster, so he always has fewer open, so he keeps getting more</li>
+        <li>Irvin and Kring come in after Felix has already cleared the queue — naturally lower volume</li>
+        <li>This is a <strong>scheduling artifact, not a performance difference</strong></li>
+        <li>Solution: Luis can switch from "fewest open" to <strong>Round Robin</strong> for balanced distribution</li>
+        <li>Different roles = different metrics — Felix (Intercom), Irvin (partner comms + optimization), Kring (calls + senior agent) should not be measured on the same raw volume number</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CALENDAR & HUBSPOT SETUP -->
+  <div class="section" id="sec-calendar">
+    <div class="sec-head" style="border-color: var(--lime);">
+      <div class="sec-dot" style="background: var(--lime);"></div>
+      <h2>Calendar & HubSpot Setup</h2>
+    </div>
+
+    <div class="card">
+      <h3>Google Calendar — Blocks to Set Up</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Block</th><th>Time (Central)</th><th>Repeat</th><th>Purpose</th></tr>
+        <tr><td>Inbox review</td><td>10:00–10:30 AM</td><td>Every weekday</td><td>Check Intercom, review open conversations, prepare for calls</td></tr>
+        <tr><td>First break</td><td>12:00–12:15 PM</td><td>Every weekday</td><td>Scheduled break — blocks partner bookings</td></tr>
+        <tr><td>Lunch break</td><td>2:00–3:00 PM</td><td>Every weekday</td><td>Blocks out 1 hour for lunch</td></tr>
+        <tr><td>Second break</td><td>5:00–5:15 PM</td><td>Every weekday</td><td>Scheduled break</td></tr>
+        <tr><td>Training block (this week)</td><td>10:00 AM–5:00 PM</td><td>Mon–Fri until May 8</td><td>Blocks all call bookings during training period</td></tr>
+        <tr><td>After-call tasks</td><td>5:00–7:00 PM</td><td>Every weekday</td><td>Optimization, blog posts, Intercom follow-ups</td></tr>
+      </table>
+      <p style="font-size: 12px; color: #888; margin-top: 8px;">Always add your newwork.co email as a guest on every event so it shows on both calendars and Neoworks can see your availability.</p>
+    </div>
+
+    <div class="card">
+      <h3>HubSpot Calendar — Availability Settings</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Go to HubSpot → Meetings (inverted pyramid icon)</strong><span>Find "Cliffy, Kring, Rick — Churn Save Link Portal" (the Round Robin link)</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Edit your own calendar availability</strong><span>Set to: Central Time, 10 AM to 5 PM, Monday to Friday, 15/30/60 minute options enabled</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Set rolling window to 2 weeks</strong><span>Partners can only book up to 2 weeks out — gives advance notice for scheduling</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Add yourself to the Round Robin team link</strong><span>Edit the link → Team Members → Edit Members → Add Rick Cruz → Confirm → Save</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Verify your availability on the live link</strong><span>Open the booking link URL — confirm no slots show before 10 AM Central</span></div></div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Time Zone Confusion — Always Use Central</div>
+      <p>HubSpot availability settings default to Eastern Time. If you set 10 AM in Eastern, it will show up as 9 AM Central on the booking page. Always explicitly set the time zone to <strong>Central Time (Chicago)</strong> in your HubSpot calendar settings, not just on your Google Calendar.</p>
+    </div>
+
+    <div class="card">
+      <h3>Why Two Calendar Profiles Matter</h3>
+      <ul>
+        <li><strong>Let's Batch email profile:</strong> Used for all Batch-related tools — Airtable, HubSpot, Intercom, partner portal, Claude Batch</li>
+        <li><strong>NewWork.co email profile:</strong> Used for all NeoWork tools — Google Drive, NeoWork Academy, team documents, Claude NewWork</li>
+        <li><strong>Critical rule:</strong> Always add your newwork.co email as a guest on every calendar event created in Let's Batch — so both calendars stay in sync</li>
+        <li><strong>Why it matters:</strong> If Batch ever offboards you and revokes the Let's Batch email access, everything you saved there disappears. Keeping newwork.co synced is your backup.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CHURN LOG & TRACKER -->
+  <div class="section" id="sec-churnlog">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Churn Log & Nail It Scale It Tracker</h2>
+    </div>
+
+    <div class="callout gold">
+      <strong>Stefan Watches This Daily</strong>
+      <p>The "Nail It Scale It" performance tracker is reviewed by Stefan regularly. Update it at the end of every shift — not just after call weeks. This is how leadership tracks saves, losses, and team momentum.</p>
+    </div>
+
+    <div class="card">
+      <h3>How to Update the May Retention Tab</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Duplicate the April Retention tab</strong><span>Rename to "May Retention and Churn" — update dates to May 1, May 4, May 11, May 18, May 25</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Clear all April numbers</strong><span>Keep the formulas and structure. Remove the data entries. Leave targets column untouched.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Log each call result under the correct week</strong><span>Enter the date, partner name, result (save/loss/follow-up), and price offered</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>The formula auto-calculates week totals</strong><span>The date field triggers the week grouping — no manual week entry needed</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Update at end of every shift</strong><span>Ideally one person updates per day — Rick during day shifts, Kring at end of her shift if she had saves</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Churn Log Note Format (Stefan's Template)</h3>
+      <p style="margin-bottom: 8px; font-size: 13.5px;">In Aircall notes after every call, paste and fill this format:</p>
+      <div style="background: var(--black); border-radius: 12px; padding: 16px 18px; margin-top: 4px;">
+        <p style="font-size: 13px; color: var(--lime); font-weight: 700; margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; font-size: 11px;">Call Note Template</p>
+        <p style="font-size: 13px; color: rgba(240,241,244,0.85); font-family: monospace; line-height: 1.9;">
+          Turn Result: [Churn Loss / Churn Save / Churn Delayed / Churn Follow-Up]<br>
+          Signal Type: [Weak / Medium / Strong / Super Strong]<br>
+          Outcome: [Brief summary — what was offered, what was accepted/declined, next step]
+        </p>
+      </div>
+      <p style="font-size: 12px; color: #888; margin-top: 10px;">Keep it concise — 2–3 lines max. The HubSpot AI summary handles the full detail.</p>
+    </div>
+
+    <div class="card">
+      <h3>Teach Teammates to Update the Tracker</h3>
+      <ul>
+        <li>Don't be the only person who knows how to update it — train Kring to update her own saves</li>
+        <li>If you're absent, Kring handles the update for that day</li>
+        <li>Goal: any team member with call responsibilities can independently maintain the tracker</li>
+        <li>This prevents a single point of failure and shows Stefan the team is self-managing</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CLIFF'S HANDOFF -->
+  <div class="section" id="sec-transition">
+    <div class="sec-head" style="border-color: var(--cosmo);">
+      <div class="sec-dot" style="background: var(--cosmo);"></div>
+      <h2>Cliff's Handoff Context</h2>
+    </div>
+
+    <div class="callout pink">
+      <strong>Cliff Is Resigning — Transition Plan in Motion</strong>
+      <p>Cliff submitted his resignation with a mutual end date — no fixed timeline. He'll remain until Rick and the two incoming new hires are fully transitioned. His goal: leave the team in a good place. Next week, Cliff will use 6–7 PM Central daily to teach Rick the member support tasks one at a time.</p>
+    </div>
+
+    <div class="card">
+      <h3>What Cliff Is Handing Off to Rick</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Area</th><th>Status</th><th>Notes</th></tr>
+        <tr><td>Churn calls</td><td class="check">✓ Handed off</td><td>Rick took first solo calls today</td></tr>
+        <tr><td>Partner support (QA, optimization, outreach)</td><td class="check">✓ Trained</td><td>Rick executing independently</td></tr>
+        <tr><td>HubSpot calendar management</td><td class="check">✓ Set up today</td><td>Rick added to Round Robin link</td></tr>
+        <tr><td>Monthly business review (MBR)</td><td style="color: #cc8800; font-weight: 700;">In Progress</td><td>Rick shadowed April MBR — takes over from next MBR</td></tr>
+        <tr><td>Member support tasks (Intercom, order fulfillment, calendars, disputes)</td><td style="color: #cc8800; font-weight: 700;">Starting next week</td><td>Cliff will teach one task per day at 6–7 PM Central</td></tr>
+        <tr><td>Supervisory tasks (QA rubrics, coaching, scorecards)</td><td class="cross">✗ Pending</td><td>Partially documented — Cliff to create videos for reference</td></tr>
+        <tr><td>New hire training (2 incoming)</td><td class="cross">✗ Pending</td><td>Rick and Cliff will co-train when they arrive</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Rick's Transition Plan — Next Steps</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>This week (May 4–8): Training continues</strong><span>Focus on calls, Intercom management, Airtable tracking. Block 10 AM–5 PM to prevent partner bookings.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Next week (May 11+): Full call schedule opens</strong><span>Partners can book directly. Rick takes all incoming churn and retention calls.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>6–7 PM slot: Cliff trains member support tasks</strong><span>One task per day — order fulfillment, calendar management, dispute handling, Intercom QA.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Next MBR: Rick leads</strong><span>Cliff present for moral support. Rick presents data, capacity analysis, and team updates to Stefan.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>New hires arrive: Co-train with Cliff</strong><span>Rick takes primary trainer role using the same task-by-task approach Cliff used.</span></div></div>
+      </div>
+    </div>
+
+    <div class="callout blue">
+      <strong>Team Dynamics — What Rick Inherits</strong>
+      <ul>
+        <li><strong>Felix:</strong> Fastest on Intercom. Non-voice preference. Knows all tasks but was originally hired for admin only.</li>
+        <li><strong>Irvin:</strong> Handles partner communications and optimizations. More thorough, quality-focused. Non-voice preference.</li>
+        <li><strong>Kring:</strong> Senior agent. Trained in coaching. Has phone call phobia but agreed to calls out of respect for Cliff. Needs Rick to earn that same trust.</li>
+        <li><strong>Angel:</strong> Reports to Stefan (not Rick). Handles new partner onboarding (48-hour check-in, 14-day, 30-day follow-ups).</li>
+        <li><strong>Eric Ingrasya:</strong> Being rehired as new headcount — has prior Batch knowledge, faster ramp-up expected.</li>
+      </ul>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Felix and Irvin's Non-Voice Agreement</div>
+      <p>Felix and Irvin were hired explicitly for admin/non-voice roles. They agreed to take phone calls as a favor to Cliff. That agreement may not automatically transfer to Rick. Earning their trust and making them feel protected as their supervisor is the prerequisite before expecting them to maintain that agreement. Don't assume — build the relationship first.</p>
+    </div>
+  </div>
+
+  <!-- OPS & ACCESS UPDATES -->
+  <div class="section" id="sec-ops">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Ops & Access Updates</h2>
+    </div>
+
+    <div class="card">
+      <h3>New Decisions from MBR / Luis Meeting</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Decision</th><th>Detail</th></tr>
+        <tr><td><strong>Airtable views</strong></td><td>Team can freely create, duplicate, rename, and filter views. New fields: request to Luis first with justification.</td></tr>
+        <tr><td><strong>Churn flow trigger</strong></td><td>Luis will build an Airtable request whenever a partner enters the churn flow in the portal — even if they don't book a call.</td></tr>
+        <tr><td><strong>Jake's calendar</strong></td><td>Luis will audit all HubSpot meeting links connected to Jake's calendar. Active links will be deleted or transferred.</td></tr>
+        <tr><td><strong>Conversation load</strong></td><td>Luis can switch Intercom from "fewest open" to Round Robin if team decides to balance Felix's load.</td></tr>
+        <tr><td><strong>CSAT activation</strong></td><td>Recommended to activate — enables partner ratings and comments for coaching. Currently using Finn AI scores only.</td></tr>
+        <tr><td><strong>SOPs from Stefan</strong></td><td>Luis is building SOPs for subscription changes, cancellations, and refunds — will be transitioned to Neoworks team over 4 weeks.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Angel's Role (Not Under Rick)</h3>
+      <ul>
+        <li>Angel reports to <strong>Stefan directly</strong> — not to Rick or Cliff</li>
+        <li>His scope: new partner onboarding check-ins at 48 hours, 14 days, 30 days</li>
+        <li>The 14-day/30-day follow-up workflows Cliff was managing are now Angel's responsibility</li>
+        <li>Rick does not need to manage Angel or assign him tasks — escalate to Stefan if coordination is needed</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Documentation Reality Check</h3>
+      <ul>
+        <li>Existing SOPs in Intercom knowledge base are <strong>6–8 years old</strong> and not updated</li>
+        <li>Google Drive has legacy documents from multiple management eras — largely outdated</li>
+        <li>Notion was used, then access was revoked, then Intercom, then artifacts — no centralized, current SOP repository exists</li>
+        <li>Recommendation: don't try to salvage old documents. Build new from scratch using current workflows.</li>
+        <li>Cliff's approach: create Loom videos for key processes so Rick has something to reference even after Cliff leaves</li>
+      </ul>
+    </div>
+
+    <div class="callout gold">
+      <strong>Rick's Training Hub — Shared with Stefan</strong>
+      <p>Cliff shared Rick's training notes hub (this site) with Stefan. Cliff specifically noted that it was <strong>Rick's own initiative</strong> — not something assigned. Stefan is aware of it. Keep it updated as a living reference — it demonstrates proactive learning and systems thinking, which is exactly what Stefan values.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <a href="day4.html">← Day 4</a>
+  <a href="index.html">Training Hub</a>
+  <a href="#" class="disabled">Day 7 — Coming Soon →</a>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('visible');
+  btn.classList.add('active');
+  window.scrollTo({ top: document.querySelector('.page-body').offsetTop - 100, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
