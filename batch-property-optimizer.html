@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listing Optimizer (Properties &amp; Stays) · Batch Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://js.puter.com/v2/"></script>
+<style>
+  :root {
+    --black: #0F0C0C; --white: #F0F1F4; --sunset: #FF5F00; --ocean: #4F97FC;
+    --cosmo: #FF93D3; --lime: #00DF00; --gold: #FFCA00; --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF; --cosmo-tint: #FFE0F3; --lime-tint: #C8FFB0; --sunset-tint: #FFD9C0;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Mulish', sans-serif; background: var(--white); color: var(--black); min-height: 100vh; font-size: 14px; }
+  .topnav { background: var(--black); padding: 14px 40px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--gold); }
+  .topnav a { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.15s; }
+  .topnav a:hover { color: var(--gold); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--gold); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+  .hero { background: var(--black); padding: 52px 40px 44px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; right: -80px; top: -80px; width: 360px; height: 360px; border-radius: 50%; background: var(--gold); opacity: 0.07; }
+  .hero::after { content: ''; position: absolute; left: -60px; bottom: -60px; width: 240px; height: 240px; border-radius: 50%; background: var(--ocean); opacity: 0.06; }
+  .hero-inner { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--gold); color: var(--black); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; padding: 5px 14px; border-radius: 30px; margin-bottom: 16px; }
+  .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--black); }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 52px); font-weight: 900; color: #fff; line-height: 1.08; margin-bottom: 10px; }
+  .hero h1 span { color: var(--gold); }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); max-width: 420px; line-height: 1.6; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+  .chip { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(240,241,244,0.7); border: 1px solid rgba(255,255,255,0.1); }
+  .hero-steps { display: flex; flex-direction: column; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px 22px; min-width: 200px; }
+  .hero-step { display: flex; align-items: center; gap: 10px; }
+  .hero-step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: var(--black); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .hero-step-label { font-size: 12px; color: rgba(240,241,244,0.65); font-weight: 600; }
+  .container { max-width: 860px; margin: 0 auto; padding: 36px 40px 80px; }
+  .sec-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; color: rgba(15,12,12,0.35); margin-bottom: 16px; margin-top: 8px; display: flex; align-items: center; gap: 10px; }
+  .sec-label::after { content: ''; flex: 1; height: 1px; background: rgba(15,12,12,0.1); }
+  .card { background: #fff; border-radius: 16px; border: 1.5px solid rgba(15,12,12,0.09); padding: 24px 26px; margin-bottom: 16px; }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+  .card-tag { font-family: 'Mulish', sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 3px 10px; border-radius: 20px; }
+  .card-tag.required { background: var(--sunset-tint); color: #993300; }
+  .card-tag.optional { background: var(--ocean-tint); color: #1a4d8f; }
+  .puter-badge { background: var(--gold-tint); border: 2px solid var(--gold); border-radius: 16px; padding: 14px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .puter-badge-icon { font-size: 22px; flex-shrink: 0; }
+  .puter-badge-text { flex: 1; min-width: 200px; }
+  .puter-badge-text strong { font-size: 13px; font-weight: 800; display: block; margin-bottom: 3px; color: var(--black); }
+  .puter-badge-text p { font-size: 12px; color: #665500; line-height: 1.5; }
+  .puter-badge-text a { color: #443300; font-weight: 700; }
+  .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field-full { grid-column: 1 / -1; }
+  .field label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: rgba(15,12,12,0.45); margin-bottom: 6px; }
+  .field input, .field textarea, .field select { width: 100%; border: 1.5px solid rgba(15,12,12,0.12); border-radius: 10px; padding: 10px 13px; font-family: 'Mulish', sans-serif; font-size: 13.5px; color: var(--black); background: var(--white); outline: none; transition: border-color 0.2s, background 0.2s; resize: vertical; }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--gold); background: #fff; box-shadow: 0 0 0 3px rgba(255,202,0,0.12); }
+  .field textarea { min-height: 100px; line-height: 1.6; }
+  .field textarea.tall { min-height: 160px; }
+  .hint-box { background: var(--ocean-tint); border-left: 4px solid var(--ocean); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; color: #1a3d6e; margin-bottom: 16px; line-height: 1.6; }
+  .error-banner { background: #FDECEA; border: 1.5px solid #F5C6C2; border-radius: 12px; padding: 14px 18px; color: #B02D2D; font-size: 13.5px; font-weight: 600; margin-bottom: 16px; display: none; }
+  .progress-wrap { height: 4px; background: rgba(15,12,12,0.08); border-radius: 4px; margin-bottom: 20px; overflow: hidden; display: none; }
+  .progress-wrap.visible { display: block; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--ocean)); width: 0%; transition: width 0.4s ease; border-radius: 4px; }
+  .run-btn { width: 100%; background: var(--black); color: #fff; border: none; border-radius: 14px; padding: 18px 24px; font-family: 'Mulish', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; transition: background 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 28px; letter-spacing: 0.3px; position: relative; overflow: hidden; }
+  .run-btn::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--gold); }
+  .run-btn:hover { background: #1a1818; transform: translateY(-1px); }
+  .run-btn:active { transform: scale(0.99); }
+  .run-btn:disabled { background: #555; cursor: not-allowed; transform: none; }
+  .run-btn .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+  .run-btn.loading .spinner { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .output-area { display: none; }
+  .output-area.visible { display: block; }
+  .download-banner { background: var(--gold-tint); border: 2px solid var(--gold); border-radius: 16px; padding: 18px 22px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .download-banner-left { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 220px; }
+  .download-icon { font-size: 26px; flex-shrink: 0; line-height: 1; }
+  .download-text strong { display: block; font-size: 14px; font-weight: 800; color: var(--black); margin-bottom: 3px; }
+  .download-text p { font-size: 12px; color: rgba(15,12,12,0.55); line-height: 1.5; }
+  .download-btn { background: var(--black); color: #fff; border: none; border-radius: 30px; padding: 11px 22px; font-family: 'Mulish', sans-serif; font-size: 13px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s, transform 0.15s; white-space: nowrap; letter-spacing: 0.2px; flex-shrink: 0; }
+  .download-btn:hover { background: #1a1818; transform: translateY(-1px); }
+  .download-btn:active { transform: scale(0.98); }
+  .download-btn.success { background: #1a8c00; }
+  .output-section { background: #fff; border: 1.5px solid rgba(15,12,12,0.09); border-radius: 14px; margin-bottom: 12px; overflow: hidden; transition: box-shadow 0.2s; }
+  .output-section:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
+  .output-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; user-select: none; transition: background 0.15s; }
+  .output-header:hover { background: var(--white); }
+  .output-header-left { display: flex; align-items: center; gap: 12px; }
+  .output-num { width: 28px; height: 28px; border-radius: 50%; background: var(--black); color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .task-0 .output-num { background: var(--ocean); }
+  .task-1 .output-num { background: var(--gold); color: var(--black); }
+  .task-2 .output-num { background: var(--cosmo); color: var(--black); }
+  .task-3 .output-num { background: var(--sunset); }
+  .task-4 .output-num { background: var(--black); color: var(--gold); border: 2px solid var(--gold); }
+  .task-5 .output-num { background: var(--lime); color: var(--black); }
+  .output-label { font-weight: 700; font-size: 14px; }
+  .output-sublabel { font-size: 11px; color: rgba(15,12,12,0.4); font-weight: 600; margin-top: 1px; }
+  .output-toggle { font-size: 14px; color: rgba(15,12,12,0.3); transition: transform 0.2s; }
+  .output-toggle.open { transform: rotate(180deg); }
+  .output-body { padding: 0 20px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.2s; }
+  .output-body.open { max-height: 3000px; padding: 4px 20px 20px; }
+  .output-divider { height: 1px; background: rgba(15,12,12,0.07); margin-bottom: 16px; }
+  .output-content { white-space: pre-wrap; font-size: 13.5px; line-height: 1.75; color: #333; font-family: 'Mulish', sans-serif; }
+  .tag-pills-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .tag-pill { display: inline-flex; align-items: center; gap: 5px; background: var(--black); color: var(--gold); font-size: 12px; font-weight: 800; padding: 5px 13px; border-radius: 30px; border: 1.5px solid var(--gold); cursor: pointer; transition: background 0.15s, color 0.15s; user-select: none; letter-spacing: 0.2px; }
+  .tag-pill:hover { background: var(--gold); color: var(--black); }
+  .tag-pill.copied-pill { background: var(--gold); color: var(--black); }
+  .tag-note { font-size: 12px; color: rgba(15,12,12,0.45); font-weight: 600; margin-bottom: 14px; line-height: 1.5; }
+  .copy-btn { margin-top: 14px; background: transparent; border: 1.5px solid rgba(15,12,12,0.12); border-radius: 8px; padding: 7px 14px; font-family: 'Mulish', sans-serif; font-size: 12px; font-weight: 700; color: rgba(15,12,12,0.45); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+  .copy-btn:hover { border-color: var(--ocean); color: var(--ocean); }
+  .copy-btn.copied { border-color: #00aa00; color: #00aa00; }
+  .bottom-nav { border-top: 2px solid rgba(15,12,12,0.08); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 860px; margin: 0 auto; }
+  .bottom-nav a { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--black); text-decoration: none; padding: 10px 20px; border: 2px solid rgba(15,12,12,0.15); border-radius: 30px; transition: all 0.15s; }
+  .bottom-nav a:hover { background: var(--black); color: var(--gold); border-color: var(--black); }
+  @media (max-width: 600px) {
+    .topnav { padding: 14px 20px; } .hero { padding: 36px 20px 32px; } .container { padding: 24px 20px 60px; }
+    .fields-grid { grid-template-columns: 1fr; } .hero-steps { display: none; } .bottom-nav { padding: 20px; }
+    .download-banner { flex-direction: column; align-items: flex-start; } .download-btn { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html">Training Hub</a>
+  <span class="sep">›</span>
+  <span class="current">Listing Optimizer (Properties &amp; Stays)</span>
+</nav>
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-badge"><div class="dot"></div>Batch Tool · CoStar Powered</div>
+      <h1>Listing<br><span>Optimizer</span></h1>
+      <p class="hero-sub">Properties &amp; Stays — paste any partner listing and get SEO keywords, an optimized title &amp; description, a partner email, a rewritten profile, and recommended tags — all in one shot.</p>
+      <div class="hero-chips">
+        <div class="chip">6 tasks automated</div>
+        <div class="chip">Puter.js · No API key</div>
+        <div class="chip">~5 min per listing</div>
+      </div>
+    </div>
+    <div class="hero-steps">
+      <div class="hero-step"><div class="hero-step-num">1</div><div class="hero-step-label">SEO Keyword Research</div></div>
+      <div class="hero-step"><div class="hero-step-num">2</div><div class="hero-step-label">Optimized Title</div></div>
+      <div class="hero-step"><div class="hero-step-num">3</div><div class="hero-step-label">Optimized Description</div></div>
+      <div class="hero-step"><div class="hero-step-num">4</div><div class="hero-step-label">Partner Update Email</div></div>
+      <div class="hero-step"><div class="hero-step-num">5</div><div class="hero-step-label">Partner Profile "About"</div></div>
+      <div class="hero-step"><div class="hero-step-num">6</div><div class="hero-step-label">Recommended Tags</div></div>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="puter-badge">
+    <div class="puter-badge-icon">⚡</div>
+    <div class="puter-badge-text">
+      <strong>Powered by Puter.js — No API Key Needed</strong>
+      <p>This tool runs Claude AI for free via <a href="https://developer.puter.com" target="_blank">Puter.js</a>. No API key or account required — just fill in the form and hit Generate. You may be asked to sign in to Puter on first use (it's free).</p>
+    </div>
+  </div>
+  <div class="hint-box"><strong>Always review AI output before sending.</strong> The optimizer generates suggestions — you must verify accuracy. If a claim doesn't match reality (e.g., claiming amenities exist when they don't), edit it before sending to the partner.</div>
+
+  <div class="sec-label">Listing Information</div>
+  <div class="card">
+    <div class="card-title">Core Details <span class="card-tag required">Required</span></div>
+    <div class="fields-grid">
+      <div class="field"><label>Partner Name</label><input type="text" id="partnerName" placeholder="e.g. The Lakeview Loft"></div>
+      <div class="field"><label>City</label><input type="text" id="city" placeholder="e.g. Chicago, IL"></div>
+      <div class="field field-full"><label>Current Listing Title</label><input type="text" id="title" placeholder="Paste the current listing title here"></div>
+      <div class="field"><label>Minimum Stay</label><input type="text" id="minStay" placeholder="e.g. 2 nights"></div>
+      <div class="field"><label>Price</label><input type="text" id="price" placeholder="e.g. $350 / night"></div>
+      <div class="field"><label>Location Type</label><input type="text" id="locationType" placeholder="e.g. Partner Location"></div>
+      <div class="field field-full"><label>About This Property — Current Description</label><textarea id="description" class="tall" placeholder="Paste the full current property description here"></textarea></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Neighborhood &amp; Additional Content <span class="card-tag optional">Optional but helpful</span></div>
+    <div class="fields-grid">
+      <div class="field field-full"><label>About the Neighborhood</label><textarea id="neighborhood" placeholder="Paste any current neighborhood description, or type &quot;none&quot;"></textarea></div>
+      <div class="field field-full"><label>Getting Around the Neighborhood</label><textarea id="gettingAround" placeholder="Transit, parking, walkability info — or type &quot;none&quot;"></textarea></div>
+      <div class="field field-full"><label>Current Partner Profile "About" Text</label><textarea id="partnerAbout" placeholder='Paste the current "About" text, or type "none"'></textarea></div>
+    </div>
+  </div>
+
+  <div class="error-banner" id="errorBanner"></div>
+  <div class="progress-wrap" id="progressWrap"><div class="progress-fill" id="progressBar"></div></div>
+  <button class="run-btn" id="runBtn" onclick="runOptimizer()">
+    <div class="spinner"></div>
+    <span class="btn-text">Generate Full Optimization</span>
+  </button>
+
+  <div class="output-area" id="outputArea">
+    <div class="sec-label">Optimization Results</div>
+    <div class="download-banner">
+      <div class="download-banner-left">
+        <div class="download-icon">📄</div>
+        <div class="download-text">
+          <strong>Take it with you</strong>
+          <p>All 6 sections in one tidy text file — perfect for sharing with your team or dropping into a doc.</p>
+        </div>
+      </div>
+      <button class="download-btn" id="downloadBtn" onclick="downloadOutput()">⬇ Download Full Output</button>
+    </div>
+
+    <div class="output-section task-0">
+      <div class="output-header" onclick="toggleSection(0)">
+        <div class="output-header-left"><div class="output-num">1</div><div><div class="output-label">SEO Keyword Research</div><div class="output-sublabel">Primary, secondary, long-tail + keywords to avoid</div></div></div>
+        <div class="output-toggle" id="toggle0">▼</div>
+      </div>
+      <div class="output-body" id="body0"><div class="output-divider"></div><div class="output-content" id="content0"></div><button class="copy-btn" onclick="copySection(0)">⎘ Copy</button></div>
+    </div>
+
+    <div class="output-section task-1">
+      <div class="output-header" onclick="toggleSection(1)">
+        <div class="output-header-left"><div class="output-num">2</div><div><div class="output-label">Optimized Title</div><div class="output-sublabel">3 options ranked by SEO strength + recommendation</div></div></div>
+        <div class="output-toggle" id="toggle1">▼</div>
+      </div>
+      <div class="output-body" id="body1"><div class="output-divider"></div><div class="output-content" id="content1"></div><button class="copy-btn" onclick="copySection(1)">⎘ Copy</button></div>
+    </div>
+
+    <div class="output-section task-2">
+      <div class="output-header" onclick="toggleSection(2)">
+        <div class="output-header-left"><div class="output-num">3</div><div><div class="output-label">Optimized Description</div><div class="output-sublabel">Full "About This Property" rewrite in Batch format</div></div></div>
+        <div class="output-toggle" id="toggle2">▼</div>
+      </div>
+      <div class="output-body" id="body2"><div class="output-divider"></div><div class="output-content" id="content2"></div><button class="copy-btn" onclick="copySection(2)">⎘ Copy</button></div>
+    </div>
+
+    <div class="output-section task-3">
+      <div class="output-header" onclick="toggleSection(3)">
+        <div class="output-header-left"><div class="output-num">4</div><div><div class="output-label">Partner Update Email</div><div class="output-sublabel">Ready-to-send email covering all 4 changes</div></div></div>
+        <div class="output-toggle" id="toggle3">▼</div>
+      </div>
+      <div class="output-body" id="body3"><div class="output-divider"></div><div class="output-content" id="content3"></div><button class="copy-btn" onclick="copySection(3)">⎘ Copy</button></div>
+    </div>
+
+    <div class="output-section task-4">
+      <div class="output-header" onclick="toggleSection(4)">
+        <div class="output-header-left"><div class="output-num">5</div><div><div class="output-label">Partner Profile "About"</div><div class="output-sublabel">Recommended + 3 alternative versions</div></div></div>
+        <div class="output-toggle" id="toggle4">▼</div>
+      </div>
+      <div class="output-body" id="body4"><div class="output-divider"></div><div class="output-content" id="content4"></div><button class="copy-btn" onclick="copySection(4)">⎘ Copy</button></div>
+    </div>
+
+    <div class="output-section task-5">
+      <div class="output-header" onclick="toggleSection(5)">
+        <div class="output-header-left"><div class="output-num">6</div><div><div class="output-label">Recommended Tags</div><div class="output-sublabel">Click any tag to copy it · Copy all at once below</div></div></div>
+        <div class="output-toggle" id="toggle5">▼</div>
+      </div>
+      <div class="output-body" id="body5"><div class="output-divider"></div><p class="tag-note" id="tagNote"></p><div class="tag-pills-wrap" id="tagPills"></div><div class="output-content" id="content5" style="display:none;"></div><button class="copy-btn" onclick="copySection(5)" style="margin-top:16px;">⎘ Copy All Tags</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav"><a href="index.html">← Back to Hub</a></div>
+
+<script>
+const TASK_LABELS = ['SEO Keyword Research','Optimized Title','Optimized Description','Partner Update Email','Partner Profile "About"','Recommended Tags'];
+
+function toggleSection(idx) {
+  const body = document.getElementById('body' + idx);
+  const toggle = document.getElementById('toggle' + idx);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  toggle.classList.toggle('open', !isOpen);
+}
+function openSection(idx) {
+  document.getElementById('body' + idx).classList.add('open');
+  document.getElementById('toggle' + idx).classList.add('open');
+}
+async function copySection(idx) {
+  let text = idx === 5 ? document.getElementById('content5').textContent : document.getElementById('content' + idx).textContent;
+  await navigator.clipboard.writeText(text);
+  const btn = document.querySelectorAll('.copy-btn')[idx];
+  btn.textContent = '✓ Copied!';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = '⎘ Copy' + (idx === 5 ? ' All Tags' : ''); btn.classList.remove('copied'); }, 2000);
+}
+async function copyTagPill(pill, tag) {
+  await navigator.clipboard.writeText(tag);
+  pill.classList.add('copied-pill');
+  const orig = pill.textContent;
+  pill.textContent = '✓ ' + tag;
+  setTimeout(() => { pill.textContent = orig; pill.classList.remove('copied-pill'); }, 1500);
+}
+function renderTagPills(tagsText) {
+  const matches = tagsText.match(/#[\w&'%!.\- ]+/g) || [];
+  const seen = new Set();
+  const tags = [];
+  for (const raw of matches) {
+    const trimmed = raw.trim().replace(/\s+$/, '');
+    if (!seen.has(trimmed.toLowerCase())) { seen.add(trimmed.toLowerCase()); tags.push(trimmed); }
+  }
+  const wrap = document.getElementById('tagPills');
+  const note = document.getElementById('tagNote');
+  wrap.innerHTML = '';
+  if (tags.length === 0) {
+    note.textContent = 'No matching tags found. See raw output below.';
+    document.getElementById('content5').style.display = 'block';
+    return;
+  }
+  note.textContent = `${tags.length} tags recommended. Click any tag to copy it individually, or use "Copy All Tags" below.`;
+  for (const tag of tags) {
+    const pill = document.createElement('span');
+    pill.className = 'tag-pill';
+    pill.textContent = tag;
+    pill.title = 'Click to copy';
+    pill.addEventListener('click', () => copyTagPill(pill, tag));
+    wrap.appendChild(pill);
+  }
+  document.getElementById('content5').textContent = tags.join(' ');
+}
+function downloadOutput() {
+  const partnerName = document.getElementById('partnerName').value.trim() || 'Listing';
+  const city = document.getElementById('city').value.trim();
+  const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  const divider = '='.repeat(55);
+  const thinDivider = '-'.repeat(55);
+  let output = `BATCH LISTING OPTIMIZER - FULL OUTPUT\n${divider}\nPartner: ${partnerName}${city ? ' | ' + city : ''}\nGenerated: ${dateStr}\n${divider}\n\n`;
+  for (let i = 0; i < 5; i++) {
+    const content = document.getElementById('content' + i).textContent.trim();
+    if (content) output += `TASK ${i + 1} - ${TASK_LABELS[i].toUpperCase()}\n${thinDivider}\n\n${content}\n\n\n`;
+  }
+  const tagContent = document.getElementById('content5').textContent.trim();
+  if (tagContent) output += `TASK 6 - ${TASK_LABELS[5].toUpperCase()}\n${thinDivider}\n\n${tagContent}\n\n\n`;
+  output += `${divider}\nGenerated by Batch Listing Optimizer - letsbatch.com\nAlways review AI output before sending to partners.\n`;
+  const blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `batch-optimization-${partnerName.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.txt`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  const btn = document.getElementById('downloadBtn');
+  btn.classList.add('success'); btn.textContent = '✓ Downloaded!';
+  setTimeout(() => { btn.classList.remove('success'); btn.textContent = '⬇ Download Full Output'; }, 2500);
+}
+function setProgress(pct) { document.getElementById('progressBar').style.width = pct + '%'; }
+function showError(msg) { const el = document.getElementById('errorBanner'); el.textContent = msg; el.style.display = 'block'; }
+function hideError() { document.getElementById('errorBanner').style.display = 'none'; }
+
+function buildPrompt() {
+  const g = id => document.getElementById(id).value.trim() || 'none';
+  const currentDescription = g('description');
+  const descWordCount = currentDescription === 'none' ? 0 : currentDescription.split(/\s+/).filter(Boolean).length;
+
+  return `You are an SEO strategist and conversion copywriter for Batch, a marketplace for local experiences and stays (letsbatch.com). Your job is to optimize a property listing for discoverability on both the Batch platform and Google search, then communicate those changes to the property partner.
+
+Complete all six tasks below in order. Every word across every task must follow the rules below without exception.
+
+UNIVERSAL WRITING RULES:
+- Zero em dashes. Not one. If you want to use one, use a colon or rewrite the sentence. This is a hard rule with no exceptions.
+- No filler openers. Do not start any response, section, or sentence with: "Certainly," "Absolutely," "Great news," "Of course," "Happy to," or any similar phrase.
+- No filler phrases anywhere. Cut: "in today's competitive landscape," "look no further," "it's worth noting," "at the end of the day," "we're excited to share," "this is a great opportunity to."
+- No clichés. Cut: "unforgettable," "one-of-a-kind," "world-class," "amazing," "seamless," "elevate," "journey," "experience like no other," "take your X to the next level," "perfect for."
+- No exclamation marks except inside Batch bullet labels where brand energy calls for it.
+- No AI-sounding language. Write the way a sharp, experienced human editor would. Short, direct sentences. Active voice. Every word earns its place.
+- Bullet labels use a colon, not a dash or em dash. Example: "Rooftop Deck: watch the city lights come alive from your own private terrace."
+- Warm tone throughout. Peer to peer. Clear and confident, not corporate.
+
+═══════════════════════════════════════
+LISTING INFORMATION
+═══════════════════════════════════════
+
+Partner Name: ${g('partnerName')}
+Experience Title: ${g('title')}
+City: ${g('city')}
+Minimum Stay: ${g('minStay')}
+Price: ${g('price')}
+Location Type: ${g('locationType')}
+
+Current Partner Profile "About" Text:
+${g('partnerAbout')}
+
+About This Property (current, approximately ${descWordCount} words):
+${currentDescription}
+
+About the Neighborhood:
+${g('neighborhood')}
+
+Getting Around the Neighborhood:
+${g('gettingAround')}
+
+═══════════════════════════════════════
+TASK 1 - SEO KEYWORD RESEARCH
+═══════════════════════════════════════
+
+Based on the listing above, identify:
+
+1. PRIMARY KEYWORD (1 term)
+   The single most important search term this listing should rank for.
+   Include search intent: transactional, informational, or navigational.
+
+2. SECONDARY KEYWORDS (4-6 terms)
+   Mix of location-based, property-based, and audience-based terms.
+
+3. LONG-TAIL KEYWORDS (3-5 phrases, 4+ words each)
+   High intent, lower competition. People searching these are ready to book.
+
+4. KEYWORDS TO AVOID
+   Terms that are too broad, too competitive, or off-target for this listing.
+
+Use these keywords when writing Tasks 2, 3, and 5.
+
+═══════════════════════════════════════
+TASK 2 - OPTIMIZED TITLE
+═══════════════════════════════════════
+
+Rewrite the listing title using keywords from Task 1.
+
+Rules:
+- 50-70 characters including spaces
+- Include the city or a location-based modifier
+- Lead with the most compelling aspect of the property
+- Title Case, no emojis, no exclamation marks, no all-caps
+- Specific enough that it could not describe any other listing
+- No keyword stuffing, no em dashes
+
+Output:
+- 3 title options ranked by SEO strength
+- One-line rationale for each (no em dashes)
+- Your single best recommendation with a brief reason
+
+═══════════════════════════════════════
+TASK 3 - OPTIMIZED DESCRIPTION
+═══════════════════════════════════════
+
+Rewrite the full "About This Property" section following the exact Batch format below. Do not skip, rename, or reorder any section.
+
+LENGTH RULE: The rewrite must be close to the original in word count (approximately ${descWordCount} words). Do not shrink the description. A shorter description loses keyword coverage and SEO value. Keep every meaningful detail from the original. Expand where it improves clarity or helps the guest understand what they're booking.
+
+NO EM DASHES anywhere in this section. Not in bullets, not in sentences, not in labels. Use a colon or rewrite instead.
+
+FORMAT:
+
+About This Property
+
+What you'll experience:
+[Hook sentence. Vivid, specific, second person. No em dashes. No clichés.]
+
+* [Label]: [One full sentence describing what the guest experiences or enjoys.]
+* [Label]: [One full sentence.]
+* [Label]: [One full sentence.]
+* [Label]: [One full sentence.]
+* [Label]: [One full sentence.]
+
+[1-2 closing sentences that capture the overall feeling of the stay. Specific. No em dashes.]
+
+Why we love it for your [group type e.g. group getaway / couple's stay / birthday weekend]:
+
+* [Label]: [Why this feature matters to the guest, one full sentence.]
+* [Label]: [One full sentence.]
+* [Label]: [One full sentence.]
+* [Label]: [One full sentence.]
+* [Label]: [One full sentence.]
+
+[Practical details woven naturally: minimum stay, check-in/out, what's provided, house rules, pet policy, pricing notes, or any other need-to-know logistics. Write in second person. No em dashes.]
+
+About the Neighborhood:
+[2-3 sentences in second person. What's nearby, what's walkable, the vibe of the area. Weave in any relevant practical details such as parking or nearby landmarks. No em dashes.]
+
+Getting Around the Neighborhood:
+[2-3 sentences in second person. Transit options, walkability, ride-share availability, driving tips. Any logistical detail that helps a guest plan their arrival and time in the area. No em dashes.]
+
+END OF DESCRIPTION. Then add:
+SEO Notes:
+(a) Where the primary keyword appears in the description
+(b) Which secondary keywords were used and where
+(c) One readability note
+
+═══════════════════════════════════════
+TASK 4 - PARTNER UPDATE EMAIL
+═══════════════════════════════════════
+
+Write a short partner-facing email covering exactly four changes. Keep it scannable and under 90 seconds to read. No em dashes anywhere.
+
+CHANGE 1 - LISTING TITLE: show old title vs. new title, explain why it reaches more of the right searchers
+CHANGE 2 - DESCRIPTION: name what specifically changed and how that helps a visitor decide to book faster
+CHANGE 3 - KEYWORD STRATEGY: name the primary keyword and 1-2 secondary keywords, explain in plain language what they do
+CHANGE 4 - PARTNER PROFILE "ABOUT": show old text vs. new text, explain why the rewrite is more effective
+
+Tone: warm, direct, peer to peer. Write the way a knowledgeable colleague talks, not a corporate newsletter. No AI-sounding openers.
+
+FORMAT:
+Subject line: 2 options
+  Option A: Direct (keep under 50 characters so it displays fully in Gmail)
+  Option B: Curiosity-driven (keep under 50 characters so it displays fully in Gmail)
+Greeting
+Opening: 2-3 lines, no filler
+Body: 4 labeled changes, 2-4 lines each
+Closing: 1 line CTA
+Sign-off: [Your Name], [Your Title], Batch
+
+═══════════════════════════════════════
+TASK 5 - OPTIMIZED PARTNER PROFILE "ABOUT"
+═══════════════════════════════════════
+
+Rewrite the partner's "About" section. It must answer three things clearly: what they offer, what makes them different, and who they serve. Weave in the primary keyword and 1-2 secondary keywords without forcing them. Make it specific enough that a first-time visitor immediately understands what they're booking.
+
+HARD CHARACTER LIMIT: Every version must be under 800 characters including spaces. Count before outputting. If a draft is over 800 characters, cut it down before including it.
+
+Style: third person, present tense, 3-4 sentences max, single flowing paragraph, no headers, no bullets, no em dashes, no exclamation marks, no clichés, no first person. Sound like a confident human wrote it, not a content generator.
+
+OUTPUT 1 - RECOMMENDED "ABOUT" PARAGRAPH
+Paste-ready. No label above or below. Show character count in parentheses: (XXX characters)
+
+OUTPUT 2 - 3 ALTERNATIVE VERSIONS (each must be under 800 characters):
+  Version A: Lead with the unique property or landmark differentiator (XXX characters)
+  Version B: Lead with the occasions or group types this property serves (XXX characters)
+  Version C: Lead with the private or exclusive nature of the stay (XXX characters)
+
+OUTPUT 3 - SEO + CONVERSION NOTES:
+  (a) Where and how the primary keyword appears
+  (b) Which secondary keywords were used and where
+  (c) One specific reason this version converts better than the original
+
+═══════════════════════════════════════
+TASK 6 - RECOMMENDED TAGS
+═══════════════════════════════════════
+
+Select only tags from the list below that genuinely fit this property listing. Do not invent or modify any tag.
+
+AVAILABLE TAGS:
+#trending, #100% that Batch, #Adults Only, #adventure, #afternoons, #Afternoons, #Anaheim, #Animal Lovers, #Arrival & Departure Days, #Asbury Park, #Asheville, #Aspen, #at home, #atlanta, #Atlanta, #Atlantic City, #Attraction, #ATV/UTV, #Austin, #bachelor, #bachelorette, #ballin, #Bar Crawl, #Batch Favorite, #Batch Nights, #Batch of a Lifetime, #Batch+, #Beaches, #Beer Me!, #Beer Tour, #Best of Batch, #Big Spender, #Bike Rental, #Bike Tour, #Boat Cruise, #Boat Rental, #Boat Tour, #Boston, #Boulder, #Brewery, #Bride Vibe, #Budget-friendly, #Bus Tour, #BYOB Parties, #Cabo, #Cancun, #Cape Cod, #Cape May, #Car Rental, #Catskills, #Charleston, #Charlotte, #Cheap Eats, #Cheeky, #cheers! let's drink, #Chicago, #Chill Vibes, #Chocolate Tour, #City Tour, #Classes, #clearwater, #Close to the Action, #Cocktail Tour, #Creative & Crafty, #Cruise, #Cruise / Large Boat, #Customizable for the Batch, #Customizable for the Bride, #Dallas, #Deal Drop, #Decorations and Supplies, #Denver, #Destin, #Detox, #Distillery, #DIY, #Dolphin, #Drag, #Drink Pouch, #Driving Tour, #E-Bike, #Eco Tour, #Escape Room, #Evening Cruise, #Event, #Events, #Exclusive, #Fall Favorites, #Family Friendly, #Fanny Packs, #Farm, #Ferry, #Festival, #Fitness Freaks, #Food, #Food and Wine Tour, #Food Tour, #Foodies Will Love, #For the Bride, #For the Extreme BACHer, #For the Extreme Batch, #For the Girls, #Fort Lauderdale, #Fort Myers, #Fredericksburg, #Ft. Lauderdale, #Galentine, #Galentines, #Games & Challenges, #Gatlinburg, #Get Pampered, #Get Wild, #Getting Frisky, #Ghost Tour, #Good For Bachelors, #Good for College, #Good for Under 21, #Great For Fall, #Great for Large Groups, #Group Activities, #Group Adventures, #Group Classes, #Guided Tour, #Guided Tours, #Gulf Coast, #Gulf Shores, #Hamptons, #Hangover, #Happy Hour Tour, #Health & Fitness, #Health & Wellness, #Hello Brunch, #Hiking, #Hilton Head, #History, #History Tour, #Honolulu, #Houston, #Hudson Valley, #Industry, #insta-worthy, #Insta-Worthy, #instant, #Joshua Tree, #Kansas City, #Kayak, #Key Largo, #Key West, #Lake Ozark, #Lake Tahoe, #Las Vegas, #Let's Hibachi, #life of the party, #Life of the Party, #Live Music, #Local Activities, #Long Beach Island, #Long Island, #Los Angeles, #Los Cabos, #Male Revue & Services, #Marina, #Miami, #Miami Beach, #mornings, #Mornings, #most popular, #Museum, #Music Tour, #Must Add-on, #Nantucket, #Nashville, #New Orleans, #New York, #Newport, #Newport Beach, #Nightlife, #Ocean City, #On Sale, #On the Water, #orlando, #Orlando, #outdoor adventure, #Outdoor Adventures, #Outdoor Seating, #Outdoors, #Package, #Palm Beach, #Palm Springs, #Parasail, #Park City, #party, #party at home, #Party at Home, #Party Boat, #Party Bus, #Party Buses, #party supplies, #Party Tours & Buses, #Perfect Packages, #Perfect Pregame, #Philadelphia, #Phoenix, #Photography Tour, #Picnic Party, #Playa del Carmen, #Pocono Mountains, #Pontoon Boat Rental, #Popular for Bachelorettes, #Popular for Bachelors, #Popular for the Bachelorette, #Popular for the Bachelorettes, #Portland, #Private, #Private Boat Charter, #Private Reservations Available, #Private Tour, #Private Wine Tour, #Protocol Friendly, #Pub Crawl, #Puff Party, #Rentals, #Retail, #Retail Therapy, #River Cruise, #Romantic, #Rooftop Views, #Sailing, #San Diego, #San Francisco, #Santa Barbara, #Santa Fe, #Sarasota, #Savannah, #Scooter, #scottsdale, #Scottsdale, #Scuba, #Seattle, #Segway, #Shooting Range, #Shows, #Sightseeing Tour, #Small Plates, #Smoky Mountain Tour, #Snorkel, #So Sophisticated, #Something for Everyone, #Soothe, #Sternwheeler/Riverboat, #Summer Kickoff, #Summer Splash, #Sunday Brunch, #Sunset Cruise, #Sunset Sail, #SUP, #Swim with Dolphins, #Swingers, #Tampa, #Tiki Time, #Top Booked Activity, #Top Restaurant, #Top-Activity, #Tourist Time, #Transportation, #trending, #Under 21, #unique finds, #Unique Finds, #UTV Rentals, #Vail, #Vegas Girls Night Out, #Vegas Vibes, #Vegetarian Friendly, #Vice, #Virtual, #Wakeboarding, #Walking Tour, #Walking Tours, #Washington, #Water Activities, #Water Park, #Wellness, #Westchester County, #Wheelchair Accessible, #Where to Eat, #Wildlife, #Wine, #Wine Not?, #Wine Tour, #Winery, #Workshop, #Yoga, #Your Birthday Your Way
+
+RULES:
+- Only use tags from the list above
+- Select 8-15 tags that fit the property type, audience, city, vibe, and occasion
+- Prioritize: property type, city/location, audience, occasion, vibe
+- Output only the selected tags as a space-separated list of hashtags, nothing else`;
+}
+
+async function runOptimizer() {
+  const required = ['partnerName','title','city','description'];
+  for (const id of required) {
+    if (!document.getElementById(id).value.trim()) {
+      showError('Please fill in at least: Partner Name, Listing Title, City, and Property Description.');
+      return;
+    }
+  }
+  hideError();
+  const btn = document.getElementById('runBtn');
+  btn.classList.add('loading'); btn.disabled = true;
+  btn.querySelector('.btn-text').textContent = 'Generating optimization...';
+  document.getElementById('progressWrap').classList.add('visible');
+  setProgress(5);
+  for (let i = 0; i < 6; i++) {
+    document.getElementById('content' + i).textContent = '';
+    document.getElementById('body' + i).classList.remove('open');
+    document.getElementById('toggle' + i).classList.remove('open');
+  }
+  document.getElementById('tagPills').innerHTML = '';
+  document.getElementById('tagNote').textContent = '';
+  document.getElementById('outputArea').classList.add('visible');
+  const prompt = buildPrompt();
+  try {
+    const response = await puter.ai.chat(prompt, { model: 'claude-sonnet-4-6', stream: true });
+    let fullText = '';
+    setProgress(15);
+    for await (const part of response) {
+      if (part?.text) {
+        fullText += part.text;
+        parseAndDisplay(fullText);
+        setProgress(Math.min(90, 15 + (fullText.length / 180)));
+      }
+    }
+    parseAndDisplay(fullText, true);
+    setProgress(100);
+    setTimeout(() => { document.getElementById('progressWrap').classList.remove('visible'); setProgress(0); }, 800);
+  } catch (err) {
+    showError('Error: ' + (err.message || String(err)));
+    document.getElementById('progressWrap').classList.remove('visible');
+  } finally {
+    btn.classList.remove('loading'); btn.disabled = false;
+    btn.querySelector('.btn-text').textContent = 'Generate Full Optimization';
+  }
+}
+
+function parseAndDisplay(text, final = false) {
+  const taskPattern = /(?:^|\n)(?:#+\s*)?(?:\*{1,2})?(?:TASK|Task)\s+([1-6])(?:\*{1,2})?[\s\-:]+([^\n]*)/g;
+  const matches = [];
+  let m;
+  while ((m = taskPattern.exec(text)) !== null) {
+    matches.push({ task: parseInt(m[1]) - 1, index: m.index });
+  }
+  if (matches.length === 0) {
+    if (text.trim().length > 0) { document.getElementById('content0').textContent = text.trim(); openSection(0); }
+    return;
+  }
+  for (let i = 0; i < matches.length; i++) {
+    const task = matches[i].task;
+    const start = matches[i].index;
+    const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
+    const chunk = text.slice(start, end).trim();
+    const bodyStart = chunk.indexOf('\n');
+    const body = bodyStart !== -1 ? chunk.slice(bodyStart + 1).trim() : chunk;
+    if (task >= 0 && task < 5) { document.getElementById('content' + task).textContent = body; openSection(task); }
+    else if (task === 5) { document.getElementById('content5').textContent = body; renderTagPills(body); openSection(5); }
+  }
+}
+</script>
+</body>
+</html>
