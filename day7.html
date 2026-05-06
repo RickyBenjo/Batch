@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 7 — Airtable Deep Dive, Stripe Phasing & Disputes · Batch Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0F0C0C; --white: #F0F1F4; --sunset: #FF5F00; --ocean: #4F97FC;
+    --cosmo: #FF93D3; --lime: #00DF00; --gold: #FFCA00; --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF; --cosmo-tint: #FFE0F3; --lime-tint: #C8FFB0; --sunset-tint: #FFD9C0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Mulish', sans-serif; background: var(--white); color: var(--black); font-size: 14px; line-height: 1.6; }
+
+  .topnav { background: var(--black); padding: 14px 40px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--cosmo); }
+  .topnav a { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.15s; }
+  .topnav a:hover { color: var(--cosmo); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--cosmo); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+
+  .tab-nav { background: var(--black); padding: 0 40px; display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 46px; z-index: 99; }
+  .tab-btn { padding: 12px 18px; font-size: 12px; font-weight: 700; color: rgba(240,241,244,0.45); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.15s; font-family: 'Mulish', sans-serif; letter-spacing: 0.3px; }
+  .tab-btn:hover { color: rgba(240,241,244,0.8); }
+  .tab-btn.active { color: var(--cosmo); border-bottom-color: var(--cosmo); }
+
+  .hero { background: var(--black); padding: 52px 40px 44px; position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; right: -60px; top: -60px; width: 300px; height: 300px; border-radius: 50%; background: var(--cosmo); opacity: 0.07; }
+  .hero::before { content: ''; position: absolute; left: -60px; bottom: -60px; width: 220px; height: 220px; border-radius: 50%; background: var(--gold); opacity: 0.06; }
+  .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-badge { display: inline-block; background: var(--cosmo); color: var(--black); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; padding: 5px 14px; border-radius: 30px; margin-bottom: 16px; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 48px); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 10px; }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); margin-bottom: 24px; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(240,241,244,0.7); border: 1px solid rgba(255,255,255,0.1); }
+
+  .page-body { max-width: 900px; margin: 0 auto; padding: 36px 40px 80px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 3px solid; }
+  .sec-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .sec-head h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+
+  .card { background: #fff; border-radius: 14px; border: 1.5px solid rgba(15,12,12,0.09); padding: 20px 22px; margin-bottom: 14px; }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 13.5px; color: #555; line-height: 1.65; }
+  .card ul { padding-left: 18px; }
+  .card li { margin-bottom: 4px; }
+
+  .callout { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; border-left: 4px solid; }
+  .callout.gold { background: var(--gold-tint); border-color: var(--gold); }
+  .callout.blue { background: var(--ocean-tint); border-color: var(--ocean); }
+  .callout.pink { background: var(--cosmo-tint); border-color: var(--cosmo); }
+  .callout.green { background: var(--lime-tint); border-color: #00b800; }
+  .callout.orange { background: var(--sunset-tint); border-color: var(--sunset); }
+  .callout strong { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+  .callout p, .callout li { font-size: 13.5px; line-height: 1.6; }
+  .callout ul { padding-left: 16px; }
+  .callout li { margin-bottom: 3px; }
+
+  .ctable { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; border-radius: 12px; overflow: hidden; }
+  .ctable th { background: var(--black); color: var(--white); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .ctable td { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+  .ctable tr:last-child td { border-bottom: none; }
+  .ctable tr:nth-child(even) td { background: rgba(240,241,244,0.5); }
+
+  .steps { }
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--black); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-body { flex: 1; }
+  .step-body strong { font-size: 13.5px; display: block; margin-bottom: 2px; }
+  .step-body span { font-size: 12.5px; color: #666; }
+
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .tag.gold { background: var(--gold); color: var(--black); }
+  .tag.blue { background: var(--ocean); color: #fff; }
+  .tag.orange { background: var(--sunset); color: #fff; }
+  .tag.green { background: var(--lime); color: var(--black); }
+  .tag.pink { background: var(--cosmo); color: var(--black); }
+  .tag.red { background: #e53e3e; color: #fff; }
+
+  .warning { background: #fff3e0; border: 2px solid var(--sunset); border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; }
+  .warning .w-title { font-weight: 800; color: var(--sunset); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .warning p, .warning li { font-size: 13px; line-height: 1.65; }
+  .warning ul { padding-left: 16px; }
+  .warning li { margin-bottom: 3px; }
+
+  .win-banner { background: var(--gold-tint); border: 2px solid var(--gold); border-radius: 14px; padding: 18px 22px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; }
+  .win-banner .win-icon { font-size: 32px; flex-shrink: 0; }
+  .win-banner .win-body strong { font-size: 15px; font-weight: 800; display: block; margin-bottom: 4px; }
+  .win-banner .win-body p { font-size: 13px; color: #665500; }
+
+  .code-block { background: var(--black); border-radius: 12px; padding: 16px 18px; margin: 10px 0; }
+  .code-block p { font-size: 13px; color: rgba(240,241,244,0.85); font-family: monospace; line-height: 1.9; }
+  .code-block .code-label { font-size: 11px; color: var(--cosmo); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px; font-family: 'Mulish', sans-serif; }
+
+  .urgency-critical { background: #fff0f0; border: 2px solid #e53e3e; border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; }
+  .urgency-critical .u-label { font-weight: 800; color: #e53e3e; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+  .urgency-critical p { font-size: 13px; line-height: 1.6; }
+
+  .bottom-nav { border-top: 2px solid rgba(15,12,12,0.08); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 900px; margin: 0 auto; }
+  .bottom-nav a { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--black); text-decoration: none; padding: 10px 20px; border: 2px solid rgba(15,12,12,0.15); border-radius: 30px; transition: all 0.15s; }
+  .bottom-nav a:hover { background: var(--black); color: var(--cosmo); border-color: var(--black); }
+  .bottom-nav .disabled { opacity: 0.35; pointer-events: none; }
+
+  @media (max-width: 600px) {
+    .topnav, .tab-nav { padding-left: 20px; padding-right: 20px; }
+    .page-body { padding: 24px 20px 60px; }
+    .bottom-nav { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html">Training Hub</a>
+  <span class="sep">›</span>
+  <span class="current">Day 7 — Airtable, Stripe & Disputes</span>
+</nav>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="show('kickoff', this)">Day Kickoff</button>
+  <button class="tab-btn" onclick="show('airtable', this)">Airtable Views</button>
+  <button class="tab-btn" onclick="show('stripe', this)">Stripe Phased Pricing</button>
+  <button class="tab-btn" onclick="show('pastdue', this)">Past Due Calls</button>
+  <button class="tab-btn" onclick="show('calendars', this)">Partner Calendars</button>
+  <button class="tab-btn" onclick="show('retention', this)">Retention Policy Updates</button>
+  <button class="tab-btn" onclick="show('disputes', this)">Dispute Handling SOP</button>
+  <button class="tab-btn" onclick="show('luis', this)">Luis Meeting Agenda</button>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Day 7 · May 5, 2026</div>
+    <h1>Airtable Deep Dive,<br>Stripe & Disputes</h1>
+    <p class="hero-sub">Hands-on Airtable view building, mastering Stripe subscription phasing for automated price reversion, past due partner calls, calendar types, and the full dispute handling SOP.</p>
+    <div class="hero-chips">
+      <div class="chip">Parts 1–3 covered</div>
+      <div class="chip">Stripe phasing unlocked</div>
+      <div class="chip">2 NW views created</div>
+      <div class="chip">Dispute SOP added</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- DAY KICKOFF -->
+  <div class="section visible" id="sec-kickoff">
+    <div class="sec-head" style="border-color: var(--cosmo);">
+      <div class="sec-dot" style="background: var(--cosmo);"></div>
+      <h2>Day 7 Kickoff</h2>
+    </div>
+
+    <div class="callout pink">
+      <strong>Morning Check-In</strong>
+      <p>Dulcy reached out first thing asking about actionable items from yesterday's MBR. Rick had already completed his Day 6 assignment — built out CoStar prompts for 5 tools and shared a new property optimizer with Irvin, who requested an accommodations-focused version. Irvin was added to the tool and will provide feedback. Intercom inbox review confirmed two calls already booked for next week, and no replies yet from any of the partner outreach messages sent the day before — normal, as partners often reply after 48 hours or more.</p>
+    </div>
+
+    <div class="card">
+      <h3>Today's Focus Areas</h3>
+      <ul>
+        <li><strong>Airtable view building</strong> — create NW-named collaborative views for partner tracking and listing QA</li>
+        <li><strong>Stripe subscription phasing</strong> — learn how to automate discounted pricing reversion so you stop relying on manual tracking</li>
+        <li><strong>Past due partner calls</strong> — walk through the past due list, debrief on each case, and make live outbound calls</li>
+        <li><strong>Partner calendar types</strong> — understand static vs. dynamic calendars and how to build them correctly</li>
+        <li><strong>Dispute SOP</strong> — review the official Batch dispute handling process end to end</li>
+        <li><strong>Luis meeting prep</strong> — consolidate all visibility gaps and system issues to present tomorrow at 1 PM CST</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Follow-Up Protocol for Partner Outreach</h3>
+      <ul>
+        <li>For <strong>recently live listings</strong> you optimized: if the partner hasn't replied within 48 hours, send one follow-up, then close the conversation. You've done your part — the after-sales support is delivered.</li>
+        <li>For <strong>proactive outreach</strong> (Core engagement Google Sheet): follow up after 48 hours with a second message listing additional improvement opportunities — more photos, videos, blog posts. At least two emails total before moving on.</li>
+        <li>For <strong>churn follow-ups</strong>: after calls, always add a note to the Intercom conversation so you know exactly where you left off when you return.</li>
+        <li>Always add notes to every Intercom conversation so you're never re-reading the entire thread from scratch.</li>
+      </ul>
+    </div>
+
+    <div class="callout gold">
+      <strong>Batchification = SEO. That's it.</strong>
+      <p>The word "Batchify" sounds proprietary but it just means optimizing a listing for the Batch platform's search engine — adding keywords, tags, experience types, completing FAQs, adding photos and videos, and writing a stronger description. Outside vendors charge 1–2 hours per listing for the same work. The tools you're using (Claude + CoStar prompts) cut that down significantly, but the estimate of 5–12 minutes per listing is still unrealistic. Real time: 20–25 minutes per full optimization.</p>
+    </div>
+  </div>
+
+  <!-- AIRTABLE VIEWS -->
+  <div class="section" id="sec-airtable">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Airtable Views — Building Your Workspace</h2>
+    </div>
+
+    <div class="callout blue">
+      <strong>Why Views Matter</strong>
+      <p>Airtable has two bases — a red one (partner/vendor side: subscriptions, requests, calendars, experiences) and a blue one (customer/order side: bookings, changes, cancellations). The team has historically been blocked from creating proper views, resulting in everyone sharing one fragile view that gets broken when someone changes a filter or sort. Now that you have go-signal from Stefan, create NW-prefixed collaborative views and protect the data properly.</p>
+    </div>
+
+    <div class="card">
+      <h3>View Naming Convention</h3>
+      <ul>
+        <li>Prefix all your views with <strong>NW</strong> so they're easy to find and clearly owned by the Neoworks team</li>
+        <li>Use descriptive suffixes: <strong>NW Task [Task Name]</strong> for task execution views, <strong>NW [Name] Tracking</strong> for productivity/reporting views</li>
+        <li>Examples: <code>NW Task Listing QA Recently Live</code>, <code>NW Listing QA Tracking</code>, <code>NW No Live Listing Tracker</code>, <code>NW All Partners View</code></li>
+        <li>Always <strong>star your views</strong> (add to favorites) so they stay pinned at the top</li>
+        <li>Set all your working views as <strong>Collaborative</strong> — not personal — so teammates can see them</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>View 1 — NW No Live Listing Tracker</h3>
+      <p style="margin-bottom: 10px; font-size: 13.5px; color: #555;">Purpose: track active partners who have no published listings so you can help them get listed.</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Start from the Vendors table in the red Airtable</strong><span>Duplicate the existing All Partners view, rename it NW No Live Listing Tracker, set as Collaborative</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Show these fields</strong><span>Vendor name, BAT status, Batch AM tier, booking method, live listing Y/N, days since live, first experience publish date, subscription status, churn reason, requests (linked), VD link</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Hide these fields</strong><span>Lead source, lead UTM source, commission, city (not needed day-to-day)</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Filter: Batch AM tier is any of Core, Basic</strong><span>Excludes Party Pro, Boost, Legacy, and blank/unassigned tiers</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Filter: BAT status is Active</strong><span>Only show partners currently active in the system — result: ~935 active partners with no listings</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Group by: Live Listing Y/N (last to first)</strong><span>Shows two groups — "No live listing" and "Has live listing" — so you can focus on the former</span></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-body"><strong>Sort by: Days Since Live (9 to 1)</strong><span>Surfaces the most recently-onboarded partners first — these need attention fastest</span></div></div>
+      </div>
+      <div class="callout orange" style="margin-top: 12px; margin-bottom: 0;">
+        <strong>What You Discovered</strong>
+        <p>~935 active, paying partners have zero published listings. Some of these are returning partners who churned and reactivated — their "days since live" counter didn't reset. You need to request a <strong>reactivation date field</strong> from Luis so you can tell the difference between new signups and returning accounts.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>View 2 — NW Listing QA Tracking</h3>
+      <p style="margin-bottom: 10px; font-size: 13.5px; color: #555;">Purpose: track listing QA productivity — which listings have been QA'd and when.</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Start from the Experiences table</strong><span>Duplicate "All Live Experiences" view, rename it NW Listing QA Tracking, set as Collaborative</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Show these fields</strong><span>Vendor ID, experience title, product type, booking method, status, Batch AM tier (from vendor), post-live QA done, days from created to live, team notified when live</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Filter: Batch AM tier has none of Party Pro, Boost (blank)</strong><span>Focus only on Core and Basic listings</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Filter: Post-live QA done is blank (unchecked)</strong><span>Shows all listings not yet QA'd — ~147 listings visible when applied correctly</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Sort by: Days from Created to Live (9 to 1)</strong><span>Oldest unreviewed listings first — these have been waiting the longest</span></div></div>
+      </div>
+      <div class="warning" style="margin-top: 12px; margin-bottom: 0;">
+        <div class="w-title">⚠️ Critical Gap — No Completion Timestamp</div>
+        <p>The Post-live QA Done field is just a checkbox — no timestamp. There's no way to tell <em>when</em> QA was completed or <em>who</em> did it. This is one of the key items to bring to Luis tomorrow: we need a date/time field that captures when the checkbox was ticked and by whom, so productivity can actually be tracked.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>View 3 — NW All Requests</h3>
+      <ul>
+        <li>Duplicate the "All Requests by Lewis" view in the Requests tab</li>
+        <li>Rename to <strong>NW All Requests</strong>, set as Collaborative, add to favorites</li>
+        <li>This is your daily working view for partner requests — filter and sort as needed from here</li>
+        <li>Key issue to flag for Luis: the request form only allows one task type per entry. A partner optimization request that involves SEO + email + photos shows up as one line. You can't accurately count task volume this way.</li>
+      </ul>
+    </div>
+
+    <div class="callout pink">
+      <strong>The Two-View Rule</strong>
+      <p>Always maintain two versions of any important view: one <strong>task view</strong> for teammates to work from (clean, with only the fields they need, protected from accidental filter changes) and one <strong>tracking view</strong> for you to pull productivity data. This prevents the situation that caused chaos before — teammates moving filters and breaking shared views. The tracking view is yours to configure; the task view is simple and safe for anyone to use.</p>
+    </div>
+
+    <div class="card">
+      <h3>Future Views to Request from Luis</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>View / Feature</th><th>Why It's Needed</th></tr>
+        <tr><td>Partner performance — last 30 days</td><td>So the team can proactively identify struggling partners without waiting for Stefan to pull the data</td></tr>
+        <tr><td>Reactivation date field</td><td>Differentiate new signups from returning partners so the "days since live" counter makes sense again</td></tr>
+        <tr><td>Post-live QA completion timestamp + agent name</td><td>Without this, productivity tracking for QA is impossible</td></tr>
+        <tr><td>Past due call ownership + completion date</td><td>Currently no owner field or completion date on past due call records — can't track who handled what</td></tr>
+        <tr><td>Churn portal trigger → Airtable request</td><td>Partners who submit a churn request in the portal but don't book a call currently fall through — no Airtable record is created</td></tr>
+        <tr><td>Multi-task dropdown on request form</td><td>Single task-type selection per request makes volume tracking misleading — need multi-select</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- STRIPE PHASED PRICING -->
+  <div class="section" id="sec-stripe">
+    <div class="sec-head" style="border-color: var(--lime);">
+      <div class="sec-dot" style="background: var(--lime);"></div>
+      <h2>Stripe Subscription Phasing</h2>
+    </div>
+
+    <div class="win-banner">
+      <div class="win-icon">🎉</div>
+      <div class="win-body">
+        <strong>Automated Price Reversion — Unlocked</strong>
+        <p>Rick and Cliff figured out how to use Stripe's phased subscription feature to automatically revert discounted pricing back to the original price after 3 months — no more manual Google Sheet tracking, no more calendar reminders to go back and fix the price. Stefan and Luis approved moving forward with this method. Share this win with the Batch Leadership Slack channel.</p>
+      </div>
+    </div>
+
+    <div class="callout gold">
+      <strong>Why This Matters</strong>
+      <p>When you save a partner by offering $99/month (or another discounted price), that discount is supposed to last only 3 months before reverting to the standard rate. Previously, this was tracked manually in a Google Sheet and required someone to go back into Stripe and manually update the price. With phased subscriptions, Stripe handles the reversion automatically.</p>
+    </div>
+
+    <div class="card">
+      <h3>How Stripe Subscription Phases Work</h3>
+      <ul>
+        <li>A subscription can be divided into <strong>phases</strong> — each phase has its own price, duration, and end date</li>
+        <li>When one phase ends, Stripe automatically moves to the next phase and applies the new pricing</li>
+        <li>This requires using the <strong>classic editor</strong> in Stripe — the current default editor does not support phased subscriptions</li>
+        <li>You access the classic editor by clicking "Switch to classic version of the subscription editor" when updating a subscription</li>
+        <li>Once a subscription has phases, any future updates must also be done through phases (not the standard "update subscription" button)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Step-by-Step: Setting Up a 3-Month Discounted Phase</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Go to the partner's subscription in Stripe</strong><span>Find the active subscription. Note the current price and the next billing date.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Click "Update Subscription" → switch to classic editor</strong><span>The system warns you that scheduling is disabled if phases already exist — ignore if doing it fresh</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Edit Phase 1: current billing to next billing date</strong><span>Keep the original price for this phase — this covers the current paid period without creating prorated charges</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Click "Add Phase" → set Phase 2: discounted pricing</strong><span>Set the price to $99/month (or agreed discount). Set duration to 3 months from the next billing date.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Click "Add Phase" again → set Phase 3: original pricing, no end date</strong><span>Restore the original price (e.g. $150/month). Leave end date empty — this phase runs forever until changed.</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Review the summary on the right side panel</strong><span>Confirm it shows: current billing date → next billing at original price → discount starts → discount ends → original price resumes. Must match exactly.</span></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-body"><strong>Click "Update Subscription" to save</strong><span>The system will show "end of current billing period" as the apply date. Confirm and save.</span></div></div>
+        <div class="step"><div class="step-num">8</div><div class="step-body"><strong>Block a calendar reminder for 1 day after Phase 2 starts</strong><span>Check the partner's invoice history to confirm no double-billing occurred. Stripe has occasionally double-charged when subscription phases are changed mid-cycle.</span></div></div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Do NOT Change the Product — Only the Price</div>
+      <p>When setting up phased pricing, only change the <strong>price amount</strong> on the existing product — do not remove the product and add a new one. Adding/removing products creates a different line item in Stripe invoices and can trigger proration charges. Keep the same product, just update the price per phase.</p>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ One-Month Pause Tracking</div>
+      <p>There is currently no field in Airtable to track whether a partner has already received a one-month pause offer. This is critical — without it, partners can receive the same offer multiple times. Add this to the Luis meeting agenda: we need a field to mark when a partner received a pause/discount offer and what the terms were, so it's never duplicated.</p>
+    </div>
+
+    <div class="card">
+      <h3>Discount Offer Rules (Confirmed)</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Scenario</th><th>Offer Allowed?</th><th>Reasoning</th></tr>
+        <tr><td>Partner on medium or strong signal, within first 3 months</td><td style="color: #00aa00; font-weight: 700;">✓ Yes</td><td>High growth potential — worth investing in</td></tr>
+        <tr><td>Partner on medium signal, after 3+ months</td><td style="color: #cc8800; font-weight: 700;">⚠ Cautious</td><td>May have exhausted potential — focus on city demand data and listing optimization instead</td></tr>
+        <tr><td>Partner on weak signal, first 3 months</td><td style="color: #cc8800; font-weight: 700;">⚠ Cautious</td><td>Prioritize optimization tools and city data over discounts — if they only want a free month, they'll ask for it again</td></tr>
+        <tr><td>Partner on weak signal, after 3+ months</td><td style="color: #cc2200; font-weight: 700;">✗ No</td><td>Discount won't fix a fundamentally weak account — let them churn</td></tr>
+        <tr><td>Partner has already received a pause before</td><td style="color: #cc2200; font-weight: 700;">✗ No</td><td>Track in Airtable to prevent repeat offers</td></tr>
+        <tr><td>Partner in backlog (from the 430 Google Sheet)</td><td style="color: #00aa00; font-weight: 700;">✓ Medium/Strong OK</td><td>Backlog partners are exceptions — acceptable to offer even after 3 months given they were never contacted</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- PAST DUE CALLS -->
+  <div class="section" id="sec-pastdue">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Past Due Partner Calls</h2>
+    </div>
+
+    <div class="callout orange">
+      <strong>What Are Past Due Calls?</strong>
+      <p>Past due calls are outbound calls to partners whose subscription payment has failed or is overdue. The goal is simple: let them know their account is at risk, find out if they want to stay, and give them the chance to update their payment method. If they're upset, unresponsive, or clearly done — proceed to cancellation. Do not force it.</p>
+    </div>
+
+    <div class="card">
+      <h3>Past Due Call Script</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Opening</strong><span>"Hi [name], this is Rick from the partner support team at Batch. I'm reaching out because I noticed your account has an outstanding invoice. Is this a good time to chat for a couple of minutes?"</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Explain the situation</strong><span>"I see that your most recent invoice from [date] is currently unpaid. Your listings are still live for now, but if the payment isn't settled, the account and listings will be deactivated."</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Check intent</strong><span>"I just wanted to make sure this was on your radar — do you want to continue with your Batch partnership, or are you thinking of making a change?"</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>If they want to stay</strong><span>Guide them to update their payment method. Confirm timing. Send a follow-up email with the link if needed. Note in Airtable.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>If they want to cancel or push back</strong><span>Treat it as a churn call. Use your retention levers if signal is medium or higher. If weak signal or they're firm — proceed to cancellation. End of current billing period, not immediate.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Case Walk-Throughs from Today</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Partner</th><th>Situation</th><th>Resolution</th></tr>
+        <tr><td>Five Aces</td><td>Past due, but Kring and Irvin already saved the partner via email. Partner promised to pay.</td><td><span class="tag green">No call needed</span> — add comment: "Partner responsive on email, promised to pay. No phone call required." Monitor until payment arrives.</td></tr>
+        <tr><td>Laya Love</td><td>Past due since Feb. Jake had previously promised billing would pause until May 26. Invoice needs to be voided.</td><td>Void the February invoice in Stripe (Change Invoice Status → Void). Add internal note explaining Jake's verbal agreement. May invoice still owed. Comment in Airtable.</td></tr>
+        <tr><td>Mobile Bar Orlando</td><td>Called by Kring. Partner not willing to pay, wants to cancel, hung up.</td><td><span class="tag orange">Churn Loss</span> — cancellation already scheduled for May 17 by Kring/Irvin. Confirmed and closed.</td></tr>
+        <tr><td>Mother Tracker</td><td>Last contact January 2026. No churn request. Weak signal (548 impressions, 54 clicks, 0 itinerary adds, 5 favorites in April).</td><td>Make outbound call. Inform of unpaid invoice. If pushback — light retention attempt only. Weak signal, don't over-invest. If they want to cancel, proceed.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>How to Void an Invoice in Stripe</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Open the partner's subscription in Stripe</strong><span>Go to their invoice history and find the failed/unpaid invoice you need to void</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Click the three-dot menu (top right of the invoice)</strong><span>Select "Change Invoice Status"</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Select "Void"</strong><span>Confirm — this permanently removes the invoice from collection. The partner will no longer be charged for it.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Add an internal note</strong><span>Document why it was voided: "Partner spoke with [agent] on [date] and was told billing would pause until [date]."</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Check if the past due status clears</strong><span>After voiding, the past due tag may still show if there are remaining open invoices. If so, mark the open invoice as paid at $0 via the Stripe dashboard — this signals a successful "payment" and clears the status.</span></div></div>
+      </div>
+    </div>
+
+    <div class="callout blue">
+      <strong>Batch Billing Model — Prepaid</strong>
+      <p>Batch uses a <strong>prepaid model</strong> — partners pay before the service period begins, not after. A payment on April 28 covers April 28 to May 28. This means if a partner is past due on an April invoice, they have technically not yet been served for that period. Use this context when deciding whether to void, pause, or proceed to cancellation — and when explaining the situation to partners who are confused about what they're being charged for.</p>
+    </div>
+  </div>
+
+  <!-- PARTNER CALENDARS -->
+  <div class="section" id="sec-calendars">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Partner Calendar Types</h2>
+    </div>
+
+    <div class="callout gold">
+      <strong>Why Calendars Exist</strong>
+      <p>Some partners take bookings directly through Batch using the platform's calendar system. Their availability windows need to be set up correctly so customers only see times when the partner is actually available. Wrong calendars = customers booking at times the partner can't fulfill = angry customers, refund requests, and Trustpilot complaints. Calendar setup was Cliff's first assignment at Batch, and Kring was trained extensively on it too — it's foundational.</p>
+    </div>
+
+    <div class="card">
+      <h3>The Two Calendar Types</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Type</th><th>How It Works</th><th>When to Use</th></tr>
+        <tr><td><strong>Static Calendar</strong></td><td>Partner selects available days (Mon–Sun). All selected days show 9 AM–9 PM as open slots automatically.</td><td>Partner is available standard hours every day they're open. Simple, no exceptions.</td></tr>
+        <tr><td><strong>Dynamic Calendar</strong></td><td>Partner provides specific time slots per day — e.g., 7–8 AM and 2–6 PM on Fridays only, 9 AM–6 PM Mon–Thu. Each slot is set manually.</td><td>Partner has irregular hours, blackout times within a day, or seasonal availability windows. More complex but more accurate.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>How to Find & Edit a Partner's Calendar</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Go to Admin → find the partner's experience listing</strong><span>Click the "Open in BAT" button at the top right of the listing — this takes you to the BAT admin portal</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Scroll to the bottom of the listing in BAT</strong><span>Find the "Full Availability Calendar" section — this shows all existing calendar entries</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Click Edit on an existing entry or create a new one</strong><span>For static: select available days and save. For dynamic: add individual time slots per day.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Always follow the partner's stated availability</strong><span>Never add availability the partner didn't provide. If unsure, ask before setting up. Over-promising availability = customer complaints.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Log it in the Calendar tracking view in Airtable</strong><span>Add date, your name, partner name, number of calendars worked on, experience link. The automated field tracking doesn't persist — manual log is your backup.</span></div></div>
+      </div>
+    </div>
+
+    <div class="callout pink">
+      <strong>The Calendar Tracking Problem</strong>
+      <p>Airtable's "calendar last updated" field resets automatically every Sunday at midnight via an automation. This means if you build a calendar on Sunday, your name appears next to it — but by midnight, the field is blank again. The team created a manual productivity tracker (a Google Sheet) as a workaround. This is on the list to fix with Luis: request an automated timestamp + agent name field that persists, ideally accessible via the vendor portal dashboard without needing to export raw data.</p>
+    </div>
+
+    <div class="card">
+      <h3>Airtable Calendar View — Quick Filter for Pending Work</h3>
+      <ul>
+        <li>Go to red Airtable → Calendars tab</li>
+        <li>Filter by: <strong>"Uses Calendar" is not empty</strong></li>
+        <li>Filter by: <strong>published status = Published</strong> (removes test/unpublished listings)</li>
+        <li>Sort by: <strong>Calendar Last Updated — oldest first</strong></li>
+        <li>This shows which active partners need their calendar reviewed or built — prioritize the oldest entries</li>
+        <li>Roughly ~528 published listings use the calendar system and need periodic review</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- RETENTION POLICY UPDATES -->
+  <div class="section" id="sec-retention">
+    <div class="sec-head" style="border-color: var(--cosmo);">
+      <div class="sec-dot" style="background: var(--cosmo);"></div>
+      <h2>Retention Policy Updates</h2>
+    </div>
+
+    <div class="callout pink">
+      <strong>One Free Month — Officially Off the Table</strong>
+      <p>Offering a completely free month is no longer an option. The new standard is a discounted 3-month pricing phase (e.g. $99/month for 3 months). This provides the retention value without giving away a month entirely, and the new Stripe phasing system automates the reversion back to standard pricing. Any offers you make must be logged so the same partner isn't offered again in the future.</p>
+    </div>
+
+    <div class="card">
+      <h3>Updated Retention Offer Hierarchy</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Lever 1 — Optimization offer</strong><span>Offer to immediately optimize their listing, add more photos/videos, run the CoStar prompt. Show them the value before offering anything financial.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Lever 2 — City demand data</strong><span>Share what types of events are doing well in their city and how their listing can be repositioned to capture that audience (bachelorette is 90% of Batch traffic).</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Lever 3 — Monthly billing switch</strong><span>If they're annual, offer to move to monthly so the commitment feels lower. No price change.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Lever 4 — Discounted pricing (3 months)</strong><span>Offer $99/month for 3 months only if signal is medium or strong and partner hasn't received a prior offer. Set up via Stripe phases — not manual.</span></div></div>
+      </div>
+    </div>
+
+    <div class="callout orange">
+      <strong>Data Needed to Make the 3-Month Offer Worth It</strong>
+      <p>Before rolling out discounted 3-month offers widely, you need a report that shows: how many churning partners accepted the one-month offer → how many recovered to full price after that period → how many churned again anyway. Without this data, you can't prove to Stefan that the discount is worth the revenue sacrifice. Building this report is Rick's responsibility — pull it once you have enough data from the new Stripe phase method.</p>
+    </div>
+
+    <div class="card">
+      <h3>When to Cancel Without a Retention Attempt</h3>
+      <ul>
+        <li>Partner has <strong>zero itinerary adds</strong> after 90+ days — not worth the call</li>
+        <li>Partner is <strong>very upset</strong> and refuses any conversation — let them cancel gracefully, avoid the Trustpilot risk</li>
+        <li>Partner is <strong>dead signal</strong> (weak impressions, zero adds, zero clicks) — no offer will fix a fundamentally uncompetitive listing</li>
+        <li>Partner has <strong>already received a prior discount offer</strong> — verify in Airtable before every call</li>
+        <li>Past due partner is <strong>unresponsive</strong> after two contact attempts — proceed to deactivation</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DISPUTE HANDLING SOP -->
+  <div class="section" id="sec-disputes">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Dispute Handling — Full SOP</h2>
+    </div>
+
+    <div class="urgency-critical">
+      <div class="u-label">🚨 Most Important Rule in This Entire SOP</div>
+      <p><strong>Dispute deadlines do not pause for partner conversations. A missed deadline = automatic loss, no exceptions.</strong> Always submit your counter evidence before the deadline — regardless of whether you've spoken to the partner or not. The partner call is a retention tool. The dispute submission is a financial protection tool. Run them in parallel, never in sequence.</p>
+    </div>
+
+    <div class="card">
+      <h3>What Is a Subscription Dispute?</h3>
+      <ul>
+        <li>A dispute (chargeback) is when a partner contacts their bank or card issuer to reverse a Batch subscription charge</li>
+        <li>Stripe notifies you when a dispute is filed — you then have a window to submit counter-evidence</li>
+        <li>If you submit strong evidence and win, the charge is returned to Batch</li>
+        <li>If you miss the deadline or don't submit, Batch loses automatically — no exceptions, no appeals</li>
+        <li>Applies to monthly, annual, and any digital product billing (marketplace listing, analytics access)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Urgency Levels by Time Remaining</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Time Remaining</th><th>Urgency</th><th>Required Action</th></tr>
+        <tr><td style="color: #e53e3e; font-weight: 700;">Less than 7 days</td><td><span class="tag red">CRITICAL</span></td><td>Investigate and submit same day. Call partner only after submission.</td></tr>
+        <tr><td style="color: #cc5500; font-weight: 700;">7–14 days</td><td><span class="tag orange">HIGH</span></td><td>Investigate and submit within 24 hours. Partner call same day if possible.</td></tr>
+        <tr><td style="color: #cc8800; font-weight: 700;">15–30 days</td><td><span class="tag gold">MODERATE</span></td><td>Prepare counter immediately. Attempt partner call. Submit by day 3 if no withdrawal.</td></tr>
+        <tr><td style="color: #007700; font-weight: 700;">30–75 days</td><td><span class="tag green">STANDARD</span></td><td>Full investigation and partner outreach. Submit no later than day 5. Set a calendar reminder — do not let it fall off your radar.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Step-by-Step Dispute Process</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Receive & Triage (Day 0)</strong><span>Log in the dispute tracker immediately. Note the deadline. Flag anything under 14 days as urgent — escalate to supervisor if needed. Identify the dispute reason (service quality, unrecognized charge, cancellation, etc.).</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Investigate & Gather Evidence (30 min or less for an expert)</strong><span>Pull from admin/platform records: billing history, invoice history, onboarding completion date, signed terms URL, listing publish date and active status, confirmed bookings and revenue generated, cancellation request date (if applicable), subscription billing date vs. cancellation request date. Verify the 14-day cancellation notice window if relevant.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Generate & Review Response Letter (10 min)</strong><span>Run evidence through the Response Letter Tool. Review all dates, amounts, and policy references for accuracy. Add any sections the tool missed (e.g. missed cancellation window). Complex or high-value disputes should have a second set of eyes.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Decide: Counter or Accept</strong><span>Counter if: service was delivered, terms were signed, evidence is clean, and charges are legitimate. Accept if: there's a clear billing error, the charge was unauthorized, or evidence doesn't support Batch's position. Do not counter a dispute you intend to accept — it complicates resolution.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Submit to Stripe (5–10 min)</strong><span>Upload all evidence documents. Attach the finalized response letter. Submit before the deadline. Log the submission timestamp in the dispute tracker.</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Partner Call — Request Withdrawal</strong><span>Call the partner to explain and ask them to withdraw the dispute. If they agree: wait max 3 business days for Stripe to reflect it (only attempt this if you have 15+ days remaining). If they decline or are unreachable: your submitted counter is already in place — no further action needed. Log the call attempt and outcome in CRM.</span></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-body"><strong>Monitor & Follow Up</strong><span>Check Stripe dashboard periodically — do not rely on email notifications alone. Do not mark the dispute resolved until Stripe confirms "Won."</span></div></div>
+        <div class="step"><div class="step-num">8</div><div class="step-body"><strong>Log & Close</strong><span>Update the dispute tracker with the final outcome (Won / Lost / Withdrawn). Log all CRM notes. If lost — flag for supervisor review and identify any process improvement.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>When to Wait for Partner Withdrawal vs. Submit Immediately</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Scenario</th><th>Action</th></tr>
+        <tr><td>15+ days remaining AND counter is ready AND partner agrees to withdraw</td><td>Wait max 3 business days, then confirm Won in Stripe</td></tr>
+        <tr><td>Less than 14 days remaining</td><td>Submit immediately. Call after.</td></tr>
+        <tr><td>Partner is unresponsive</td><td>Submit immediately. Attempt callback separately.</td></tr>
+        <tr><td>Partner declines to withdraw</td><td>Counter already submitted — no further action needed</td></tr>
+        <tr><td>Partner agrees verbally but hasn't actioned after 3 days</td><td>Counter already submitted — monitor Stripe</td></tr>
+        <tr><td>Accepting the dispute (billing error, unauthorized charge)</td><td>Do not submit a counter. Process refund/acceptance.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Card Network Withdrawal TAT (US)</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Card Network</th><th>Typical TAT</th><th>Worst Case</th></tr>
+        <tr><td>Visa</td><td>3–5 business days</td><td>7–10 business days</td></tr>
+        <tr><td>Mastercard</td><td>3–7 business days</td><td>Up to 30 days (complex cases)</td></tr>
+        <tr><td>Amex</td><td>2–5 business days</td><td>7 business days</td></tr>
+        <tr><td>Discover</td><td>3–7 business days</td><td>10 business days</td></tr>
+      </table>
+      <p style="font-size: 12px; color: #888; margin-top: 8px;">TAT starts from when the partner contacts their bank — not from your call. Expect 1–3 business days of bank processing lag before it reflects in Stripe.</p>
+    </div>
+
+    <div class="card">
+      <h3>Expected Timelines by Handler</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Handler Level</th><th>Investigation</th><th>Letter</th><th>Submission</th><th>Partner Call</th><th>Total</th></tr>
+        <tr><td>Standard (no tool)</td><td>1–1.5 hrs</td><td>30–60 min</td><td>10–15 min</td><td>15–45 min</td><td>2–4 hrs</td></tr>
+        <tr><td>Standard (with tool)</td><td>1–1.5 hrs</td><td>5–10 min</td><td>10–15 min</td><td>15–45 min</td><td>1.5–3 hrs</td></tr>
+        <tr><td>Expert (with tool)</td><td>15–30 min</td><td>5–10 min</td><td>5–10 min</td><td>15–30 min</td><td>40 min–1.5 hrs</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>What Happens If You Don't Submit</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Scenario</th><th>Outcome</th></tr>
+        <tr><td>Partner withdraws before deadline</td><td style="color: #00aa00; font-weight: 700;">Won — no submission needed</td></tr>
+        <tr><td>Partner says they'll withdraw but doesn't</td><td style="color: #cc2200; font-weight: 700;">Lost by default if deadline passes</td></tr>
+        <tr><td>Deadline passes with no submission</td><td style="color: #cc2200; font-weight: 700;">Automatic loss — no exceptions</td></tr>
+        <tr><td>Evidence submitted 1 day late</td><td style="color: #cc2200; font-weight: 700;">Rejected by processor — automatic loss</td></tr>
+        <tr><td>Dispute closes before your deadline</td><td style="color: #00aa00; font-weight: 700;">Won — no submission needed</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Escalation Triggers</h3>
+      <ul>
+        <li>Deadline is <strong>less than 3 days away</strong> and investigation is not complete</li>
+        <li>Disputed amount <strong>exceeds $500</strong></li>
+        <li>Partner is <strong>threatening legal action</strong></li>
+        <li>Evidence is <strong>incomplete or unclear</strong></li>
+        <li><strong>Multiple disputes</strong> filed by the same partner</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>What Goes in the Dispute Tracker</h3>
+      <ul>
+        <li>Dispute ID and Charge ID</li>
+        <li>Disputed amount</li>
+        <li>Response deadline</li>
+        <li>Submission date and timestamp</li>
+        <li>Partner call outcome</li>
+        <li>Final resolution and date (Won / Lost / Withdrawn)</li>
+      </ul>
+      <p style="font-size: 12px; color: #888; margin-top: 8px;">Check the Stripe dashboard directly for status changes — don't rely on email notifications alone. Only mark a dispute resolved internally once Stripe shows "Won."</p>
+    </div>
+
+    <div class="callout blue">
+      <strong>Related Policies</strong>
+      <ul>
+        <li>Batch Terms & Conditions — Subscription and Cancellation Policy</li>
+        <li>No-Refund Policy — all processed payments are non-refundable</li>
+        <li>Cancellation Notice Policy — 14 days prior to next billing date required</li>
+        <li>Stripe Dispute Response Guidelines</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- LUIS MEETING AGENDA -->
+  <div class="section" id="sec-luis">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Luis Meeting Agenda — May 6, 1 PM CST</h2>
+    </div>
+
+    <div class="callout blue">
+      <strong>Meeting Setup</strong>
+      <p>Rick scheduled a 1-hour meeting with Luis for Tuesday May 6 at 1 PM CST (title: "Task Tracking System and Airtable Review"). Cliff is added as a guest. The goal is to walk Luis through the specific visibility gaps and system issues the team needs addressed — with concrete examples, not just complaints. Come with screenshots, view links, and clear requests.</p>
+    </div>
+
+    <div class="card">
+      <h3>Items to Present to Luis</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>#</th><th>Item</th><th>What to Ask For</th></tr>
+        <tr><td>1</td><td>Stripe subscription phasing (update)</td><td>Inform Luis and Stefan that Rick and Cliff figured out how to automate price reversion via Stripe phases — will implement going forward. No action needed from Luis.</td></tr>
+        <tr><td>2</td><td>Track if partner received a one-month pause/discount before</td><td>Add a field in Airtable to record: (a) date the discount was offered, (b) discount amount, (c) discount end date. Prevents duplicate offers.</td></tr>
+        <tr><td>3</td><td>Churn portal trigger → Airtable request</td><td>When a partner enters the churn flow in the admin portal, automatically create an Airtable request — even if they don't book a call. Follow up from Day 6.</td></tr>
+        <tr><td>4</td><td>Jake's calendar links still active</td><td>Audit all HubSpot meeting links tied to Jake's calendar. Delete or reassign any that are still routing bookings to him.</td></tr>
+        <tr><td>5</td><td>Past due call tracking — owner + completion date</td><td>Add an owner field and a completion date field to the past due calls view. Currently there's no way to track who worked on what or when it was resolved.</td></tr>
+        <tr><td>6</td><td>Post-live QA completion timestamp</td><td>The current Post-live QA done field is a checkbox only — no timestamp, no agent name. Need a date/time field that persists when the box is checked.</td></tr>
+        <tr><td>7</td><td>Reactivation date field on vendor records</td><td>When a churned partner reactivates, we need their "days since live" counter to reset — or a separate reactivation date field so we can distinguish new vs. returning partners.</td></tr>
+        <tr><td>8</td><td>Multi-task dropdown on cross-team request form</td><td>The current form only allows one task type per request. Needs a multi-select option so combined tasks (e.g. optimization + email + photos) can be logged as one request with all types visible.</td></tr>
+        <tr><td>9</td><td>Cross-team request form — Rick's name missing</td><td>Rick is not in the agent dropdown on the cross-team form. Needs to be added. Contact Eric and Gracia to fix.</td></tr>
+        <tr><td>10</td><td>HubSpot visibility bug</td><td>Rick and Cliff are seeing different conversation histories for the same partners. Rick's HubSpot only shows conversations from November onwards — Cliff can see back to February. Flag with a screenshot for investigation.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>How to Frame It for Luis</h3>
+      <ul>
+        <li>Lead with the business impact: "Without this, we can't track productivity / we can't prove capacity / we risk offering the same discount twice."</li>
+        <li>Have screenshots ready for each item — do not go in with a verbal-only list</li>
+        <li>For each item, state: what the problem is, what it impacts, and what you're asking for — in that order</li>
+        <li>If Luis says he'll "check on it," ask for a specific ETA before the meeting ends. No ETA = no commitment.</li>
+        <li>Cc Dulcy or Stefan on follow-up messages if an ETA passes with no update</li>
+      </ul>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Use Your Cards Well</div>
+      <p>You now have Stefan's visibility and support. Use it strategically — not reactively. When following up on stalled requests, the message to Luis should be professional and solution-focused: "I keep following up on [item] — if capacity is an issue, I'd be happy to find out who else can help, or I can attempt to build this myself if access is provided." Frame Stefan as a resource for prioritization, not a threat.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <a href="day6.html">← Day 6</a>
+  <a href="index.html">Training Hub</a>
+  <a href="#" class="disabled">Day 8 — Coming Soon →</a>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('visible');
+  btn.classList.add('active');
+  window.scrollTo({ top: document.querySelector('.page-body').offsetTop - 100, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
