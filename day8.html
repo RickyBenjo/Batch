@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 8 — Intercom, Live Dispute & Reporting · Batch Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0F0C0C; --white: #F0F1F4; --sunset: #FF5F00; --ocean: #4F97FC;
+    --cosmo: #FF93D3; --lime: #00DF00; --gold: #FFCA00; --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF; --cosmo-tint: #FFE0F3; --lime-tint: #C8FFB0; --sunset-tint: #FFD9C0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Mulish', sans-serif; background: var(--white); color: var(--black); font-size: 14px; line-height: 1.6; }
+  .topnav { background: var(--black); padding: 14px 40px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--gold); }
+  .topnav a { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.15s; }
+  .topnav a:hover { color: var(--gold); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--gold); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+  .tab-nav { background: var(--black); padding: 0 40px; display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 46px; z-index: 99; }
+  .tab-btn { padding: 12px 18px; font-size: 12px; font-weight: 700; color: rgba(240,241,244,0.45); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.15s; font-family: 'Mulish', sans-serif; letter-spacing: 0.3px; }
+  .tab-btn:hover { color: rgba(240,241,244,0.8); }
+  .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .hero { background: var(--black); padding: 52px 40px 44px; position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; right: -60px; top: -60px; width: 300px; height: 300px; border-radius: 50%; background: var(--gold); opacity: 0.07; }
+  .hero::before { content: ''; position: absolute; left: -60px; bottom: -60px; width: 220px; height: 220px; border-radius: 50%; background: var(--ocean); opacity: 0.06; }
+  .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-badge { display: inline-block; background: var(--gold); color: var(--black); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; padding: 5px 14px; border-radius: 30px; margin-bottom: 16px; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 48px); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 10px; }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); margin-bottom: 24px; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(240,241,244,0.7); border: 1px solid rgba(255,255,255,0.1); }
+  .page-body { max-width: 900px; margin: 0 auto; padding: 36px 40px 80px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 3px solid; }
+  .sec-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .sec-head h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+  .card { background: #fff; border-radius: 14px; border: 1.5px solid rgba(15,12,12,0.09); padding: 20px 22px; margin-bottom: 14px; }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 13.5px; color: #555; line-height: 1.65; }
+  .card ul { padding-left: 18px; }
+  .card li { margin-bottom: 4px; }
+  .callout { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; border-left: 4px solid; }
+  .callout.gold { background: var(--gold-tint); border-color: var(--gold); }
+  .callout.blue { background: var(--ocean-tint); border-color: var(--ocean); }
+  .callout.pink { background: var(--cosmo-tint); border-color: var(--cosmo); }
+  .callout.green { background: var(--lime-tint); border-color: #00b800; }
+  .callout.orange { background: var(--sunset-tint); border-color: var(--sunset); }
+  .callout strong { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+  .callout p, .callout li { font-size: 13.5px; line-height: 1.6; }
+  .callout ul { padding-left: 16px; }
+  .callout li { margin-bottom: 3px; }
+  .ctable { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; border-radius: 12px; overflow: hidden; }
+  .ctable th { background: var(--black); color: var(--white); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .ctable td { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+  .ctable tr:last-child td { border-bottom: none; }
+  .ctable tr:nth-child(even) td { background: rgba(240,241,244,0.5); }
+  .steps {}
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--black); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-body { flex: 1; }
+  .step-body strong { font-size: 13.5px; display: block; margin-bottom: 2px; }
+  .step-body span { font-size: 12.5px; color: #666; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .tag.gold { background: var(--gold); color: var(--black); }
+  .tag.blue { background: var(--ocean); color: #fff; }
+  .tag.orange { background: var(--sunset); color: #fff; }
+  .tag.green { background: var(--lime); color: var(--black); }
+  .tag.pink { background: var(--cosmo); color: var(--black); }
+  .warning { background: #fff3e0; border: 2px solid var(--sunset); border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; }
+  .warning .w-title { font-weight: 800; color: var(--sunset); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .warning p, .warning li { font-size: 13px; line-height: 1.65; }
+  .warning ul { padding-left: 16px; }
+  .warning li { margin-bottom: 3px; }
+  .win-banner { background: var(--gold-tint); border: 2px solid var(--gold); border-radius: 14px; padding: 18px 22px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; }
+  .win-banner .win-icon { font-size: 32px; flex-shrink: 0; }
+  .win-banner .win-body strong { font-size: 15px; font-weight: 800; display: block; margin-bottom: 4px; }
+  .win-banner .win-body p { font-size: 13px; color: #665500; }
+  .bottom-nav { border-top: 2px solid rgba(15,12,12,0.08); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 900px; margin: 0 auto; }
+  .bottom-nav a { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--black); text-decoration: none; padding: 10px 20px; border: 2px solid rgba(15,12,12,0.15); border-radius: 30px; transition: all 0.15s; }
+  .bottom-nav a:hover { background: var(--black); color: var(--gold); border-color: var(--black); }
+  .bottom-nav .disabled { opacity: 0.35; pointer-events: none; }
+  @media (max-width: 600px) {
+    .topnav, .tab-nav { padding-left: 20px; padding-right: 20px; }
+    .page-body { padding: 24px 20px 60px; }
+    .bottom-nav { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html">Training Hub</a>
+  <span class="sep">›</span>
+  <span class="current">Day 8 — Intercom, Live Dispute & Reporting</span>
+</nav>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="show('kickoff', this)">Day Kickoff</button>
+  <button class="tab-btn" onclick="show('pastdue', this)">Past Due Workflow</button>
+  <button class="tab-btn" onclick="show('boost', this)">Boost & Party Pro</button>
+  <button class="tab-btn" onclick="show('intercom', this)">Intercom Deep Dive</button>
+  <button class="tab-btn" onclick="show('dispute', this)">Dispute Walkthrough</button>
+  <button class="tab-btn" onclick="show('reporting', this)">Reporting & Metrics</button>
+  <button class="tab-btn" onclick="show('productivity', this)">Productivity Tracking</button>
+  <button class="tab-btn" onclick="show('seo', this)">SEO & Call Debrief</button>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Day 8 · May 6, 2026</div>
+    <h1>Intercom Deep Dive,<br>Disputes &amp; Reporting</h1>
+    <p class="hero-sub">Full Intercom platform walkthrough, dispute handling debrief from Day 7 (Austin Salt Room walkthrough with Cliff), reporting accuracy deep dive, productivity tracking framework, and Boost/Party Pro protocols.</p>
+    <div class="hero-chips">
+      <div class="chip">Parts 1–3 covered</div>
+      <div class="chip">Dispute process walked through with Cliff</div>
+      <div class="chip">Intercom access unlocked</div>
+      <div class="chip">Productivity framework inherited</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- DAY KICKOFF -->
+  <div class="section visible" id="sec-kickoff">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Day 8 Kickoff — Schedule & Priorities</h2>
+    </div>
+
+    <div class="callout gold">
+      <strong>Today's Goal — Touch Everything</strong>
+      <p>The goal for today is not to go deep on one task — it's to touch all task types so you don't lose the learnings from each area. Scheduled phone calls, past due calls, listing QA, disputes, and proactive outreach. Practice at least two of each category. Leave 15–30 minutes before end of shift for a debrief with Cliff.</p>
+    </div>
+
+    <div class="card">
+      <h3>Daily Task Block Plan</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Morning — Intercom inbox + calendar check</strong><span>Review open conversations, confirm scheduled calls, block calendar slots for past due calls and tasks</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>After lunch — Scheduled phone calls</strong><span>Prepare 10 minutes before each. Run the churn call tool. Self-debrief immediately after.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Afternoon — Past due calls</strong><span>Block calendar time specifically for this. Check area codes for time zones first. No calls after 6 PM partner local time.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Mid-afternoon — Listing QA</strong><span>Work from the oldest unreviewed listing in the NW Listing QA Tracking view. Quality over quantity.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Late afternoon — Disputes + proactive outreach</strong><span>One dispute handled end to end. Send 1–2 proactive emails from the Core engagement backlog.</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>End of shift — Debrief with Cliff</strong><span>Block 15–30 minutes. Bring questions, blockers, and observations from the day.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Escalation Path — Current State</h3>
+      <ul>
+        <li>All escalations route to either <strong>Rick or Stefan</strong> — minimize Stefan's involvement where possible</li>
+        <li>For discounted pricing / one-month offers: Rick has authority to decide independently, but must have clear internal rules and be able to defend them to Stefan</li>
+        <li>For <strong>Boost and Party Pro partners</strong>: always loop in Aislin and Rachel first before taking any action</li>
+        <li>For disputes over $500: flag to Stefan for visibility</li>
+        <li>When uncertain — document your reasoning before escalating, so Stefan sees you've already thought it through</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PAST DUE WORKFLOW -->
+  <div class="section" id="sec-pastdue">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Past Due Account Workflow</h2>
+    </div>
+
+    <div class="callout blue">
+      <strong>What Is a Past Due Account?</strong>
+      <p>A partner whose subscription payment has failed or is overdue. The goal is a clear, professional heads-up and a chance to update their payment before the account is deactivated. One attempt per day, consistent documentation, and a clean cancellation if they don't respond.</p>
+    </div>
+
+    <div class="card">
+      <h3>Past Due Call Process — Step by Step</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Check the time zone before calling</strong><span>Look up the partner's area code on Google to confirm their time zone. No calls after 6 PM their local time.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Block the call on your calendar</strong><span>Add the partner name and scheduled call time as a calendar event so you have structure and can track attempts.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Call once. Leave a voicemail if no answer.</strong><span>"Hi, this is Rick from the partner support team at Batch. I'm reaching out about your account — there's an outstanding invoice I'd love to help you sort out. Please give us a call back or reply to our email. Thank you."</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Send a follow-up email</strong><span>Keep it short and professional. Include the invoice amount, date, and a clear next step (update payment or contact you to discuss options).</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Document the attempt in Airtable comments</strong><span>Note the date, what was done, and current status. If the partner responds via email and promises to pay — log it, no further calls needed.</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Second attempt next day if no response</strong><span>Try once more the following day. If still unresponsive — proceed to cancellation with a notification email.</span></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-body"><strong>Assess signal before attempting a save</strong><span>If the partner responds and wants to cancel — run a churn call. Apply signal rules: strong/medium within 3 months = save attempt. Weak signal or 30+ days overdue = cancel gracefully.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Time Zone Reference for Past Due Calls</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Partner Time Zone</th><th>Latest Call Time (Their Time)</th><th>Equivalent in Central Time</th></tr>
+        <tr><td>Eastern (ET)</td><td>6:00 PM ET</td><td>5:00 PM CT</td></tr>
+        <tr><td>Central (CT)</td><td>6:00 PM CT</td><td>6:00 PM CT</td></tr>
+        <tr><td>Mountain (MT)</td><td>6:00 PM MT</td><td>7:00 PM CT</td></tr>
+        <tr><td>Pacific (PT)</td><td>6:00 PM PT</td><td>8:00 PM CT</td></tr>
+      </table>
+      <p style="font-size: 12px; color: #888; margin-top: 8px;">To find a partner's time zone: Google their area code (e.g. "area code 512 time zone"). Schedule all past due calls on your calendar in advance.</p>
+    </div>
+
+    <div class="card">
+      <h3>Case Study — Oasis South Florida Cigar</h3>
+      <ul>
+        <li>Partner had an ongoing churn request thread. Initial messages were seen but no reply afterward.</li>
+        <li>Eight failed payment attempts since April 12 — well past the 30-day threshold</li>
+        <li>Signal: weak — no meaningful traction to justify a save effort</li>
+        <li>Decision: <span class="tag orange">Cancel Immediately</span> — no further retention attempt warranted</li>
+        <li>Lesson: when a partner exceeds 30 days of non-payment with weak signal, a clean cancellation is more respectful than continued outreach</li>
+      </ul>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ Visibility Gap — No Ownership on Past Due List</div>
+      <p>The current past due calls view shows which partners are overdue but has <strong>no owner field and no status field</strong>. There is no way to tell if a teammate already called without manually checking each record. Flag to Luis: add an owner field, a status dropdown (new / called / emailed / resolved / cancelled), and a completion date field.</p>
+    </div>
+  </div>
+
+  <!-- BOOST & PARTY PRO -->
+  <div class="section" id="sec-boost">
+    <div class="sec-head" style="border-color: var(--cosmo);">
+      <div class="sec-dot" style="background: var(--cosmo);"></div>
+      <h2>Boost & Party Pro — Handling Protocol</h2>
+    </div>
+
+    <div class="callout pink">
+      <strong>These Are Not Your Partners to Own</strong>
+      <p>Boost and Party Pro partners are handled by their dedicated account managers — Aislin and Rachel. Your role is to flag, inform, and route — not to take ownership of their cases. The PX team does not independently handle Boost/Party Pro disputes, cancellations, or retention calls without first checking with Aislin or Rachel.</p>
+    </div>
+
+    <div class="card">
+      <h3>What Makes Boost & Party Pro Different</h3>
+      <ul>
+        <li>They have access to features core partners don't: <strong>email campaigns and SMS campaigns</strong></li>
+        <li>Do not offer email or SMS marketing as a retention lever to core partners — those features are not available at that tier</li>
+        <li>If you're not trained on what products were promised to a Boost/Party Pro partner, you can't accurately assess whether service was delivered — which means you can't run a retention call or dispute properly without AM involvement</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Step-by-Step — Handling a Boost/Party Pro Case</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Identify the partner tier</strong><span>Check the BAT status or Batch AM tier field in the vendor directory. If it shows Boost or Party Pro — this is an AM-handled account.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Message Aislin (and Rachel if needed) in #batch-partner-support on Slack</strong><span>Do NOT tag them in Airtable — they prefer Slack. Include: partner name, Intercom conversation link, vendor directory link, dispute or issue link, and a brief summary.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Ask a clear yes/no question</strong><span>Example: "This partner has an active dispute and previously requested cancellation. Do you want to handle this, or should we accept the dispute?"</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>CC Stefan on the conversation</strong><span>Always CC Stefan when looping in Aislin/Rachel. This protects you if there's any later disagreement about who was responsible for what.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Wait for their direction before acting</strong><span>Their go-signal for one task (e.g. accept the dispute) does NOT mean go-signal for all tasks (e.g. also do the cancellation). Get explicit approval for each action.</span></div></div>
+      </div>
+    </div>
+
+    <div class="callout gold">
+      <strong>Case Study — Surf and Pontoons (Boost Partner Dispute)</strong>
+      <p>Boost partner with an active dispute AND a cancellation request from 5 months prior. The team messaged Aislin in #batch-partner-support with all links and details, and asked whether to handle or accept. Aislin confirmed: accept the dispute. That was the only approved action — the cancellation still required separate authorization. Lesson: one go-signal does not cover all tasks on the same account.</p>
+    </div>
+  </div>
+
+  <!-- INTERCOM DEEP DIVE -->
+  <div class="section" id="sec-intercom">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Intercom Deep Dive</h2>
+    </div>
+
+    <div class="callout blue">
+      <strong>Your Intercom Access — What You Now Have</strong>
+      <p>After today, Rick has proper working access to Intercom. Go to Settings → Teammates → find Rick → update permissions. You can now create and edit reports, delete your own reports, manage automations, create knowledge base articles, manage team inboxes, view all conversations, and manage teammate permissions.</p>
+    </div>
+
+    <div class="card">
+      <h3>Permission Status</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Permission</th><th>Status</th><th>Notes</th></tr>
+        <tr><td>Create & edit reports</td><td style="color: #00aa00; font-weight: 700;">✓ Granted</td><td>Always create your own — never edit the 27 existing pre-built reports</td></tr>
+        <tr><td>Delete reports</td><td style="color: #00aa00; font-weight: 700;">✓ Granted</td><td>Only delete reports you created yourself</td></tr>
+        <tr><td>Manage automations & workflows</td><td style="color: #00aa00; font-weight: 700;">✓ Granted</td><td>Update snippets and FinAI workflows as needed</td></tr>
+        <tr><td>Create knowledge base content</td><td style="color: #00aa00; font-weight: 700;">✓ Granted</td><td>Add internal SOPs and public articles</td></tr>
+        <tr><td>Manage team inboxes & teammates</td><td style="color: #00aa00; font-weight: 700;">✓ Granted</td><td>Same access level as Kring's existing permissions</td></tr>
+        <tr><td>FinAI agent settings</td><td style="color: #cc8800; font-weight: 700;">⚠ Restricted</td><td>Requires Luis/Stefan approval — flag when needed</td></tr>
+        <tr><td>Apps & integrations</td><td style="color: #cc2200; font-weight: 700;">✗ Not granted</td><td>Luis holds this access — escalate via Stefan if needed</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Knowledge Base — Structure & How to Use It</h3>
+      <ul>
+        <li><strong>Internal SOPs</strong> — for teammates only. Set audience to "Internal Batch Audience." Use for process guides and handling instructions. These power the FinAI co-pilot so teammates get AI-assisted answers during conversations.</li>
+        <li><strong>Public articles (partner-facing)</strong> — visible to partners in the Help Center. Only publish what is current and accurate. Many existing articles are outdated — verify before updating anything.</li>
+        <li><strong>Snippets / macros</strong> — pre-written responses the FinAI agent uses. Use internal Intercom macros only — not personal saved templates that can go out of sync.</li>
+        <li>You can draft articles in Notion with collapsible sections and copy-paste into Intercom — the formatting carries over.</li>
+        <li>When Stefan sends a new SOP, convert it to an internal article in Intercom immediately so FinAI and co-pilot use the latest version.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>FinAI Agent — Recommendations Tab</h3>
+      <ul>
+        <li>Go to <strong>Analyze → Recommendations</strong> to see what the FinAI agent is flagging as content gaps</li>
+        <li>Current high-priority gaps: (1) how partners can manage and communicate discounts on Batch, (2) the removal of in-app chat and group messaging</li>
+        <li>Each recommendation shows actual sample conversations where FinAI gave incomplete answers — read these to understand the gap</li>
+        <li>Fix: create or update an internal SOP article covering the topic, then enable it for co-pilot and FinAI</li>
+        <li>Check the <strong>Trends tab</strong> to see what topics come up most frequently — tells you where to focus knowledge base improvements</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Intercom Terminology Map</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Platform</th><th>What They Call Partners</th></tr>
+        <tr><td>Intercom</td><td>Suppliers</td></tr>
+        <tr><td>Vendor Directory (Airtable)</td><td>Vendors</td></tr>
+        <tr><td>Admin Portal</td><td>Partners</td></tr>
+        <tr><td>Stripe</td><td>Customers</td></tr>
+        <tr><td>HubSpot</td><td>Contacts / Companies</td></tr>
+      </table>
+      <p style="font-size: 12px; color: #888; margin-top: 8px;">All the same people. Don't let naming differences across platforms confuse you.</p>
+    </div>
+
+    <div class="callout orange">
+      <strong>SLA Settings — Current State & What to Fix</strong>
+      <p>Current SLAs: 15 minutes for chat, 1 day for email — tracked separately. A conversation that starts as chat and converts to email gets split across two SLA buckets, making the data inconsistent. The ideal is a unified response time target covering both. Raise this with Stefan: we need one universal SLA target, not separate chat and email targets that don't account for conversation-type switching.</p>
+    </div>
+  </div>
+
+  <!-- LIVE DISPUTE WALKTHROUGH -->
+  <div class="section" id="sec-dispute">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Dispute Handling Walkthrough — Austin Salt Room</h2>
+    </div>
+
+    <div class="callout orange">
+      <strong>Context — This Was a Day 7 Debrief, Not a Solo Counter</strong>
+      <p>The Austin Salt Room dispute was handled on May 5 with Cliff guiding the entire process. Today (May 6) was a continuation of that walkthrough — reviewing what was done, understanding the evidence package, and learning the submission process step by step. The goal was to understand it well enough to handle the next one independently.</p>
+    </div>
+
+    <div class="card">
+      <h3>Case Details — Austin Salt Room</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Field</th><th>Detail</th></tr>
+        <tr><td>Dispute amount</td><td>$159</td></tr>
+        <tr><td>Dispute reason</td><td>Product unacceptable</td></tr>
+        <tr><td>Charge date</td><td>February 25</td></tr>
+        <tr><td>Cancellation request date</td><td>March 16 (30 days after charge)</td></tr>
+        <tr><td>14-day cancellation window</td><td>Missed — request came 16 days late</td></tr>
+        <tr><td>Service delivered?</td><td>Yes — listing published January 24, page views confirmed, bookings generated, blog post created by the team</td></tr>
+        <tr><td>Decision</td><td><span class="tag blue">Counter</span> — strong case, service delivered, cancellation window missed</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>How to Find a Partner in a Dispute</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Check Intercom first</strong><span>The dispute notification usually shows the partner's email. Search Intercom by email — fastest route to conversation history.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Airtable partner directory — Ctrl+F by email</strong><span>If Intercom doesn't surface them, go to the vendor directory and search by email address.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>HubSpot — search by email</strong><span>HubSpot often has the fullest contact and communication history — use it to understand the timeline of what was promised and delivered.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Stripe — confirm the customer ID</strong><span>Search the email in Stripe and confirm the charge ID matches the dispute. You'll need the Stripe customer ID for the evidence submission form.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Evidence Preparation — Step by Step</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Run the dispute evidence builder tool</strong><span>Fill it out completely — it structures your investigation and highlights what evidence you need. The tool is only as good as what you put in.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Gather evidence documents</strong><span>Pull: billing records, onboarding completion date, signed TNC URL, listing publish date and active status, confirmed bookings/revenue, cancellation request date vs. charge date. Verify the 14-day window against the timeline.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Draft the response letter using Claude</strong><span>Open Claude, paste your evidence, and ask it to draft a dispute response letter. Request a "Missed Cancellation Window" section if applicable. Review every date, amount, and policy reference before using it.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Prepare your exhibits</strong><span>Exhibit A: proof of service delivery (blog post, listing screenshots). Exhibit B: listing performance analytics (impressions, page views, bookings). Exhibit C: listing created in the Batch platform. Use full-page browser screenshots via developer tools for clean captures.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Export response letter as PDF</strong><span>Download from Google Docs. Use clear file names: "Response_Letter_PartnerName.pdf," "Exhibit_A_BlogPost.pdf," etc.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Stripe Submission — Step by Step</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Open the dispute in Stripe</strong><span>Go to Payments → Disputes. Find by amount or date. Click into it.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Upload evidence by category</strong><span>Customer signature (signed TNC), Service documentation (your exhibits), Customer communication (Intercom conversation export or screenshots).</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Fill in the additional information text field</strong><span>Explain in plain language: what service was delivered, when, when the charge was made, when the cancellation request came in, and why the charge was legitimate. Factual and concise.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Answer Stripe's specific questions</strong><span>Stripe asks: "Do you have a no-refund policy?" (yes) and "When were terms shown during sign-up?" — answer from onboarding records.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Submit before the deadline</strong><span>Log the submission timestamp in the dispute tracker. Check the Stripe dashboard directly for status — don't rely on email notifications alone.</span></div></div>
+      </div>
+    </div>
+
+    <div class="callout gold">
+      <strong>Disputes Are a Major Revenue Leak</strong>
+      <p>Batch receives 30–50 disputes per month. Each takes 40 minutes to 1.5 hours to handle properly. Without consistent handling, the company loses $10,000–$13,000 per month — the equivalent of one full week of team work, gone. Approval authority limits: all staff up to $50/month, supervisors up to $500, managers up to $5,000, CEO up to $50,000. Monthly dispute losses have been exceeding the supervisor ceiling — meaning this is a systemic issue requiring proper tracking, SOP ownership, and an Airtable view.</p>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">⚠️ No Dispute Tracking System Yet</div>
+      <p>There is currently no Airtable view, no shared tracker, and no ownership system for disputes. If a teammate starts working on a dispute, no one else knows without checking Stripe manually — risking duplicate work and missed deadlines. Add to the Luis agenda: create an Airtable request/view for disputes with owner, status, submission date, and outcome fields.</p>
+    </div>
+  </div>
+
+  <!-- REPORTING & METRICS -->
+  <div class="section" id="sec-reporting">
+    <div class="sec-head" style="border-color: var(--cosmo);">
+      <div class="sec-dot" style="background: var(--cosmo);"></div>
+      <h2>Reporting & Metrics — Intercom</h2>
+    </div>
+
+    <div class="callout pink">
+      <strong>Previous KPI Reports Were 50–80% Accurate</strong>
+      <p>Before today, the team was working without proper Intercom reporting access. Rick starts with full access from day one — a significant advantage. Use it to build accurate baselines from the start rather than working around the system with Google Sheets.</p>
+    </div>
+
+    <div class="card">
+      <h3>The 5 Metrics That Actually Matter</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Metric</th><th>What It Measures</th><th>Where to Find It</th></tr>
+        <tr><td>Conversations assigned</td><td>How many tickets each teammate was given</td><td>Intercom → Reports → Teammate Performance</td></tr>
+        <tr><td>Conversations replied to</td><td>How many tickets each teammate actually responded to</td><td>Same report — different from "assigned"</td></tr>
+        <tr><td>Median response time</td><td>Typical time from partner message to teammate reply</td><td>Teammate Performance report</td></tr>
+        <tr><td>CX score</td><td>AI-generated quality score for conversations (% positive)</td><td>Separate CX Score report</td></tr>
+        <tr><td>CSAT</td><td>Partner satisfaction rating (1–5 emoji scale)</td><td>Customer Satisfaction report — not yet activated</td></tr>
+      </table>
+      <p style="font-size: 12px; color: #888; margin-top: 8px;">Remove everything else from your active reports. Extra metrics create noise and can mislead when you don't fully understand what they're measuring.</p>
+    </div>
+
+    <div class="card">
+      <h3>CX Score — How to Measure It Accurately</h3>
+      <ul>
+        <li>CX score = percentage of conversations that received a positive rating (4 or 5 out of 5)</li>
+        <li><strong>Filter accurately:</strong> select FinAI agent and teammate as <em>two separate filters</em> — do NOT use the "FinAI agent and teammate" combined option, which produces inaccurate numbers</li>
+        <li>April benchmarks: overall 58% positive, FinAI agent 21%, teammates 58%</li>
+        <li>CSAT scale: Terrible (1) → Bad (2) → Okay (3) → Great (4) → Amazing (5)</li>
+        <li>For MBR: show positive, neutral, and negative breakdowns separately — not just the net score</li>
+        <li>CSAT is not yet activated — activate it to start collecting partner ratings and coaching comments</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>The Drill-In Feature — Your Best Analysis Tool</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Open any report, click "Drill In"</strong><span>Select the metric you want to analyze (e.g. median response time)</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Add context columns</strong><span>Add: AI issue summary, AI topic, AI subtopic, ticket category, batch tier — these reveal what type of conversation was slow or fast</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Look for outliers first</strong><span>Fastest: 7 seconds (Felix — likely a macro). Slowest: 75 hours (Kring — likely a weekend/schedule gap). Investigate extremes before focusing on the median.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Export to Claude for analysis</strong><span>Export drill-in data as CSV, upload to Claude, and ask: "What are the main drivers for long vs. short response time? What should I highlight in the MBR?" Claude will structure the narrative for your slide and speaker notes.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Building Reports — The Right Way</h3>
+      <ul>
+        <li><strong>Never edit the 27 pre-built Intercom reports</strong> — they may be shared or used elsewhere</li>
+        <li>Always duplicate or create new. Name yours: "NW Teammate Performance," "NW CX Score Monthly," etc.</li>
+        <li>For teammate performance: include conversations assigned, replied to, median response time, and CX score — remove everything else</li>
+        <li>For MBR slides: get the number from Intercom, put it in a table. Clear numbers with context are more credible than fancy charts.</li>
+        <li>Filter by exact date range (e.g. April 1–30) when comparing months so you're comparing apples to apples</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PRODUCTIVITY TRACKING -->
+  <div class="section" id="sec-productivity">
+    <div class="sec-head" style="border-color: var(--lime);">
+      <div class="sec-dot" style="background: var(--lime);"></div>
+      <h2>Productivity Tracking Framework</h2>
+    </div>
+
+    <div class="callout green">
+      <strong>The Common Denominator: Hours, Not Task Count</strong>
+      <p>Felix and Irvin do fundamentally different work — comparing their ticket counts directly is unfair and misleading. The solution: measure productivity by <strong>hours spent per task type</strong>, using SLA as the baseline. This works across all task types regardless of who's doing them, and it holds up during seasonal slowdowns when member support teammates pick up partner support tasks.</p>
+    </div>
+
+    <div class="card">
+      <h3>Established Task Handling Times (Expert Mode)</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Task Type</th><th>Handling Time</th><th>Tasks Per Hour</th></tr>
+        <tr><td>Intercom ticket</td><td>12 min</td><td>5</td></tr>
+        <tr><td>Order fulfillment</td><td>12 min</td><td>5</td></tr>
+        <tr><td>Calendar management</td><td>20 min</td><td>3</td></tr>
+        <tr><td>Dispute handling</td><td>40–60 min</td><td>1</td></tr>
+        <tr><td>Upload ratings & reviews</td><td>45 min</td><td>1.5</td></tr>
+        <tr><td>Airtable / cross-team request</td><td>15 min</td><td>4</td></tr>
+        <tr><td>Listing QA</td><td>15 min</td><td>4</td></tr>
+        <tr><td>Past due outreach (no answer)</td><td>8 min</td><td>7.5</td></tr>
+        <tr><td>Past due outreach (live conversation)</td><td>15 min</td><td>4</td></tr>
+        <tr><td>Proactive outreach (email)</td><td>15 min</td><td>4</td></tr>
+      </table>
+      <p style="font-size: 12px; color: #888; margin-top: 8px;">These are expert-mode estimates. Standard mode (no automation) takes significantly longer. Use these as your SLA baseline, not as a quota.</p>
+    </div>
+
+    <div class="card">
+      <h3>The Scorecard — 5 Core Metrics</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Metric</th><th>Weight</th><th>Source</th></tr>
+        <tr><td>Quality (QA score)</td><td>35%</td><td>QA rubric forms in Google Sheets / Intercom</td></tr>
+        <tr><td>CX Score</td><td>30%</td><td>Intercom CX Score report</td></tr>
+        <tr><td>Efficiency (response time)</td><td>~15%</td><td>Intercom median response time</td></tr>
+        <tr><td>Productivity (hours on SLA tasks)</td><td>~10%</td><td>Airtable + Daily Prod Tracker</td></tr>
+        <tr><td>Attendance</td><td>10%</td><td>NeoWork Airtable → All Time Entries view</td></tr>
+      </table>
+      <p style="font-size: 12px; color: #888; margin-top: 8px;">Confirm exact weights with Stefan. He may want to swap CX Score for CSAT once CSAT is activated.</p>
+    </div>
+
+    <div class="card">
+      <h3>Attendance Tracking — NeoWork Airtable</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Go to NeoWork Airtable → All Time Entries</strong><span>Log in via the NeoWork profile</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Filter by year/month + account</strong><span>Filter: year contains "2026/4" (for April) + account = Batch Customer Support</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Search by teammate name</strong><span>Use the search button (top right) to filter to one teammate at a time</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Compare Shift Length vs. Total Final Hours</strong><span>If equal → 100% attendance. If not: (total final hours ÷ shift length) × 100 = attendance %. You can calculate directly in your browser URL bar (e.g. type "= 177.25/180" and press Enter).</span></div></div>
+      </div>
+      <div class="callout gold" style="margin-top: 12px; margin-bottom: 0;">
+        <strong>April Results</strong>
+        <p>Irvin: 166/166 hours = 100%. Felix: 177.25/180 hours = 98.5%. Kring: 100% attendance confirmed.</p>
+      </div>
+    </div>
+
+    <div class="callout blue">
+      <strong>The Supervisor Must Be Non-Production</strong>
+      <p>The Batch Capacity 2026 document (in the shared Google Drive) makes this case with data: a supervisor handling phone calls, QA, training, reporting, and workforce management simultaneously is not sustainable. Use this document as your reference when proposing to Stefan that the supervisory role needs to be primarily non-production — with calls only as a bridge until the team reaches full capacity.</p>
+    </div>
+  </div>
+
+  <!-- SEO & CALL DEBRIEF -->
+  <div class="section" id="sec-seo">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>SEO ROI Conversations & Call Debrief</h2>
+    </div>
+
+    <div class="callout gold">
+      <strong>SEO Is Compounding — Partners Need to Hear This Early</strong>
+      <p>Two of today's scheduled calls came from partners with ROI concerns after only 2 months. This is the most common objection you'll face. The answer: SEO results build slowly in the first 30 days, accelerate through month 2, and by month 3 the audience and data are in place for real traction. Manage this expectation on every onboarding and follow-up call — before partners get frustrated enough to cancel.</p>
+    </div>
+
+    <div class="card">
+      <h3>How to Frame the SEO Compounding Argument</h3>
+      <ul>
+        <li>After 65 days, one partner had 1,000 search impressions — roughly 33 times per day their listing appeared in search results</li>
+        <li>Frame it: "Day 1, you might show up 5 times a day. By week 2, it's 20. By month 1, it's 30–35. Right now you're building that curve. Month 3 is when it really bends."</li>
+        <li>Show the data: impressions, favorites added, itinerary ads. Even 2 itinerary adds and 3 favorites in 65 days is real traction.</li>
+        <li>If they have favorites added: tell them that real potential planners have bookmarked their listing — bookings typically follow within 30–90 days</li>
+        <li>Never promise a booking date. Frame everything as compounding probability, not guaranteed outcomes.</li>
+        <li>Use the city demand data to anchor expectations: show how many parties are actually being created in their specific city, not the platform-wide 3 million figure</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>City Demand Data — Use It Every Time</h3>
+      <ul>
+        <li>The city demand data feature shows how many parties are being created in a specific city — this is the realistic customer pool</li>
+        <li>Actual demand per city is 200–2,000 parties. Use the city number on partner calls, not the platform-wide total.</li>
+        <li>If a partner's listing isn't tailored to bachelorette groups (90% of Batch audience), that's actionable: help them reposition their description and photos toward that audience</li>
+        <li>City demand data access is in the partner analytics dashboard — make sure you know how to pull it before calls</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <a href="day7.html">← Day 7</a>
+  <a href="index.html">Training Hub</a>
+  <a href="#" class="disabled">Day 9 — Coming Soon →</a>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('visible');
+  btn.classList.add('active');
+  window.scrollTo({ top: document.querySelector('.page-body').offsetTop - 100, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
