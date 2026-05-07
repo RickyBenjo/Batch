@@ -6,96 +6,78 @@
 <title>Batch Training — Partner Engagement Specialist</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --black: #0F0C0C; --white: #F0F1F4; --sunset: #FF5F00; --ocean: #4F97FC;
-    --cosmo: #FF93D3; --lime: #00DF00; --gold: #FFCA00; --gold-tint: #FFF3B0;
-    --ocean-tint: #D6E9FF; --cosmo-tint: #FFE0F3; --lime-tint: #C8FFB0; --sunset-tint: #FFD9C0;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Mulish', sans-serif; background: var(--white); color: var(--black); min-height: 100vh; }
-
-  .hero { background: var(--black); padding: 64px 48px 56px; position: relative; overflow: hidden; }
-  .hero::before { content: ''; position: absolute; width: 500px; height: 500px; border-radius: 50%; background: var(--gold); opacity: 0.07; right: -120px; top: -180px; }
-  .hero::after { content: ''; position: absolute; width: 300px; height: 300px; border-radius: 50%; background: var(--ocean); opacity: 0.07; left: -80px; bottom: -120px; }
-  .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
-  .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: var(--gold); color: var(--black); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; padding: 6px 16px; border-radius: 30px; margin-bottom: 24px; }
-  .hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--black); }
-  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 6vw, 64px); font-weight: 900; color: #fff; line-height: 1.05; margin-bottom: 16px; }
-  .hero h1 span { color: var(--gold); }
-  .hero-sub { font-size: 16px; color: rgba(240,241,244,0.6); max-width: 480px; line-height: 1.6; margin-bottom: 36px; }
-  .hero-meta { display: flex; gap: 24px; flex-wrap: wrap; }
-  .meta-pill { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 30px; padding: 8px 18px; font-size: 13px; color: rgba(240,241,244,0.8); font-weight: 600; }
-  .meta-pill .icon { width: 8px; height: 8px; border-radius: 50%; }
-
-  .progress-bar { background: rgba(255,255,255,0.06); border-top: 1px solid rgba(255,255,255,0.08); padding: 20px 48px; display: flex; align-items: center; gap: 16px; }
-  .progress-bar-inner { max-width: 900px; margin: 0 auto; width: 100%; display: flex; align-items: center; gap: 16px; }
-  .progress-label { font-size: 12px; color: rgba(240,241,244,0.5); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
-  .progress-track { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
-  .progress-fill { height: 100%; width: 70%; background: var(--gold); border-radius: 10px; transition: width 0.5s ease; }
-  .progress-count { font-size: 12px; color: rgba(240,241,244,0.5); font-weight: 700; white-space: nowrap; }
-
-  .main { max-width: 900px; margin: 0 auto; padding: 52px 48px 80px; }
-  .section-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; color: rgba(15,12,12,0.35); margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(15,12,12,0.1); }
-
-  .day-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin-bottom: 56px; }
-  .day-card { border-radius: 18px; border: 2px solid transparent; padding: 24px; text-decoration: none; color: var(--black); position: relative; overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s ease; display: block; }
-  .day-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.12); }
-  .day-card.available { cursor: pointer; }
-  .day-card.locked { cursor: default; opacity: 0.55; pointer-events: none; }
-  .day-card.locked:hover { transform: none; box-shadow: none; }
-  .day-card::before { content: ''; position: absolute; top: -30px; right: -30px; width: 100px; height: 100px; border-radius: 50%; opacity: 0.15; }
-  .day-card.c-gold { background: var(--gold-tint); border-color: var(--gold); }
-  .day-card.c-gold::before { background: var(--gold); }
-  .day-card.c-blue { background: var(--ocean-tint); border-color: var(--ocean); }
-  .day-card.c-blue::before { background: var(--ocean); }
-  .day-card.c-pink { background: var(--cosmo-tint); border-color: var(--cosmo); }
-  .day-card.c-pink::before { background: var(--cosmo); }
-  .day-card.c-green { background: var(--lime-tint); border-color: #00cc00; }
-  .day-card.c-green::before { background: var(--lime); }
-  .day-card.c-orange { background: var(--sunset-tint); border-color: var(--sunset); }
-  .day-card.c-orange::before { background: var(--sunset); }
-  .day-card.c-gray { background: #f0f0ee; border-color: #ccc; }
-  .day-num { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; opacity: 0.5; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1.5px; }
-  .day-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; line-height: 1.25; margin-bottom: 10px; }
-  .day-desc { font-size: 12.5px; line-height: 1.6; opacity: 0.65; margin-bottom: 16px; }
-  .day-tags { display: flex; flex-wrap: wrap; gap: 5px; }
-  .day-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 3px 10px; border-radius: 20px; background: rgba(15,12,12,0.08); color: rgba(15,12,12,0.6); }
-  .day-status { position: absolute; top: 20px; right: 20px; font-size: 18px; }
-  .day-date { font-size: 11px; font-weight: 700; opacity: 0.45; margin-top: 14px; display: block; }
-
-  .quick-ref { background: var(--black); border-radius: 20px; padding: 36px 40px; color: var(--white); margin-bottom: 48px; }
-  .quick-ref h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 24px; color: #fff; }
-  .ref-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
-  .ref-item { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px 16px; }
-  .ref-item .ref-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(240,241,244,0.4); margin-bottom: 6px; }
-  .ref-item .ref-val { font-size: 14px; font-weight: 700; color: var(--white); line-height: 1.4; }
-  .ref-item .ref-val.gold { color: var(--gold); }
-  .ref-item .ref-val.blue { color: var(--ocean); }
-  .ref-item .ref-val.green { color: var(--lime); }
-  .ref-item .ref-val.pink { color: var(--cosmo); }
-  .ref-item .ref-val.orange { color: var(--sunset); }
-
-  footer { border-top: 1px solid rgba(15,12,12,0.08); padding: 28px 48px; text-align: center; font-size: 12px; color: rgba(15,12,12,0.35); }
-  footer strong { color: rgba(15,12,12,0.6); }
-
-  @media (max-width: 600px) {
-    .hero { padding: 40px 24px 36px; } .progress-bar { padding: 16px 24px; }
-    .main { padding: 36px 24px 60px; } footer { padding: 24px; } .quick-ref { padding: 24px; }
-  }
+  :root{--black:#0F0C0C;--white:#F0F1F4;--sunset:#FF5F00;--ocean:#4F97FC;--cosmo:#FF93D3;--lime:#00DF00;--gold:#FFCA00;--gold-tint:#FFF3B0;--ocean-tint:#D6E9FF;--cosmo-tint:#FFE0F3;--lime-tint:#C8FFB0;--sunset-tint:#FFD9C0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Mulish',sans-serif;background:var(--white);color:var(--black);min-height:100vh;}
+  .hero{background:var(--black);padding:64px 48px 56px;position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:var(--gold);opacity:.07;right:-120px;top:-180px;}
+  .hero::after{content:'';position:absolute;width:300px;height:300px;border-radius:50%;background:var(--ocean);opacity:.07;left:-80px;bottom:-120px;}
+  .hero-inner{position:relative;z-index:1;max-width:900px;margin:0 auto;}
+  .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:var(--black);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:2.5px;padding:6px 16px;border-radius:30px;margin-bottom:24px;}
+  .hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--black);}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(36px,6vw,64px);font-weight:900;color:#fff;line-height:1.05;margin-bottom:16px;}
+  .hero h1 span{color:var(--gold);}
+  .hero-sub{font-size:16px;color:rgba(240,241,244,0.6);max-width:480px;line-height:1.6;margin-bottom:36px;}
+  .hero-meta{display:flex;gap:24px;flex-wrap:wrap;}
+  .meta-pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:8px 18px;font-size:13px;color:rgba(240,241,244,0.8);font-weight:600;}
+  .meta-pill .icon{width:8px;height:8px;border-radius:50%;}
+  .progress-bar{background:rgba(255,255,255,0.06);border-top:1px solid rgba(255,255,255,0.08);padding:20px 48px;}
+  .progress-bar-inner{max-width:900px;margin:0 auto;width:100%;display:flex;align-items:center;gap:16px;}
+  .progress-label{font-size:12px;color:rgba(240,241,244,0.5);font-weight:700;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;}
+  .progress-track{flex:1;height:6px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;}
+  .progress-fill{height:100%;width:80%;background:var(--gold);border-radius:10px;transition:width .5s ease;}
+  .progress-count{font-size:12px;color:rgba(240,241,244,0.5);font-weight:700;white-space:nowrap;}
+  .main{max-width:900px;margin:0 auto;padding:52px 48px 80px;}
+  .section-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:2.5px;color:rgba(15,12,12,0.35);margin-bottom:24px;display:flex;align-items:center;gap:10px;}
+  .section-label::after{content:'';flex:1;height:1px;background:rgba(15,12,12,0.1);}
+  .day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-bottom:56px;}
+  .day-card{border-radius:18px;border:2px solid transparent;padding:24px;text-decoration:none;color:var(--black);position:relative;overflow:hidden;transition:transform .2s ease,box-shadow .2s ease;display:block;}
+  .day-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.12);}
+  .day-card.available{cursor:pointer;}
+  .day-card.locked{cursor:default;opacity:.55;pointer-events:none;}
+  .day-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;opacity:.15;}
+  .day-card.c-gold{background:var(--gold-tint);border-color:var(--gold);}
+  .day-card.c-gold::before{background:var(--gold);}
+  .day-card.c-blue{background:var(--ocean-tint);border-color:var(--ocean);}
+  .day-card.c-blue::before{background:var(--ocean);}
+  .day-card.c-pink{background:var(--cosmo-tint);border-color:var(--cosmo);}
+  .day-card.c-pink::before{background:var(--cosmo);}
+  .day-card.c-green{background:var(--lime-tint);border-color:#00cc00;}
+  .day-card.c-green::before{background:var(--lime);}
+  .day-card.c-orange{background:var(--sunset-tint);border-color:var(--sunset);}
+  .day-card.c-orange::before{background:var(--sunset);}
+  .day-num{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;opacity:.5;margin-bottom:6px;text-transform:uppercase;letter-spacing:1.5px;}
+  .day-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;line-height:1.25;margin-bottom:10px;}
+  .day-desc{font-size:12.5px;line-height:1.6;opacity:.65;margin-bottom:16px;}
+  .day-tags{display:flex;flex-wrap:wrap;gap:5px;}
+  .day-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:3px 10px;border-radius:20px;background:rgba(15,12,12,0.08);color:rgba(15,12,12,0.6);}
+  .day-status{position:absolute;top:20px;right:20px;font-size:18px;}
+  .day-date{font-size:11px;font-weight:700;opacity:.45;margin-top:14px;display:block;}
+  .quick-ref{background:var(--black);border-radius:20px;padding:36px 40px;color:var(--white);margin-bottom:48px;}
+  .quick-ref h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:24px;color:#fff;}
+  .ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;}
+  .ref-item{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px 16px;}
+  .ref-item .ref-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:rgba(240,241,244,0.4);margin-bottom:6px;}
+  .ref-item .ref-val{font-size:14px;font-weight:700;color:var(--white);line-height:1.4;}
+  .ref-item .ref-val.gold{color:var(--gold);} .ref-item .ref-val.blue{color:var(--ocean);}
+  .ref-item .ref-val.green{color:var(--lime);} .ref-item .ref-val.pink{color:var(--cosmo);}
+  .ref-item .ref-val.orange{color:var(--sunset);}
+  footer{border-top:1px solid rgba(15,12,12,0.08);padding:28px 48px;text-align:center;font-size:12px;color:rgba(15,12,12,0.35);}
+  footer strong{color:rgba(15,12,12,0.6);}
+  @media(max-width:600px){.hero{padding:40px 24px 36px;}.progress-bar{padding:16px 24px;}.main{padding:36px 24px 60px;}.quick-ref{padding:24px;}footer{padding:24px;}}
 </style>
 </head>
 <body>
 
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-eyebrow"><div class="dot"></div>Batch · Partner Engagement Specialist</div>
+    <div class="hero-eyebrow"><div class="dot"></div>Batch &middot; Partner Engagement Specialist</div>
     <h1>Training<br><span>Notes Hub</span></h1>
     <p class="hero-sub">10-day onboarding curriculum. Click any completed day to review your notes. Days in progress will unlock as training continues.</p>
     <div class="hero-meta">
-      <div class="meta-pill"><div class="icon" style="background: var(--gold);"></div> Trainee: Rick</div>
-      <div class="meta-pill"><div class="icon" style="background: var(--ocean);"></div> Supervisor: Cliff</div>
-      <div class="meta-pill"><div class="icon" style="background: var(--lime);"></div> Started: April 27, 2026</div>
+      <div class="meta-pill"><div class="icon" style="background:var(--gold);"></div> Trainee: Rick</div>
+      <div class="meta-pill"><div class="icon" style="background:var(--ocean);"></div> Supervisor: Cliff</div>
+      <div class="meta-pill"><div class="icon" style="background:var(--lime);"></div> Started: April 27, 2026</div>
     </div>
   </div>
 </div>
@@ -104,7 +86,7 @@
   <div class="progress-bar-inner">
     <span class="progress-label">Progress</span>
     <div class="progress-track"><div class="progress-fill"></div></div>
-    <span class="progress-count">7 / 10 days</span>
+    <span class="progress-count">8 / 10 days</span>
   </div>
 </div>
 
@@ -113,8 +95,7 @@
   <div class="day-grid">
 
     <a href="day1.html" class="day-card c-gold available">
-      <div class="day-status">✅</div>
-      <div class="day-num">Day 1</div>
+      <div class="day-status">&#9989;</div><div class="day-num">Day 1</div>
       <div class="day-title">Platform Foundation</div>
       <div class="day-desc">What Batch is, how it works, partner vs customer roles, subscription tiers, listing models, and all core tools.</div>
       <div class="day-tags"><span class="day-tag">Platform</span><span class="day-tag">Tiers</span><span class="day-tag">Tools</span><span class="day-tag">Workflow</span></div>
@@ -122,81 +103,72 @@
     </a>
 
     <a href="day2.html" class="day-card c-blue available">
-      <div class="day-status">✅</div>
-      <div class="day-num">Day 2</div>
-      <div class="day-title">Partner Health & Deep Dives</div>
+      <div class="day-status">&#9989;</div><div class="day-num">Day 2</div>
+      <div class="day-title">Partner Health &amp; Deep Dives</div>
       <div class="day-desc">All 5 booking methods, listing health framework, CoStar SEO prompt, retention levers, HubSpot navigation, and Airtable workflows.</div>
       <div class="day-tags"><span class="day-tag">Booking Types</span><span class="day-tag">SEO</span><span class="day-tag">HubSpot</span><span class="day-tag">Retention</span></div>
       <span class="day-date">April 28, 2026</span>
     </a>
 
     <a href="day3.html" class="day-card c-pink available">
-      <div class="day-status">✅</div>
-      <div class="day-num">Day 3</div>
-      <div class="day-title">Ticket Handling & Intercom</div>
+      <div class="day-status">&#9989;</div><div class="day-num">Day 3</div>
+      <div class="day-title">Ticket Handling &amp; Intercom</div>
       <div class="day-desc">Churn case study, Intercom deep dive, proactive outreach workflow, updated retention policy, and the shift to proactive engagement.</div>
       <div class="day-tags"><span class="day-tag">Intercom</span><span class="day-tag">Churn</span><span class="day-tag">Outreach</span><span class="day-tag">Retention</span></div>
       <span class="day-date">April 29, 2026</span>
     </a>
 
     <a href="day4.html" class="day-card c-green available">
-      <div class="day-status">✅</div>
-      <div class="day-num">Day 4</div>
-      <div class="day-title">Listing QA & Churn Calls</div>
+      <div class="day-status">&#9989;</div><div class="day-num">Day 4</div>
+      <div class="day-title">Listing QA &amp; Churn Calls</div>
       <div class="day-desc">Full listing QA standards, supervisor role overview, the complete churn call framework with scripts, retention levers, and Stripe cancellation process.</div>
       <div class="day-tags"><span class="day-tag">QA</span><span class="day-tag">Call Scripts</span><span class="day-tag">Retention</span><span class="day-tag">Stripe</span></div>
       <span class="day-date">April 30, 2026</span>
     </a>
 
     <a href="day5.html" class="day-card c-orange available">
-      <div class="day-status">✅</div>
-      <div class="day-num">Day 5</div>
-      <div class="day-title">Disputes, Billing & Week Wrap</div>
+      <div class="day-status">&#9989;</div><div class="day-num">Day 5</div>
+      <div class="day-title">Disputes, Billing &amp; Week Wrap</div>
       <div class="day-desc">After-call Airtable workflow, retention tiers, Stripe price reversion, dispute management, Batch Partner Policies, 3 live call case studies, and Week 1 close-out.</div>
       <div class="day-tags"><span class="day-tag">Disputes</span><span class="day-tag">Stripe</span><span class="day-tag">Case Studies</span><span class="day-tag">Week Wrap</span></div>
       <span class="day-date">May 1, 2026</span>
     </a>
 
     <a href="day6.html" class="day-card c-blue available">
-      <div class="day-status">✅</div>
-      <div class="day-num">Day 6</div>
-      <div class="day-title">Go-Live: Calls, MBR & Transition</div>
+      <div class="day-status">&#9989;</div><div class="day-num">Day 6</div>
+      <div class="day-title">Go-Live: Calls, MBR &amp; Transition</div>
       <div class="day-desc">First live churn calls, April MBR with Stefan, supervisor transition context, HubSpot calendar setup, productivity tracking, and Cliff's handoff.</div>
       <div class="day-tags"><span class="day-tag">Live Calls</span><span class="day-tag">MBR</span><span class="day-tag">Supervisor</span><span class="day-tag">HubSpot</span></div>
       <span class="day-date">May 4, 2026</span>
     </a>
 
     <a href="day7.html" class="day-card c-pink available">
-      <div class="day-status">✅</div>
-      <div class="day-num">Day 7</div>
-      <div class="day-title">Airtable Deep Dive, Stripe & Disputes</div>
-      <div class="day-desc">Hands-on Airtable view building, Stripe subscription phasing for automated price reversion, past due partner calls, calendar types, and the full dispute handling SOP.</div>
+      <div class="day-status">&#9989;</div><div class="day-num">Day 7</div>
+      <div class="day-title">Airtable Deep Dive, Stripe &amp; Disputes</div>
+      <div class="day-desc">Hands-on Airtable view building, Stripe subscription phasing for automated price reversion, past due partner calls, partner calendar types, and the full dispute handling SOP.</div>
       <div class="day-tags"><span class="day-tag">Airtable</span><span class="day-tag">Stripe</span><span class="day-tag">Disputes</span><span class="day-tag">Past Due</span></div>
       <span class="day-date">May 5, 2026</span>
     </a>
 
-    <div class="day-card c-gold locked">
-      <div class="day-status">🔒</div>
-      <div class="day-num">Day 8</div>
-      <div class="day-title">Advanced Partner Scenarios</div>
-      <div class="day-desc">Complex case studies, escalation paths, working with Boost/Party Pro accounts, and cross-team coordination.</div>
-      <div class="day-tags"><span class="day-tag">Escalations</span><span class="day-tag">Cases</span><span class="day-tag">Team</span></div>
-      <span class="day-date">To follow</span>
-    </div>
+    <a href="day8.html" class="day-card c-gold available">
+      <div class="day-status">&#9989;</div><div class="day-num">Day 8</div>
+      <div class="day-title">Disputes, Intercom &amp; Reporting</div>
+      <div class="day-desc">Full Intercom deep dive, dispute handling walkthrough with Cliff (Austin Salt Room debrief from Day 7), Boost/Party Pro escalation rules, reporting framework handed off, and productivity tracking inherited.</div>
+      <div class="day-tags"><span class="day-tag">Disputes</span><span class="day-tag">Intercom</span><span class="day-tag">Reporting</span><span class="day-tag">Productivity</span></div>
+      <span class="day-date">May 6, 2026</span>
+    </a>
 
     <div class="day-card c-green locked">
-      <div class="day-status">🔒</div>
-      <div class="day-num">Day 9</div>
-      <div class="day-title">Performance & Reporting</div>
+      <div class="day-status">&#128274;</div><div class="day-num">Day 9</div>
+      <div class="day-title">Performance &amp; Reporting</div>
       <div class="day-desc">Building daily reports, tracking KPIs, using Airtable views, Google Sheets, and communicating results to leadership.</div>
       <div class="day-tags"><span class="day-tag">Airtable</span><span class="day-tag">Reporting</span><span class="day-tag">KPIs</span></div>
       <span class="day-date">To follow</span>
     </div>
 
     <div class="day-card c-orange locked">
-      <div class="day-status">🔒</div>
-      <div class="day-num">Day 10</div>
-      <div class="day-title">Graduation & Go-Live</div>
+      <div class="day-status">&#128274;</div><div class="day-num">Day 10</div>
+      <div class="day-title">Graduation &amp; Go-Live</div>
       <div class="day-desc">Full workflow recap, account assignment, solo call practice, and signing off on independent partner support responsibilities.</div>
       <div class="day-tags"><span class="day-tag">Recap</span><span class="day-tag">Solo</span><span class="day-tag">Live</span></div>
       <span class="day-date">To follow</span>
@@ -204,112 +176,105 @@
 
   </div>
 
-  <!-- TOOLS SECTION -->
   <div class="section-label">Tools</div>
-  <div class="day-grid" style="margin-bottom: 56px;">
+  <div class="day-grid" style="margin-bottom:56px;">
 
-    <a href="listing-optimizer.html" class="day-card c-green available" style="border-width: 2px;">
-      <div class="day-status">🛠️</div>
-      <div class="day-num">Tool</div>
+    <a href="listing-optimizer.html" class="day-card c-green available" style="border-width:2px;">
+      <div class="day-status">&#128295;</div><div class="day-num">Tool</div>
       <div class="day-title">Listing Optimizer (Experiences &amp; Activities)</div>
       <div class="day-desc">Paste any partner listing and auto-generate SEO keywords, an optimized title and description, a partner email, and a rewritten profile.</div>
       <div class="day-tags"><span class="day-tag">SEO</span><span class="day-tag">CoStar</span><span class="day-tag">Claude AI</span><span class="day-tag">6 Tasks</span></div>
-      <span class="day-date">Live · ~5 min per listing</span>
+      <span class="day-date">Live &middot; ~5 min per listing</span>
     </a>
 
-    <a href="batch-property-optimizer.html" class="day-card c-gold available" style="border-width: 2px;">
-      <div class="day-status">🛠️</div>
-      <div class="day-num">Tool</div>
+    <a href="batch-property-optimizer.html" class="day-card c-gold available" style="border-width:2px;">
+      <div class="day-status">&#128295;</div><div class="day-num">Tool</div>
       <div class="day-title">Listing Optimizer (Properties &amp; Stays)</div>
       <div class="day-desc">Paste any property listing and auto-generate SEO keywords, an optimized title and description, a partner email, and a rewritten profile.</div>
       <div class="day-tags"><span class="day-tag">SEO</span><span class="day-tag">CoStar</span><span class="day-tag">Claude AI</span><span class="day-tag">6 Tasks</span></div>
-      <span class="day-date">Live · ~5 min per listing</span>
+      <span class="day-date">Live &middot; ~5 min per listing</span>
     </a>
 
-    <a href="batch-bar-optimizer.html" class="day-card c-pink available" style="border-width: 2px;">
-      <div class="day-status">🛠️</div>
-      <div class="day-num">Tool</div>
+    <a href="batch-bar-optimizer.html" class="day-card c-pink available" style="border-width:2px;">
+      <div class="day-status">&#128295;</div><div class="day-num">Tool</div>
       <div class="day-title">Listing Optimizer (Bars &amp; Nightlife)</div>
       <div class="day-desc">Paste any bar or nightlife listing and auto-generate SEO keywords, an optimized title and description, a partner email, and a rewritten profile.</div>
       <div class="day-tags"><span class="day-tag">SEO</span><span class="day-tag">CoStar</span><span class="day-tag">Claude AI</span><span class="day-tag">6 Tasks</span></div>
-      <span class="day-date">Live · ~5 min per listing</span>
+      <span class="day-date">Live &middot; ~5 min per listing</span>
     </a>
 
-    <a href="batch-restaurant-optimizer.html" class="day-card c-orange available" style="border-width: 2px;">
-      <div class="day-status">🛠️</div>
-      <div class="day-num">Tool</div>
+    <a href="batch-restaurant-optimizer.html" class="day-card c-orange available" style="border-width:2px;">
+      <div class="day-status">&#128295;</div><div class="day-num">Tool</div>
       <div class="day-title">Listing Optimizer (Restaurants)</div>
       <div class="day-desc">Paste any restaurant listing and auto-generate SEO keywords, an optimized title and description, a partner email, and a rewritten profile.</div>
       <div class="day-tags"><span class="day-tag">SEO</span><span class="day-tag">CoStar</span><span class="day-tag">Claude AI</span><span class="day-tag">6 Tasks</span></div>
-      <span class="day-date">Live · ~5 min per listing</span>
+      <span class="day-date">Live &middot; ~5 min per listing</span>
     </a>
 
-    <a href="partner-update-email-generator.html" class="day-card c-blue available" style="border-width: 2px;">
-      <div class="day-status">✉️</div>
-      <div class="day-num">Tool</div>
+    <a href="partner-update-email-generator.html" class="day-card c-blue available" style="border-width:2px;">
+      <div class="day-status">&#9993;&#65039;</div><div class="day-num">Tool</div>
       <div class="day-title">Partner Update Email Generator</div>
       <div class="day-desc">Fill in the partner's metrics, what you optimized, and what you're recommending — get a warm, plain-language update email ready to send in seconds.</div>
       <div class="day-tags"><span class="day-tag">Outreach</span><span class="day-tag">Email</span><span class="day-tag">Puter.js</span><span class="day-tag">No API Key</span></div>
-      <span class="day-date">Live · ~1 min per partner</span>
+      <span class="day-date">Live &middot; ~1 min per partner</span>
     </a>
 
-    <a href="neowork-listing-qa.html" class="day-card c-orange available" style="border-width: 2px;">
-      <div class="day-status">🔍</div>
-      <div class="day-num">Tool</div>
+    <a href="neowork-listing-qa.html" class="day-card c-orange available" style="border-width:2px;">
+      <div class="day-status">&#128269;</div><div class="day-num">Tool</div>
       <div class="day-title">NeoWork Listing QA</div>
       <div class="day-desc">Full QA workflow for Basic and Core listings — checklist, category reference, routing guide, and an AI-powered partner email generator all in one place.</div>
       <div class="day-tags"><span class="day-tag">QA</span><span class="day-tag">Checklist</span><span class="day-tag">Claude AI</span><span class="day-tag">Email</span></div>
-      <span class="day-date">Live · Basic & Core partners</span>
+      <span class="day-date">Live &middot; Basic &amp; Core partners</span>
     </a>
 
-    <a href="batch_churn_tool.html" class="day-card c-pink available" style="border-width: 2px;">
-      <div class="day-status">📞</div>
-      <div class="day-num">Tool</div>
+    <a href="batch_churn_tool.html" class="day-card c-pink available" style="border-width:2px;">
+      <div class="day-status">&#128222;</div><div class="day-num">Tool</div>
       <div class="day-title">Churn Call Script Tool</div>
       <div class="day-desc">Fill in the partner's info and metrics, then walk through the call step by step — opening, acknowledgment, all 4 retention levers, and a tailored close or cancellation script.</div>
       <div class="day-tags"><span class="day-tag">Retention</span><span class="day-tag">Call Script</span><span class="day-tag">SAVED</span><span class="day-tag">Puter.js</span></div>
-      <span class="day-date">Live · Use during calls</span>
+      <span class="day-date">Live &middot; Use during calls</span>
     </a>
 
   </div>
 
-  <!-- QUICK REFERENCE -->
   <div class="section-label">Quick Reference</div>
   <div class="quick-ref">
-    <h2>Key Numbers & Facts</h2>
+    <h2>Key Numbers &amp; Facts</h2>
     <div class="ref-grid">
       <div class="ref-item"><div class="ref-label">Platform Cities</div><div class="ref-val gold">30+ US cities</div></div>
       <div class="ref-item"><div class="ref-label">Customer Base</div><div class="ref-val gold">3+ million</div></div>
       <div class="ref-item"><div class="ref-label">Active Partners</div><div class="ref-val blue">~1,500 total</div></div>
       <div class="ref-item"><div class="ref-label">Rick's Focus</div><div class="ref-val blue">~1,100 Core/Basic</div></div>
-      <div class="ref-item"><div class="ref-label">Basic Tier Price</div><div class="ref-val green">$99–$300/mo</div></div>
+      <div class="ref-item"><div class="ref-label">Basic Tier Price</div><div class="ref-val green">$99&ndash;$300/mo</div></div>
       <div class="ref-item"><div class="ref-label">Commission (Direct)</div><div class="ref-val green">0%</div></div>
       <div class="ref-item"><div class="ref-label">SEO Lock-in Period</div><div class="ref-val orange">3 months</div></div>
-      <div class="ref-item"><div class="ref-label">Daily Call Target</div><div class="ref-val orange">13–15 calls</div></div>
+      <div class="ref-item"><div class="ref-label">Daily Call Target</div><div class="ref-val orange">13&ndash;15 calls</div></div>
       <div class="ref-item"><div class="ref-label">Strong Signal</div><div class="ref-val pink">5+ itinerary adds</div></div>
-      <div class="ref-item"><div class="ref-label">Dispute Win Rate</div><div class="ref-val pink">~6% (needs fix)</div></div>
       <div class="ref-item"><div class="ref-label">Booking Methods</div><div class="ref-val gold">5 types</div></div>
       <div class="ref-item"><div class="ref-label">Min. Listing Photos</div><div class="ref-val blue">5 photos + 1 video</div></div>
       <div class="ref-item"><div class="ref-label">CoStar Workflow</div><div class="ref-val green">5 tasks, ~5 min</div></div>
       <div class="ref-item"><div class="ref-label">Churn Levers</div><div class="ref-val orange">4 levels</div></div>
       <div class="ref-item"><div class="ref-label">Free Month Offer</div><div class="ref-val orange">Eliminated</div></div>
-      <div class="ref-item"><div class="ref-label">Outreach Backlog</div><div class="ref-val pink">434 partners</div></div>
-      <div class="ref-item"><div class="ref-label">Inbox Block</div><div class="ref-val blue">10–11 AM CST</div></div>
-      <div class="ref-item"><div class="ref-label">Title Length</div><div class="ref-val gold">40–70 chars</div></div>
+      <div class="ref-item"><div class="ref-label">Outreach Backlog</div><div class="ref-val pink">~430 partners</div></div>
+      <div class="ref-item"><div class="ref-label">Inbox Block</div><div class="ref-val blue">10&ndash;11 AM CST</div></div>
+      <div class="ref-item"><div class="ref-label">Title Length</div><div class="ref-val gold">40&ndash;70 chars</div></div>
       <div class="ref-item"><div class="ref-label">Min. Reviews</div><div class="ref-val green">10 ratings</div></div>
       <div class="ref-item"><div class="ref-label">Pre-Call Buffer</div><div class="ref-val blue">10 minutes</div></div>
-      <div class="ref-item"><div class="ref-label">Avg Task Time</div><div class="ref-val gold">20–25 min</div></div>
-      <div class="ref-item"><div class="ref-label">Churn Log</div><div class="ref-val green">Update daily</div></div>
+      <div class="ref-item"><div class="ref-label">Avg Task Time</div><div class="ref-val gold">20&ndash;25 min</div></div>
+      <div class="ref-item"><div class="ref-label">Dispute Fee</div><div class="ref-val orange">~$19&ndash;$25</div></div>
       <div class="ref-item"><div class="ref-label">Stripe Phases</div><div class="ref-val pink">3-month discount</div></div>
       <div class="ref-item"><div class="ref-label">No Live Listings</div><div class="ref-val orange">~935 active partners</div></div>
-      <div class="ref-item"><div class="ref-label">Cliff Transition</div><div class="ref-val blue">In progress</div></div>
+      <div class="ref-item"><div class="ref-label">Cancellation Window</div><div class="ref-val gold">14 days prior</div></div>
+      <div class="ref-item"><div class="ref-label">Supervisory Budget</div><div class="ref-val green">Up to $500/mo</div></div>
+      <div class="ref-item"><div class="ref-label">Churn Log</div><div class="ref-val blue">Update daily</div></div>
+      <div class="ref-item"><div class="ref-label">Cliff Transition</div><div class="ref-val pink">In progress</div></div>
     </div>
   </div>
 
 </div>
 
 <footer>
-  <strong>Batch Partner Engagement Specialist</strong> · Training Notes · Rick · Supervised by Cliff · Started April 27, 2026
+  <strong>Batch Partner Engagement Specialist</strong> &middot; Training Notes &middot; Rick &middot; Supervised by Cliff &middot; Started April 27, 2026
 </footer>
 
 </body>
