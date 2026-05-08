@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 9 — Scheduling, Luis Meeting & Partner Ops · Batch Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0F0C0C; --white: #F0F1F4; --sunset: #FF5F00; --ocean: #4F97FC;
+    --cosmo: #FF93D3; --lime: #00DF00; --gold: #FFCA00; --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF; --cosmo-tint: #FFE0F3; --lime-tint: #C8FFB0; --sunset-tint: #FFD9C0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Mulish', sans-serif; background: var(--white); color: var(--black); font-size: 14px; line-height: 1.6; }
+  .topnav { background: var(--black); padding: 14px 40px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--lime); }
+  .topnav a { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.15s; }
+  .topnav a:hover { color: var(--lime); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--lime); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+  .tab-nav { background: var(--black); padding: 0 40px; display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 46px; z-index: 99; }
+  .tab-btn { padding: 12px 18px; font-size: 12px; font-weight: 700; color: rgba(240,241,244,0.45); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.15s; font-family: 'Mulish', sans-serif; letter-spacing: 0.3px; }
+  .tab-btn:hover { color: rgba(240,241,244,0.8); }
+  .tab-btn.active { color: var(--lime); border-bottom-color: var(--lime); }
+  .hero { background: var(--black); padding: 52px 40px 44px; position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; right: -60px; top: -60px; width: 300px; height: 300px; border-radius: 50%; background: var(--lime); opacity: 0.07; }
+  .hero::before { content: ''; position: absolute; left: -60px; bottom: -60px; width: 220px; height: 220px; border-radius: 50%; background: var(--gold); opacity: 0.06; }
+  .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-badge { display: inline-block; background: var(--lime); color: var(--black); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; padding: 5px 14px; border-radius: 30px; margin-bottom: 16px; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 48px); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 10px; }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); margin-bottom: 24px; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(240,241,244,0.7); border: 1px solid rgba(255,255,255,0.1); }
+  .page-body { max-width: 900px; margin: 0 auto; padding: 36px 40px 80px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 3px solid; }
+  .sec-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .sec-head h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+  .card { background: #fff; border-radius: 14px; border: 1.5px solid rgba(15,12,12,0.09); padding: 20px 22px; margin-bottom: 14px; }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 13.5px; color: #555; line-height: 1.65; }
+  .card ul { padding-left: 18px; }
+  .card li { margin-bottom: 4px; }
+  .callout { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; border-left: 4px solid; }
+  .callout.gold { background: var(--gold-tint); border-color: var(--gold); }
+  .callout.blue { background: var(--ocean-tint); border-color: var(--ocean); }
+  .callout.pink { background: var(--cosmo-tint); border-color: var(--cosmo); }
+  .callout.green { background: var(--lime-tint); border-color: #00b800; }
+  .callout.orange { background: var(--sunset-tint); border-color: var(--sunset); }
+  .callout strong { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+  .callout p, .callout li { font-size: 13.5px; line-height: 1.6; }
+  .callout ul { padding-left: 16px; }
+  .callout li { margin-bottom: 3px; }
+  .ctable { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; border-radius: 12px; overflow: hidden; }
+  .ctable th { background: var(--black); color: var(--white); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .ctable td { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+  .ctable tr:last-child td { border-bottom: none; }
+  .ctable tr:nth-child(even) td { background: rgba(240,241,244,0.5); }
+  .steps { }
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--black); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-body { flex: 1; }
+  .step-body strong { font-size: 13.5px; display: block; margin-bottom: 2px; }
+  .step-body span { font-size: 12.5px; color: #666; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .tag.gold { background: var(--gold); color: var(--black); }
+  .tag.blue { background: var(--ocean); color: #fff; }
+  .tag.orange { background: var(--sunset); color: #fff; }
+  .tag.green { background: var(--lime); color: var(--black); }
+  .tag.pink { background: var(--cosmo); color: var(--black); }
+  .warning { background: #fff3e0; border: 2px solid var(--sunset); border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; }
+  .warning .w-title { font-weight: 800; color: var(--sunset); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .warning p, .warning li { font-size: 13px; line-height: 1.65; }
+  .warning ul { padding-left: 16px; }
+  .warning li { margin-bottom: 3px; }
+  .win-banner { background: var(--lime-tint); border: 2px solid #00b800; border-radius: 14px; padding: 18px 22px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; }
+  .win-banner .win-icon { font-size: 32px; flex-shrink: 0; }
+  .win-banner .win-body strong { font-size: 15px; font-weight: 800; display: block; margin-bottom: 4px; }
+  .win-banner .win-body p { font-size: 13px; color: #1a5c1a; }
+  .code-block { background: var(--black); border-radius: 12px; padding: 16px 18px; margin: 10px 0; }
+  .code-block .code-label { font-size: 11px; color: var(--lime); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px; font-family: 'Mulish', sans-serif; }
+  .code-block p { font-size: 13px; color: rgba(240,241,244,0.85); font-family: monospace; line-height: 1.9; }
+  .bottom-nav { border-top: 2px solid rgba(15,12,12,0.08); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 900px; margin: 0 auto; }
+  .bottom-nav a { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--black); text-decoration: none; padding: 10px 20px; border: 2px solid rgba(15,12,12,0.15); border-radius: 30px; transition: all 0.15s; }
+  .bottom-nav a:hover { background: var(--black); color: var(--lime); border-color: var(--black); }
+  .bottom-nav .disabled { opacity: 0.35; pointer-events: none; }
+  @media (max-width: 600px) {
+    .topnav, .tab-nav { padding-left: 20px; padding-right: 20px; }
+    .page-body { padding: 24px 20px 60px; }
+    .bottom-nav { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html">Training Hub</a>
+  <span class="sep">›</span>
+  <span class="current">Day 9 — Scheduling, Luis Meeting &amp; Partner Ops</span>
+</nav>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="show('kickoff', this)">Day Kickoff</button>
+  <button class="tab-btn" onclick="show('dulcy', this)">Dulcy Check-In</button>
+  <button class="tab-btn" onclick="show('scheduling', this)">Team Scheduling</button>
+  <button class="tab-btn" onclick="show('ops', this)">Team Ops &amp; HR</button>
+  <button class="tab-btn" onclick="show('luis', this)">Luis Meeting Outcomes</button>
+  <button class="tab-btn" onclick="show('airtable', this)">Airtable Updates</button>
+  <button class="tab-btn" onclick="show('disputes', this)">Customer Disputes</button>
+  <button class="tab-btn" onclick="show('partner', this)">Partner Case — Cabo Adventures</button>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Day 9 · May 7, 2026</div>
+    <h1>Scheduling, Luis Meeting<br>&amp; Partner Ops</h1>
+    <p class="hero-sub">Team schedule finalized, Dulcy check-in completed, two new teammates confirmed for Monday. Deep dive into the Luis meeting — calendar strategy, Airtable tracking gaps, bulk automation approach, and a live Cabo Adventures payment issue walkthrough.</p>
+    <div class="hero-chips">
+      <div class="chip">Parts 1–3 covered</div>
+      <div class="chip">New teammates confirmed Monday</div>
+      <div class="chip">Luis meeting completed</div>
+      <div class="chip">Cabo Adventures payment escalated</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- DAY KICKOFF -->
+  <div class="section visible" id="sec-kickoff">
+    <div class="sec-head" style="border-color: var(--lime);">
+      <div class="sec-dot" style="background: var(--lime);"></div>
+      <h2>Day 9 Kickoff</h2>
+    </div>
+
+    <div class="callout green">
+      <strong>Morning Focus</strong>
+      <p>The morning started with a quick triage of an incoming customer dispute for Daniel Conn — identified as a customer, not a partner — before moving into preparation for the Dulcy check-in meeting. After the check-in, a full meeting with Luis covered the team's system visibility requests, Airtable updates, calendar strategy, and the bookable partner roadmap. The afternoon included a live walkthrough of the Cabo Adventures payment issue.</p>
+    </div>
+
+    <div class="card">
+      <h3>Weekly Status Update Format</h3>
+      <p style="margin-bottom: 10px; font-size: 13.5px; color: #555;">Every weekly update to Dulcy, Josh, and Stefan should follow this structure. Keep it concise — executives want numbers and blockers, not narratives.</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Accomplishments</strong><span>What was completed this week — with specific numbers where possible (e.g. calls completed, views created, tools deployed)</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Priorities</strong><span>What the team is actively focused on right now — partner outreach, training, churn calls, onboarding</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Questions &amp; Blockers</strong><span>What you need answered or unblocked — hiring timeline, system access, approvals needed</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Team Updates</strong><span>Schedule changes, performance highlights, coverage notes, new teammate status</span></div></div>
+      </div>
+      <div class="callout blue" style="margin-top: 12px; margin-bottom: 0;">
+        <strong>Stefan's Feedback on Executive Updates</strong>
+        <p>When sending updates to leadership, ask Claude to make the message as concise as possible without losing key information. Executives have short attention spans for updates — lead with numbers and what needs to get unblocked. Everything else is context, not the lead.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>This Week's Accomplishments (Logged)</h3>
+      <ul>
+        <li>Stripe subscription phasing introduced — automated discounted pricing reversion, eliminating manual tracking</li>
+        <li>4 listing optimizer tools built and deployed (Experiences, Properties, Bars, Restaurants)</li>
+        <li>Live churn calls completed — multiple saves and losses logged in the Nail It Scale It tracker</li>
+        <li>First dispute counter-submission walkthrough completed with Cliff (Austin Salt Room)</li>
+        <li>Intercom full access granted — reports, FinAI agent, knowledge base, team inboxes</li>
+        <li>2 new Airtable NW views created (No Live Listing Tracker, Listing QA Tracking)</li>
+        <li>Transition schedule completed for the full team — day-off alignment finalized</li>
+        <li>Subscription Dispute Handling SOP added to knowledge base and training hub</li>
+        <li>Core engagement outreach at 23% complete (102 out of 434 partners)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DULCY CHECK-IN -->
+  <div class="section" id="sec-dulcy">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Dulcy Check-In — Key Outcomes</h2>
+    </div>
+
+    <div class="win-banner">
+      <div class="win-icon">🎉</div>
+      <div class="win-body">
+        <strong>Two New Teammates Confirmed for Monday</strong>
+        <p>Dulcy confirmed that credentials for the two new partner support teammates will be sent before Monday. Rick and Cliff are responsible for preparing the training plan and coverage schedule before they arrive. Eric Ingrasya (previous Batch experience) is one of the two — expect a faster ramp-up. Start building the onboarding plan this week.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Action Items from Dulcy Check-In</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Item</th><th>Owner</th><th>Status</th></tr>
+        <tr><td>Prepare training plan for the two incoming teammates</td><td>Rick + Cliff</td><td><span class="tag gold">Before Monday</span></td></tr>
+        <tr><td>Prepare coverage plan for when new teammates start</td><td>Rick</td><td><span class="tag gold">Before Monday</span></td></tr>
+        <tr><td>Replace Cliff with Rick on the NeoWork timesheet tracker</td><td>Jelly (NeoWork)</td><td><span class="tag blue">Pending — Cliff to coordinate</span></td></tr>
+        <tr><td>Rick to start receiving infraction notifications via NeoWork Slack bot</td><td>Jelly</td><td><span class="tag blue">Pending update</span></td></tr>
+        <tr><td>Two new hire NDA documents</td><td>Rick</td><td><span class="tag blue">Check personal email — sign and return</span></td></tr>
+        <tr><td>Kring's phone call agreement — salary add-on confirmed</td><td>Dulcy</td><td><span class="tag green">Done</span></td></tr>
+      </table>
+    </div>
+
+    <div class="callout blue">
+      <strong>New Teammate Training — What Cliff Did, What Rick Should Do</strong>
+      <p>Cliff's approach was one task per day, 6–7 PM daily, with a structured runthrough. Rick will take the primary trainer role. Use the same task-by-task method. Eric Ingrasya has prior Batch knowledge so his ramp-up will be faster. The second hire is new — budget more time for them. Have the training plan, tool access checklist, and first-week task schedule ready before Monday morning.</p>
+    </div>
+
+    <div class="card">
+      <h3>Optimizer Tools Update</h3>
+      <ul>
+        <li>Rick built 4 listing optimizer tools since starting last week: Experiences &amp; Activities, Properties &amp; Stays, Bars &amp; Nightlife, Restaurants</li>
+        <li>Stefan was notified via Slack — shared all 4 HTML files with a request to upload to Vercel to avoid token limitations</li>
+        <li>Also requested Stefan create a dispute builder tool for customers (separate from the existing partner-focused one)</li>
+        <li>Irvin's feedback on the accommodations optimizer was incorporated — the properties tool was built in direct response to his request</li>
+        <li>The tools are currently built on Puter.js — token usage is limited without a Vercel deployment</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TEAM SCHEDULING -->
+  <div class="section" id="sec-scheduling">
+    <div class="sec-head" style="border-color: var(--lime);">
+      <div class="sec-dot" style="background: var(--lime);"></div>
+      <h2>Team Schedule — Finalized</h2>
+    </div>
+
+    <div class="callout green">
+      <strong>Schedule Ownership Transferred to Rick</strong>
+      <p>Stefan gave full authority to Rick to manage the team schedule. All Rick needs to do is communicate changes to Stefan before implementing them. The transition schedule Cliff built is now complete — all day-off changes have been applied and the team is aligned going into next week.</p>
+    </div>
+
+    <div class="card">
+      <h3>Current Schedule Summary</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Teammate</th><th>Day Off</th><th>Primary Focus</th><th>Notes</th></tr>
+        <tr><td>Felix</td><td>Saturday &amp; Sunday</td><td>Intercom / Member Support</td><td>Earliest shift — handles overnight backlog. Fastest on Intercom. Round Robin balancing recommended.</td></tr>
+        <tr><td>Irvin</td><td>Thursday &amp; Friday</td><td>Partner comms, optimizations, order fulfillment</td><td>Weekend shift provides coverage when Felix is off. Keen eye for detail — reliable for solo work.</td></tr>
+        <tr><td>Kring</td><td>Saturday &amp; Sunday</td><td>Churn calls via phone, Intercom, coaching support</td><td>Schedule shifted 2 hours earlier to maximize phone call windows. Salary add-on confirmed for phone calls.</td></tr>
+        <tr><td>Rick</td><td>Saturday &amp; Sunday</td><td>Supervisor — churn/retention calls, reporting, team management</td><td>Monday–Friday required for Stefan/Luis communications. Do not change to Thursday–Friday until Kring can independently handle leadership comms.</td></tr>
+        <tr><td>2 incoming teammates</td><td>TBD</td><td>Partner support — outreach, QA, optimization, disputes</td><td>One will take a weekend-covering schedule (Irvin-style), one Monday–Friday (Felix-style). Confirm once they start.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Why This Schedule Was Built This Way</h3>
+      <ul>
+        <li><strong>Felix on Monday–Friday:</strong> Monday to Wednesday is the highest-volume period for Intercom. Felix is the fastest responder — keeping him on weekdays maximizes throughput when it matters most.</li>
+        <li><strong>Irvin on weekend coverage:</strong> Member support needs a consistent presence on weekends. Irvin's attention to detail makes him reliable for solo shifts. Felix's throughput speed is less critical on low-volume weekends.</li>
+        <li><strong>No split days off:</strong> With a small team, split days off leave gaps and make coverage planning complex. Consecutive days off are always preferred.</li>
+        <li><strong>No Monday–Wednesday days off:</strong> Heavy volume days — these must always be fully staffed.</li>
+        <li><strong>Kring shifted earlier:</strong> Moving her 2 hours earlier gives her more time in the call window for churn and retention calls, which are her primary added responsibility.</li>
+        <li><strong>Rick stays Monday–Friday:</strong> Someone needs to communicate with Stefan and Luis on weekdays. Once Kring or another teammate can own leadership communications, Rick's day off flexibility opens up.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Upcoming Specialized Role Structure (Once Fully Staffed)</h3>
+      <ul>
+        <li>The goal is each teammate having a <strong>primary task that takes 70–80% of their time</strong>, with cross-training as backup coverage</li>
+        <li><strong>Member Support Pod (Felix + Irvin):</strong> Intercom, order fulfillment, customer tickets — measured on volume, response time, CSAT</li>
+        <li><strong>Partner Support Pod (new teammates + Kring):</strong> Outreach, listing QA, optimization, disputes, churn calls</li>
+        <li><strong>Rick:</strong> Supervisor — reduced production, focused on team outcomes, reporting, and leadership communications</li>
+        <li>Off-peak season (August+): member support volume drops — Felix and Irvin shift toward partner support tasks temporarily</li>
+        <li>Luis also raised the idea of a dedicated bookings/fulfillment pod if the bookable partner volume increases significantly</li>
+      </ul>
+    </div>
+
+    <div class="callout gold">
+      <strong>How to Communicate Schedule Changes to the Team</strong>
+      <p>Cliff's approach: be fully transparent about the reasoning behind every scheduling decision. Tell teammates why they got the schedule they got, what constraints you were working with, and what will change in the future. This prevents side comments and office gossip — teammates who understand the decision-making process accept outcomes they may not prefer. The goal is to bring them into the decision, not just announce the result.</p>
+    </div>
+
+    <div class="card">
+      <h3>Coverage vs. Overtime — Know the Difference</h3>
+      <ul>
+        <li><strong>Coverage:</strong> A teammate volunteers or is assigned to cover another teammate's shift during their own working hours. Treated as regular hours — no premium pay. The covering teammate absorbs the work within their normal shift.</li>
+        <li><strong>Overtime:</strong> Batch explicitly asks the team to work beyond contracted hours. This triggers a rate premium (typically +20–30% per hour depending on the contract). Batch initiates this, not the team.</li>
+        <li><strong>Key rule:</strong> Always tag coverage properly in the roster so the record shows who covered what and when. Without this, coverage looks like extra hours and creates discrepancies in the NeoWork timesheet.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TEAM OPS & HR -->
+  <div class="section" id="sec-ops">
+    <div class="sec-head" style="border-color: var(--cosmo);">
+      <div class="sec-dot" style="background: var(--cosmo);"></div>
+      <h2>Team Ops &amp; HR</h2>
+    </div>
+
+    <div class="card">
+      <h3>Leave Request Process — Full Flow</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Teammate submits via the internal Batch leave form</strong><span>The form feeds directly into the roster/Daily Prod Tracker. It captures who is requesting leave and the coverage plan.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Coverage plan is arranged</strong><span>Kring (or Rick) confirms that proper coverage exists and there are no overlapping day-offs.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Notify Stefan (acknowledgement only)</strong><span>Send Stefan the leave details — who's off, who's covering, what dates. He doesn't need to approve it, just acknowledge it.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Submit separately to NeoWork's PTO form</strong><span>Only submit to NeoWork after Stefan's acknowledgement and after coverage is confirmed.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Rick approves the NeoWork submission</strong><span>Rick is now the approver in NeoWork. Kring can approve if Rick is unavailable.</span></div></div>
+      </div>
+      <div class="warning" style="margin-top: 12px; margin-bottom: 0;">
+        <div class="w-title">&#9888; Two-Week Rule — No Exceptions</div>
+        <p>All leave requests must be submitted at least <strong>two weeks before the intended leave date</strong>. Mental health days and non-emergency personal days must also follow this rule. If a teammate wants to use leave in 30 days, they need to submit now — and they cannot move it to tomorrow just because they changed their mind. Emergencies are handled case-by-case, but the standard is two weeks, always.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>NDA — What You Can and Cannot Disclose</h3>
+      <ul>
+        <li>You have signed an NDA that includes <strong>non-disclosure of salary</strong> — yours and all teammates'</li>
+        <li>You <strong>cannot ask teammates directly</strong> about their salary, even as their supervisor</li>
+        <li>You <strong>cannot disclose</strong> salary information to anyone, including informally or outside of work</li>
+        <li>As supervisor, you will have visibility into salary documents through Dulcy's process — but visibility does not equal permission to share</li>
+        <li>The salary appraisal process: Rick prepares the justification → submits to Dulcy → Dulcy sends to the People Team → People Team communicates directly with the teammate. Rick is not in the final conversation.</li>
+        <li>This structure exists to protect the team from the salary-comparison friction that can damage morale</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>NeoWork Academy — Required Completions</h3>
+      <ul>
+        <li>All teammates must complete all available NeoWork Academy courses that are not account-specific</li>
+        <li>Skip anything labeled with a specific client name (e.g., ShiftMed101) — those are not for your team</li>
+        <li>All courses must be completed <strong>before the 6-month performance review</strong> and again <strong>before the annual review with salary increase eligibility</strong></li>
+        <li>There are 7 AI training modules in the Academy covering tools like Lindy, Lovable, and others — these are required too</li>
+        <li>Per-quarter security check: reach out to Arjon Brioso at the start of each quarter. Send the security check form to teammates — ask them to complete it the same day. Confirm antivirus is active and updated, and that their computer meets current hardware requirements.</li>
+      </ul>
+    </div>
+
+    <div class="callout gold">
+      <strong>Hardware Standards — Know What to Flag</strong>
+      <p>When running the quarterly security check, flag any teammate using a computer older than roughly 5–6 years or one that cannot upgrade to Windows 11. These systems are too slow for multi-tool workflows and create security vulnerabilities. The workaround is not always possible — coordinate with Dulcy on NeoWork's laptop loan process if a teammate needs hardware support. Be specific about the issue (processor generation, RAM, OS version) when escalating.</p>
+    </div>
+
+    <div class="card">
+      <h3>Duplicate Calendar Bookings — How to Handle</h3>
+      <ul>
+        <li>If a partner books the same time slot multiple times (e.g., 3 back-to-back calls), send them an email asking which time they prefer</li>
+        <li>Once they confirm, delete the other two calendar entries</li>
+        <li>If they don't respond and you need to clear the calendar, use your judgment on which slot to keep — default to the earliest</li>
+        <li>Always send a confirmation email after resolving the duplicates so the partner knows what was kept</li>
+        <li>For partners who cancel via Intercom before a scheduled call — remove the calendar entry immediately and note it in the Airtable churn log</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- LUIS MEETING OUTCOMES -->
+  <div class="section" id="sec-luis">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>Luis Meeting — Key Outcomes</h2>
+    </div>
+
+    <div class="callout blue">
+      <strong>Meeting Summary</strong>
+      <p>The Luis meeting ran long and covered a lot of ground. The key shift in Luis's thinking: instead of tracking tasks individually one-by-one, he prefers a bulk project approach — generate data for all partners at once, review it as a batch, and automate the sending rather than handling partners individually. Luis will sync with Stefan on the granular tracking discussion. A follow-up meeting is scheduled for Monday.</p>
+    </div>
+
+    <div class="card">
+      <h3>What Was Resolved in the Meeting</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Item</th><th>Outcome</th></tr>
+        <tr><td>Post-live QA done — timestamp added</td><td>Luis added a "Done Date" field to the post-live QA checkbox. It records the last time the box was checked. <span class="tag green">Done</span></td></tr>
+        <tr><td>Past due calls — owner field added</td><td>Luis added a "Past Due Owner" field to the vendor directory. Use "Subscription Status Last Updated" as the completion timestamp. <span class="tag green">Done</span></td></tr>
+        <tr><td>UGC collection tool usage tracking</td><td>A QR code request table exists in the marketing platform Airtable base. Filter by Status (Requested / Shipped / Delivered) to see which partners have used it. Both Rick and Cliff were given access. <span class="tag green">Done</span></td></tr>
+        <tr><td>Churn intents from portal — now visible in vendor directory</td><td>Luis connected portal churn intents to the vendor directory. When a partner enters the churn flow, it now creates a record here — including date and how many times they've initiated it. <span class="tag green">Done</span></td></tr>
+        <tr><td>Disputes tracking in Airtable</td><td>Luis added this to his to-do list. <span class="tag gold">Pending — next week</span></td></tr>
+        <tr><td>Granular per-task tracking (ownership + timestamp per task type)</td><td>Luis is discussing with Stefan first. His preference is bulk-project approach over granular one-by-one tracking. <span class="tag gold">Pending Stefan sync</span></td></tr>
+        <tr><td>No Live Listing view — filter improvement</td><td>Add filter: "First Experience Published Date is empty" to distinguish truly new partners from re-onboarding ones. Also add "Subscription Status = Active" filter to focus only on paying partners. <span class="tag blue">Rick to implement</span></td></tr>
+        <tr><td>New Google Calendar account for clean calendar management</td><td>Luis will create a new Google account and share it. The existing account has hundreds of outdated calendars — start fresh rather than clean up the old one. <span class="tag gold">Luis creating — standby</span></td></tr>
+      </table>
+    </div>
+
+    <div class="callout green">
+      <strong>Luis's Bulk Automation Approach — Partner Profile Page</strong>
+      <p>Luis showed a working Airtable automation that scrapes partner websites and auto-fills their profile data: Facebook, Instagram, TikTok, company logo, and an about section. For the 1,500+ partner backlog, the plan is: run the automation for all partners, have one teammate review the output over 2 days for accuracy, then ask the dev team to bulk-upload the confirmed data to the portal. One bulk operation rather than copy-pasting one by one. After that, a single automated email goes out to all partners notifying them of their updated profile.</p>
+    </div>
+
+    <div class="card">
+      <h3>How to Use the Profile Auto-Fill Automation</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Go to the vendor directory → make hidden profile fields visible</strong><span>Search for fields starting with "profile" — these are connected directly from the portal. Fields labeled "auto" are the ones the AI populated.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Tick the checkbox on a partner row to trigger the automation</strong><span>The automation visits their website and pulls: logo URL, about section, social links (Facebook, Instagram, TikTok)</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Review the output carefully</strong><span>If the website field is empty, don't trust the pulled data. Compare the "auto" fields with the "profile" fields — if the partner already has an about section, don't overwrite it.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Export confirmed data as CSV and request bulk upload from dev team</strong><span>For the 1,500-partner backlog, this is far more efficient than updating the portal one by one</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Trigger the automated partner notification email</strong><span>Once bulk-uploaded, a single automated email notifies all affected partners that their profile was updated. No manual emailing required.</span></div></div>
+      </div>
+    </div>
+
+    <div class="callout orange">
+      <strong>Important: Airtable Does Not Write Back to the Portal</strong>
+      <p>Data flows <strong>one way only</strong> — from the portal into Airtable. Nothing you update in Airtable will update the portal. This applies to all fields: booking status, listing details, partner profile data, everything. Always make changes in the <strong>admin portal</strong>, not in Airtable. Airtable is a read/reporting layer, not an editing tool for live data.</p>
+    </div>
+
+    <div class="card">
+      <h3>Bookable Partner Strategy — Current Reality</h3>
+      <ul>
+        <li>The original plan was 100% bookable partners by end of year — this plan has been quietly stepped back</li>
+        <li>An email went to ~300 partners asking them to switch to bookable by end of June. Only about 20 replied positively — not a successful push.</li>
+        <li>The new direction is likely a "lead connector" model — Batch sends the customer inquiry to the partner instead of taking the booking directly. Exact mechanics still being defined.</li>
+        <li>This is good news for workload: 100% bookable would have required 2 full-time people just doing calendar management and order fulfillment</li>
+        <li>If bookable volume does increase gradually, Luis and Stefan's vision is specialized pods — one pod for fulfillment/calendars, one for partner engagement/calls</li>
+        <li>Rick should monitor the trend and flag to Stefan when a capacity plan adjustment is needed — don't wait until it becomes a problem</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Calendar Management — Luis's Recommendations</h3>
+      <ul>
+        <li>Priority calendars to update: those that have had bookings canceled due to unavailability — fix those first</li>
+        <li>For partners with 8+ booking options, check their booking data. If only 2 options actually get used, delete the other 6 — this cuts calendar update time to 20% of what it was</li>
+        <li>A dev is working on smarter availability flagging — if a listing has no availability for any of a given month, it gets flagged automatically</li>
+        <li>Long-term option: get the partner's calendar link (ICS file) and use Zapier to auto-sync their availability into Airtable. No manual calendar updates needed.</li>
+        <li>New Google Calendar account: Luis will create a clean one. Move only active calendars there and leave the hundreds of outdated ones behind.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Meeting Strategy — What to Adjust for Luis</h3>
+      <ul>
+        <li>Luis has a threshold of about 35 minutes before his engagement starts to drop. Keep future meetings to 30 minutes max.</li>
+        <li>Lead with the <strong>items that need an immediate action from him</strong> — fields to add, views to create, access to grant. Put those first while he's fresh.</li>
+        <li>Strategic or system-design discussions (how to track, what to automate) go at the end or in a separate meeting</li>
+        <li>Prepare the Airtable view links and screenshots in advance — don't search for them during the meeting</li>
+        <li>When Luis proposes a bulk approach instead of granular tracking, find the bridge: agree on the bulk project for the backlog, but still push for timestamp fields so new items are tracked granularly going forward</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- AIRTABLE UPDATES -->
+  <div class="section" id="sec-airtable">
+    <div class="sec-head" style="border-color: var(--lime);">
+      <div class="sec-dot" style="background: var(--lime);"></div>
+      <h2>Airtable Updates from Today</h2>
+    </div>
+
+    <div class="card">
+      <h3>New Fields Added by Luis Today</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Field</th><th>Table</th><th>What It Does</th></tr>
+        <tr><td>Post-live QA Done Date</td><td>Experiences</td><td>Records the timestamp when the post-live QA checkbox was last ticked. Use this for productivity tracking.</td></tr>
+        <tr><td>Past Due Owner</td><td>Vendor Directory</td><td>Dropdown to assign who is handling a past due account. Use "Subscription Status Last Updated" as the completion date.</td></tr>
+        <tr><td>Churn Intents (from portal)</td><td>Vendor Directory — new tab</td><td>Auto-populated from the partner portal whenever a partner enters the churn flow. Shows date and how many times they've initiated the process.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Updated NW No Live Listing Tracker — Better Filters</h3>
+      <p style="margin-bottom: 10px; font-size: 13.5px; color: #555;">Add these two filters to significantly improve the accuracy of this view:</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Filter: First Experience Published Date is empty</strong><span>This identifies truly new partners who have never had a live listing — vs. re-onboarding partners whose counter didn't reset</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Filter: Subscription Status = Active</strong><span>Only show paying partners. Non-active partners are not the team's priority.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Sort by: Subscription Status Last Updated (oldest first)</strong><span>Partners who have been paying the longest without a live listing are the highest risk for disputes and refund requests</span></div></div>
+      </div>
+      <div class="callout orange" style="margin-top: 12px; margin-bottom: 0;">
+        <strong>Hold — Do Not Contact These Partners Yet</strong>
+        <p>Luis flagged that Shauna and Beth are already working on this quietly — getting listings live without telling partners they were ever unlisted. Contacting partners proactively about having no live listing could create refund requests and disputes. Wait for Stefan's direction before reaching out to anyone on this list. When in doubt, send Stefan a message with Luis and Shauna/Beth CC'd to align.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Cross-Team Request Form — What's Still Needed</h3>
+      <p style="margin-bottom: 10px; font-size: 13.5px; color: #555;">The current form has several gaps for accurate productivity tracking. These are still pending with Luis:</p>
+      <ul>
+        <li>Multi-select task type dropdown — currently one task per request, which makes counting individual task volumes impossible</li>
+        <li>Listing-level vs. partner-level distinction — some tasks (listing optimization, QA, city demand data) apply per listing; others (blog post, UGC, partner page) apply per partner</li>
+        <li>Completion timestamp per task type — each task type needs its own checkbox + timestamp so productivity is trackable at the task level, not just the request level</li>
+        <li>Rick's name still missing from the agent dropdown — Cliff to follow up with Eric and Gracia</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Productivity Tracking — Where Things Stand</h3>
+      <ul>
+        <li>Luis's position: he prefers bulk project approaches over granular per-task tracking. He will discuss with Stefan whether the team's need for granular data aligns with Stefan's reporting expectations.</li>
+        <li>Rick's position (correct): Stefan specifically asked for granular task-level data to validate capacity and headcount. Without per-task timestamps, the team cannot prove to Stefan how much work is actually being done.</li>
+        <li>The gap: a single Airtable request that covers 5–7 sub-tasks gets counted as one unit of work, making the team's output look far smaller than it actually is</li>
+        <li>What to prepare for the Monday meeting: a list of specific task types, expected time per task, and what field/automation would be needed to track them. Make the ask concrete and minimal — don't ask for a full new system, just specific fields.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CUSTOMER DISPUTES -->
+  <div class="section" id="sec-disputes">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Customer Disputes — Key Differences from Partner Disputes</h2>
+    </div>
+
+    <div class="callout orange">
+      <strong>Today's Case — Daniel Conn ($654 Dispute)</strong>
+      <p>A dispute was filed for $654 — marked as "fraudulent." Investigation confirmed this is a customer (not a partner), who booked a Private Hibachi Chef Experience for an August 8 event date. The customer went through the full booking process themselves, adding their card details and confirming the booking. The dispute reason of "fraudulent" is inconsistent with having placed the booking themselves. This is most likely a case of buyer's remorse or a desire to cancel, not fraud.</p>
+    </div>
+
+    <div class="card">
+      <h3>How to Find if a Dispute Is from a Customer vs. a Partner</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Copy the email from the Stripe dispute</strong><span>The email address is always shown in the dispute details</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Search in Airtable (vendor directory) first</strong><span>If they appear as a partner record, it's a partner dispute. If nothing shows up, it's likely a customer.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Check in Old BAT — Users section</strong><span>Paste the email into Old BAT → Users → All Users. If they appear there with party/booking history, they're a customer.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Click through to their booking details</strong><span>Find the specific order, confirm the charge amount, check the event date, and review the price breakdown including commission</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Check if they have a future-dated booking</strong><span>If the event hasn't happened yet, a refund may be appropriate — subject to the cancellation policy (7-day notice for full refund)</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Handling a Customer Dispute — Process</h3>
+      <table class="ctable" style="margin: 8px 0 0;">
+        <tr><th>Scenario</th><th>Action</th></tr>
+        <tr><td>Customer claims fraud but clearly placed the booking themselves</td><td>Counter the dispute. The booking process itself is evidence of authorization (card entry, event selection, confirmation). Call the customer, explain the process, offer to cancel through proper channels.</td></tr>
+        <tr><td>Customer wants to cancel a future-dated booking</td><td>If within the 7-day cancellation window, offer a full refund and ask them to withdraw the dispute. Process the refund through the proper channel, not through the dispute.</td></tr>
+        <tr><td>Customer is past the cancellation window but the event is in the future</td><td>Offer partial refund or credit per policy. Ask them to contact their bank to withdraw the dispute first before processing anything.</td></tr>
+        <tr><td>Customer was genuinely charged in error</td><td>Accept the dispute. Do not counter when the evidence clearly supports the customer's claim.</td></tr>
+      </table>
+    </div>
+
+    <div class="callout blue">
+      <strong>Daniel Conn — Recommended Next Steps</strong>
+      <p>Call the customer once. Explain that the booking was placed through the platform by them and that "fraud" is not the appropriate dispute reason for a voluntary booking. Offer to cancel through the proper process — if within the cancellation window, a full refund is available. Encourage them to withdraw the dispute and let the team process the refund correctly. If they decline or are unreachable, counter the dispute with the booking authorization evidence.</p>
+    </div>
+
+    <div class="card">
+      <h3>Customer Dispute Escalation — Flag Repeat Disputers</h3>
+      <ul>
+        <li>If a customer has a pattern of filing disputes after completing bookings, flag it to Stefan</li>
+        <li>Stefan should decide whether to block the customer account from future bookings</li>
+        <li>Document the pattern: date of dispute, booking details, dispute reason, outcome</li>
+        <li>A dispute builder tool for customers (separate from the existing partner dispute tool) has been requested from Stefan — this will streamline the process once built</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PARTNER CASE — CABO ADVENTURES -->
+  <div class="section" id="sec-partner">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Partner Case — Cabo Adventures</h2>
+    </div>
+
+    <div class="callout orange">
+      <strong>The Issue</strong>
+      <p>Cabo Adventures has 9 confirmed bookings in April totaling approximately $1,490 — but investigation of their Stripe Connect account shows zero transfers. The partner is requesting cancellation because they haven't been paid. This is a legitimate and serious complaint. The payment system is not transferring to their Stripe account despite bookings being confirmed and charged to customers.</p>
+    </div>
+
+    <div class="card">
+      <h3>How to Investigate a Partner Payment Issue</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Find the partner in the vendor directory</strong><span>Confirm their booking method (email, bookable, batch direct). Cabo Adventures: email partner — Batch collects from customers, then transfers to partner via Stripe Connect.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Check their orders in Old BAT</strong><span>Click through each booking — verify status (confirmed), booking date, and transfer amounts shown in the order details</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Find their Stripe Connect ID in Admin</strong><span>Open their listing in Admin → find the Stripe Connect account ID. This is the payout account that should be receiving transfers.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Open that Stripe Connect account and check transfers</strong><span>Go to Stripe → open the connected account → check Payouts and Transfers. If there are no transfers despite confirmed bookings, there is a system issue that needs escalating.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Escalate to MX Internal (Slack)</strong><span>Tag John and Luis. Provide: partner name, Stripe Connect ID, booking dates, amounts owed, and screenshot showing zero transfers. Ask them to investigate and ensure the partner is paid.</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Update the partner via Intercom</strong><span>Let them know the issue has been identified and escalated to the tech team. Apologize for the inconvenience, confirm you are working to resolve it, and give them a realistic timeline. If they still want to cancel, proceed — but handle the payment issue first.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Email Partners — How Payment Works</h3>
+      <ul>
+        <li>Email partners = customer pays Batch directly → Batch takes a commission (currently ~10%) → Batch transfers the remainder to the partner via Stripe Connect</li>
+        <li>The partner must have a Stripe Connect account set up and connected in Admin for transfers to work</li>
+        <li>If a partner has no Stripe Connect ID linked, transfers will not happen — this is a setup gap that needs fixing</li>
+        <li>Always verify that the Stripe Connect account is properly linked when doing listing QA for email or bookable partners</li>
+        <li>Commission was previously ~25%, now ~10% — this affects the business case for heavy manual fulfillment work per partner</li>
+      </ul>
+    </div>
+
+    <div class="callout gold">
+      <strong>Retention Offer for Cabo Adventures</strong>
+      <p>Once the payment issue is resolved and funds are transferred, Cabo Adventures is actually a strong-signal partner — 9 confirmed bookings in a single month shows real traction. When following up after the payment fix, do a listing QA check. If no blog post exists, offer to create one. If they're still frustrated, a 25% courtesy discount on their next month's subscription is reasonable given the payment inconvenience. The goal is to turn a legitimate complaint into a loyalty moment.</p>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">&#9888; Email Partner Without Stripe Connect = Payment Risk</div>
+      <p>Any email partner who does not have a Stripe Connect account properly linked in Admin will not receive their booking payouts. This is a silent failure — the system records the booking and charges the customer, but the transfer never happens. Add a Stripe Connect verification step to your listing QA checklist for all email and bookable partners. If it's missing, flag it to the dev team before the partner starts receiving bookings.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <a href="day8.html">← Day 8</a>
+  <a href="index.html">Training Hub</a>
+  <a href="#" class="disabled">Day 10 — Coming Soon →</a>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('visible');
+  btn.classList.add('active');
+  window.scrollTo({ top: document.querySelector('.page-body').offsetTop - 100, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
