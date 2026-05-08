@@ -64,6 +64,25 @@
   .ref-item .ref-val.orange{color:var(--sunset);}
   footer{border-top:1px solid rgba(15,12,12,0.08);padding:28px 48px;text-align:center;font-size:12px;color:rgba(15,12,12,0.35);}
   footer strong{color:rgba(15,12,12,0.6);}
+
+  .search-wrap{max-width:900px;margin:0 auto;padding:0 48px 24px;position:relative;}
+  .search-box{position:relative;}
+  .search-box input{width:100%;padding:11px 44px 11px 18px;border-radius:30px;border:1.5px solid rgba(240,241,244,0.12);background:rgba(255,255,255,0.07);color:var(--white);font-family:'Mulish',sans-serif;font-size:13px;font-weight:600;outline:none;transition:border-color 0.15s,background 0.15s;}
+  .search-box input::placeholder{color:rgba(240,241,244,0.35);}
+  .search-box input:focus{border-color:var(--gold);background:rgba(255,255,255,0.1);}
+  .search-icon{position:absolute;right:15px;top:50%;transform:translateY(-50%);font-size:14px;opacity:0.4;pointer-events:none;}
+  .search-results{position:absolute;top:calc(100% + 8px);left:0;right:0;background:#1c1919;border:1.5px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;z-index:300;box-shadow:0 16px 48px rgba(0,0,0,0.5);max-height:360px;overflow-y:auto;display:none;}
+  .search-results.visible{display:block;}
+  .sri{display:flex;align-items:flex-start;gap:12px;padding:11px 16px;cursor:pointer;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.1s;}
+  .sri:last-child{border-bottom:none;}
+  .sri:hover{background:rgba(255,255,255,0.07);}
+  .sri-badge{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:3px 9px;border-radius:10px;white-space:nowrap;flex-shrink:0;margin-top:3px;}
+  .sri-badge.day{background:var(--ocean);color:#fff;}
+  .sri-badge.tool{background:var(--lime);color:var(--black);}
+  .sri-body{flex:1;min-width:0;}
+  .sri-title{font-size:13px;font-weight:700;color:var(--white);line-height:1.3;margin-bottom:2px;}
+  .sri-sub{font-size:11.5px;color:rgba(240,241,244,0.4);line-height:1.4;}
+  .sri-none{padding:18px 16px;font-size:13px;color:rgba(240,241,244,0.35);text-align:center;}
   @media(max-width:600px){.hero{padding:40px 24px 36px;}.progress-bar{padding:16px 24px;}.main{padding:36px 24px 60px;}.quick-ref{padding:24px;}footer{padding:24px;}}
 </style>
 </head>
@@ -87,6 +106,14 @@
     <span class="progress-label">Progress</span>
     <div class="progress-track"><div class="progress-fill"></div></div>
     <span class="progress-count">9 / 10 days</span>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <div class="search-box" id="searchBox">
+    <input type="text" id="searchInput" placeholder="Search topics, terms, tools… (e.g. churn, Stripe, disputes)" autocomplete="off" />
+    <span class="search-icon">🔍</span>
+    <div class="search-results" id="searchResults"></div>
   </div>
 </div>
 
@@ -280,6 +307,117 @@
 <footer>
   <strong>Batch Partner Engagement Specialist</strong> &middot; Training Notes &middot; Rick &middot; Supervised by Cliff &middot; Started April 27, 2026
 </footer>
+
+
+
+
+<script>
+var SEARCH_INDEX = [
+  {file:"day1.html",type:"day",day:"Day 1",title:"Platform Overview",sub:"What Batch is, how it works, bachelorette focus, 30+ cities",keywords:"batch platform overview bachelorette party planners cities customers"},
+  {file:"day1.html",type:"day",day:"Day 1",title:"Partners and Roles",sub:"Partner vs customer, vendor directory, booking methods",keywords:"partners roles vendor directory customer booking methods listing types"},
+  {file:"day1.html",type:"day",day:"Day 1",title:"Subscription Tiers",sub:"Basic, Core, Boost, Party Pro tiers and pricing",keywords:"subscription tiers basic core boost party pro pricing 99 150 300"},
+  {file:"day1.html",type:"day",day:"Day 1",title:"Listing Models",sub:"Batch direct, external URL, email partner, bookable",keywords:"listing models batch direct external url email bookable web"},
+  {file:"day1.html",type:"day",day:"Day 1",title:"Tools and Systems",sub:"Intercom, HubSpot, Airtable, Aircall, Stripe, admin portal",keywords:"tools systems intercom hubspot airtable aircall stripe admin portal"},
+  {file:"day1.html",type:"day",day:"Day 1",title:"Team Structure",sub:"NeoWork, Batch, supervisor roles, Felix Irvin Kring",keywords:"team structure neowork cliff rick felix irvin kring angel stefan dulcy luis"},
+  {file:"day2.html",type:"day",day:"Day 2",title:"5 Booking Methods",sub:"Batch direct, external URL, email, bookable, web",keywords:"5 booking methods batch direct external url email bookable web partner"},
+  {file:"day2.html",type:"day",day:"Day 2",title:"Listing Health",sub:"Signal strength, itinerary adds, impressions, clicks, favorites",keywords:"listing health signal strength itinerary adds impressions clicks favorites weak medium strong"},
+  {file:"day2.html",type:"day",day:"Day 2",title:"CoStar SEO Tool",sub:"Batchification, keyword research, listing optimization",keywords:"costar seo tool batchification keyword research listing optimization title description tags"},
+  {file:"day2.html",type:"day",day:"Day 2",title:"Retention Levers",sub:"4 retention levers, monthly switch, discount, optimization",keywords:"retention levers 4 levels monthly switch discount optimization city demand"},
+  {file:"day2.html",type:"day",day:"Day 2",title:"HubSpot and Comms",sub:"HubSpot navigation, meeting scheduler, round robin",keywords:"hubspot navigation meeting scheduler round robin calendar churn save link portal"},
+  {file:"day2.html",type:"day",day:"Day 2",title:"Airtable and Tasks",sub:"Airtable bases, red vs blue, requests tab, listing QA",keywords:"airtable tasks requests tab listing qa tracking red blue base vendor directory"},
+  {file:"day3.html",type:"day",day:"Day 3",title:"Churn Case Study",sub:"Real churn case walkthrough, signals, retention attempt, outcome",keywords:"churn case study signals retention attempt outcome partner cancellation"},
+  {file:"day3.html",type:"day",day:"Day 3",title:"Intercom Deep Dive",sub:"Conversation management, notes, status, macros, team inbox",keywords:"intercom conversation notes status macros team inbox cx team assigned replied"},
+  {file:"day3.html",type:"day",day:"Day 3",title:"Proactive Outreach",sub:"430 partner backlog, Core engagement Google Sheet, workflow",keywords:"proactive outreach 430 backlog core engagement google sheet workflow 2 emails"},
+  {file:"day3.html",type:"day",day:"Day 3",title:"Updated Retention Policy",sub:"No more free month, 3-month discount via Stripe phases",keywords:"retention policy no free month 3 month discount stripe phases offer hierarchy"},
+  {file:"day4.html",type:"day",day:"Day 4",title:"Listing QA",sub:"QA standards, photo requirements, tags, booking link checklist",keywords:"listing qa standards photos 5 photos 1 video tags booking link post-live checklist"},
+  {file:"day4.html",type:"day",day:"Day 4",title:"Supervisor Role",sub:"Supervisory responsibilities, coaching, performance management",keywords:"supervisor role responsibilities coaching performance management scorecard"},
+  {file:"day4.html",type:"day",day:"Day 4",title:"Call Framework",sub:"Churn call opening, acknowledgment, pivot, retention levers, close",keywords:"call framework opening acknowledgment pivot retention levers close script"},
+  {file:"day4.html",type:"day",day:"Day 4",title:"Cancellation Process",sub:"Stripe cancellation steps, end of billing period, Intercom confirmation",keywords:"cancellation process stripe end of billing period intercom confirmation screenshot"},
+  {file:"day5.html",type:"day",day:"Day 5",title:"After-Call Workflow",sub:"Post-call Airtable logging, Aircall tags, Intercom notes",keywords:"after-call workflow airtable logging aircall tags intercom notes churn log update"},
+  {file:"day5.html",type:"day",day:"Day 5",title:"Stripe Billing",sub:"Subscription management, price reversion, promo expiry, void invoice",keywords:"stripe billing subscription price reversion promo expiry void invoice past due"},
+  {file:"day5.html",type:"day",day:"Day 5",title:"Dispute Management",sub:"Partner disputes, chargeback, evidence, counter submission",keywords:"dispute management chargeback evidence counter submission accept reject partner"},
+  {file:"day5.html",type:"day",day:"Day 5",title:"Partner Policies",sub:"Batch cancellation policy, no-refund, 14-day notice window",keywords:"partner policies batch cancellation no-refund 14-day notice window terms conditions"},
+  {file:"day5.html",type:"day",day:"Day 5",title:"Case Studies",sub:"3 live call case studies from Week 1",keywords:"case studies live calls week 1 wins losses follow-ups churn save loss delayed"},
+  {file:"day6.html",type:"day",day:"Day 6",title:"First Live Calls",sub:"La Vida Luxury and Bluebill Charters - first solo calls",keywords:"first live calls la vida luxury bluebill charters save loss solo call 99"},
+  {file:"day6.html",type:"day",day:"Day 6",title:"Call Notes and Logging",sub:"Aircall tagging, Intercom note format, conversation status",keywords:"call notes logging aircall tagging intercom note format turn result signal type outcome"},
+  {file:"day6.html",type:"day",day:"Day 6",title:"April MBR Insights",sub:"Monthly business review with Stefan, metrics, capacity math",keywords:"april mbr monthly business review stefan metrics capacity math action items cx score csat"},
+  {file:"day6.html",type:"day",day:"Day 6",title:"Calendar and HubSpot Setup",sub:"Google Calendar blocks, HubSpot availability, round robin",keywords:"calendar hubspot setup google calendar blocks availability round robin time zone central"},
+  {file:"day6.html",type:"day",day:"Day 6",title:"Churn Log and Tracker",sub:"Nail It Scale It tracker, May retention tab, Stefan template",keywords:"churn log tracker nail it scale it may retention tab stefan template turn result"},
+  {file:"day6.html",type:"day",day:"Day 6",title:"Cliff Handoff",sub:"Transition plan, handoff status, team dynamics, new hire timeline",keywords:"cliff handoff transition plan team dynamics felix irvin kring angel eric new hire"},
+  {file:"day7.html",type:"day",day:"Day 7",title:"Airtable Views",sub:"NW view naming, No Live Listing Tracker, Listing QA Tracking",keywords:"airtable views nw naming no live listing tracker listing qa tracking collaborative"},
+  {file:"day7.html",type:"day",day:"Day 7",title:"Stripe Phased Pricing",sub:"Automated 3-month discount phases, classic editor, price reversion",keywords:"stripe phased pricing 3 month discount classic editor price reversion automatic phases"},
+  {file:"day7.html",type:"day",day:"Day 7",title:"Past Due Calls",sub:"Past due outbound calls, voicemail flow, void invoice",keywords:"past due calls outbound voicemail flow void invoice mother tracker oasis five aces"},
+  {file:"day7.html",type:"day",day:"Day 7",title:"Partner Calendars",sub:"Static vs dynamic calendars, how to find and edit in BAT",keywords:"partner calendars static dynamic bat booking availability tracking"},
+  {file:"day7.html",type:"day",day:"Day 7",title:"Dispute Handling SOP",sub:"Full 8-step dispute process, urgency levels, TAT reference",keywords:"dispute handling sop 8 steps urgency critical high moderate standard tat visa mastercard amex deadline"},
+  {file:"day8.html",type:"day",day:"Day 8",title:"Past Due Workflow",sub:"One-call rule, decision guide, case outcomes",keywords:"past due workflow one call rule voicemail email oasis south florida mother tracker"},
+  {file:"day8.html",type:"day",day:"Day 8",title:"Dispute Walkthrough",sub:"Austin Salt Room - evidence package, Stripe submission steps",keywords:"dispute walkthrough austin salt room evidence package tnc acceptance timestamp service documentation exhibits response letter claude"},
+  {file:"day8.html",type:"day",day:"Day 8",title:"Boost and Party Pro",sub:"Aislin escalation rules, Surf and Pontoons case, Slack template",keywords:"boost party pro aislin rachel escalation rules surf pontoons slack template batch-partner-support"},
+  {file:"day8.html",type:"day",day:"Day 8",title:"Intercom Deep Dive",sub:"FinAI agent, knowledge base, snippets, CX team inbox, permissions",keywords:"intercom finai agent knowledge base snippets macros cx team inbox permissions articles"},
+  {file:"day8.html",type:"day",day:"Day 8",title:"Reporting and Metrics",sub:"5 MBR metrics, drill-in feature, CX score filter, attendance",keywords:"reporting metrics mbr cx score csat teammate performance drill-in attendance neowork airtable"},
+  {file:"day8.html",type:"day",day:"Day 8",title:"Productivity Tracking",sub:"SLA handling times, task benchmarks, documents from Cliff",keywords:"productivity tracking sla handling times task benchmarks capacity documents cliff"},
+  {file:"day8.html",type:"day",day:"Day 8",title:"Team Ops and Scorecard",sub:"Team structure, scorecard dimensions, top performer incentive",keywords:"team ops scorecard dimensions quality cx score efficiency productivity attendance top performer incentive"},
+  {file:"day9.html",type:"day",day:"Day 9",title:"Dulcy Check-In",sub:"Two new teammates confirmed Monday, optimizer tools, NDA",keywords:"dulcy check-in new teammates monday optimizer tools nda neowork eric ingrasya"},
+  {file:"day9.html",type:"day",day:"Day 9",title:"Team Scheduling",sub:"Finalized schedule for all teammates, coverage vs overtime",keywords:"team scheduling felix irvin kring rick day off coverage overtime monday wednesday volume"},
+  {file:"day9.html",type:"day",day:"Day 9",title:"Team Ops and HR",sub:"Leave request flow, NDA salary rules, NeoWork Academy",keywords:"team ops hr leave request 2 weeks nda salary neowork academy security check hardware"},
+  {file:"day9.html",type:"day",day:"Day 9",title:"Luis Meeting Outcomes",sub:"Airtable fields added, bulk automation, calendar strategy",keywords:"luis meeting airtable fields bulk automation profile auto-fill calendar strategy bookable partners"},
+  {file:"day9.html",type:"day",day:"Day 9",title:"Airtable Updates",sub:"QA timestamp, past due owner, churn intents, portal data flow",keywords:"airtable updates qa timestamp past due owner churn intents no live listing portal data flow one way"},
+  {file:"day9.html",type:"day",day:"Day 9",title:"Customer Disputes",sub:"Daniel Conn case - customer vs partner dispute identification",keywords:"customer disputes daniel conn fraudulent booking customer vs partner identification"},
+  {file:"day9.html",type:"day",day:"Day 9",title:"Cabo Adventures Payment Issue",sub:"Payment investigation, Stripe Connect, MX Internal escalation",keywords:"cabo adventures payment issue stripe connect mx internal escalation email partner payout transfer"},
+  {file:"listing-optimizer.html",type:"tool",day:"Tool",title:"Listing Optimizer - Experiences and Activities",sub:"Auto-generate SEO keywords, title, description, partner email",keywords:"listing optimizer experiences activities seo keywords title description partner email costar batchify"},
+  {file:"batch-property-optimizer.html",type:"tool",day:"Tool",title:"Listing Optimizer - Properties and Stays",sub:"SEO optimizer for property and accommodation listings",keywords:"listing optimizer properties stays accommodations hotel seo keywords title description"},
+  {file:"batch-bar-optimizer.html",type:"tool",day:"Tool",title:"Listing Optimizer - Bars and Nightlife",sub:"SEO optimizer for bar and nightlife venue listings",keywords:"listing optimizer bars nightlife venue seo keywords title description bachelorette"},
+  {file:"batch-restaurant-optimizer.html",type:"tool",day:"Tool",title:"Listing Optimizer - Restaurants",sub:"SEO optimizer for restaurant and dining listings",keywords:"listing optimizer restaurants dining seo keywords title description"},
+  {file:"neowork-listing-qa.html",type:"tool",day:"Tool",title:"NeoWork Listing QA",sub:"Full QA checklist for Basic and Core listings, email generator",keywords:"neowork listing qa checklist basic core category reference email generator routing guide"},
+  {file:"batch_churn_tool.html",type:"tool",day:"Tool",title:"Churn Call Script Tool",sub:"Step-by-step churn call guide, retention levers, close or cancel",keywords:"churn call script tool opening acknowledgment retention levers close cancel save loss"},
+  {file:"partner-update-email-generator.html",type:"tool",day:"Tool",title:"Partner Update Email Generator",sub:"Fill in metrics and optimizations, get a ready-to-send email",keywords:"partner update email generator metrics optimizations ready to send"}
+];
+
+function doSearch() {
+  var q = document.getElementById("searchInput").value.trim().toLowerCase();
+  var box = document.getElementById("searchResults");
+  box.innerHTML = "";
+  if (q.length < 2) { box.style.display = "none"; return; }
+  var hits = [];
+  for (var i = 0; i < SEARCH_INDEX.length; i++) {
+    var item = SEARCH_INDEX[i];
+    if (item.keywords.indexOf(q) > -1 || item.title.toLowerCase().indexOf(q) > -1 || item.sub.toLowerCase().indexOf(q) > -1 || item.day.toLowerCase().indexOf(q) > -1) {
+      hits.push(item);
+    }
+    if (hits.length >= 10) break;
+  }
+  if (hits.length === 0) {
+    box.innerHTML = "<div class=\"sri-none\">No results found.</div>";
+  } else {
+    for (var j = 0; j < hits.length; j++) {
+      var h = hits[j];
+      var a = document.createElement("a");
+      a.className = "sri";
+      a.href = h.file;
+      var badge = "<span class=\"sri-badge " + h.type + "\">" + h.day + "</span>";
+      var body = "<div class=\"sri-body\"><div class=\"sri-title\">" + h.title + "</div><div class=\"sri-sub\">" + h.sub + "</div></div>";
+      a.innerHTML = badge + body;
+      box.appendChild(a);
+    }
+  }
+  box.style.display = "block";
+}
+
+document.getElementById("searchInput").addEventListener("input", doSearch);
+
+document.addEventListener("click", function(e) {
+  var box = document.getElementById("searchBox");
+  var results = document.getElementById("searchResults");
+  if (!box.contains(e.target)) { results.style.display = "none"; results.innerHTML = ""; }
+});
+
+document.getElementById("searchInput").addEventListener("keydown", function(e) {
+  if (e.key === "Escape") {
+    document.getElementById("searchResults").style.display = "none";
+    document.getElementById("searchResults").innerHTML = "";
+    this.blur();
+  }
+});
+</script>
 
 </body>
 </html>
