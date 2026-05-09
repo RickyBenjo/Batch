@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 10 — Graduation: Disputes, New Hires &amp; Full Production · Batch Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0F0C0C; --white: #F0F1F4; --sunset: #FF5F00; --ocean: #4F97FC;
+    --cosmo: #FF93D3; --lime: #00DF00; --gold: #FFCA00; --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF; --cosmo-tint: #FFE0F3; --lime-tint: #C8FFB0; --sunset-tint: #FFD9C0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Mulish', sans-serif; background: var(--white); color: var(--black); font-size: 14px; line-height: 1.6; }
+  .topnav { background: var(--black); padding: 14px 40px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--sunset); }
+  .topnav a { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: color 0.15s; }
+  .topnav a:hover { color: var(--sunset); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--sunset); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+  .tab-nav { background: var(--black); padding: 0 40px; display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 46px; z-index: 99; }
+  .tab-btn { padding: 12px 18px; font-size: 12px; font-weight: 700; color: rgba(240,241,244,0.45); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.15s; font-family: 'Mulish', sans-serif; }
+  .tab-btn:hover { color: rgba(240,241,244,0.8); }
+  .tab-btn.active { color: var(--sunset); border-bottom-color: var(--sunset); }
+  .hero { background: var(--black); padding: 52px 40px 44px; position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; right: -60px; top: -60px; width: 300px; height: 300px; border-radius: 50%; background: var(--sunset); opacity: 0.07; }
+  .hero::before { content: ''; position: absolute; left: -60px; bottom: -60px; width: 220px; height: 220px; border-radius: 50%; background: var(--gold); opacity: 0.06; }
+  .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-badge { display: inline-block; background: var(--sunset); color: #fff; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; padding: 5px 14px; border-radius: 30px; margin-bottom: 16px; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(28px, 5vw, 48px); font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 10px; }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); margin-bottom: 24px; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { font-size: 11px; font-weight: 700; padding: 5px 14px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(240,241,244,0.7); border: 1px solid rgba(255,255,255,0.1); }
+  .page-body { max-width: 900px; margin: 0 auto; padding: 36px 40px 80px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 3px solid; }
+  .sec-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .sec-head h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+  .card { background: #fff; border-radius: 14px; border: 1.5px solid rgba(15,12,12,0.09); padding: 20px 22px; margin-bottom: 14px; }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 13.5px; color: #555; line-height: 1.65; }
+  .card ul { padding-left: 18px; }
+  .card li { margin-bottom: 4px; }
+  .callout { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; border-left: 4px solid; }
+  .callout.gold { background: var(--gold-tint); border-color: var(--gold); }
+  .callout.blue { background: var(--ocean-tint); border-color: var(--ocean); }
+  .callout.pink { background: var(--cosmo-tint); border-color: var(--cosmo); }
+  .callout.green { background: var(--lime-tint); border-color: #00b800; }
+  .callout.orange { background: var(--sunset-tint); border-color: var(--sunset); }
+  .callout strong { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+  .callout p, .callout li { font-size: 13.5px; line-height: 1.6; }
+  .callout ul { padding-left: 16px; }
+  .callout li { margin-bottom: 3px; }
+  .ctable { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; border-radius: 12px; overflow: hidden; }
+  .ctable th { background: var(--black); color: var(--white); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .ctable td { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+  .ctable tr:last-child td { border-bottom: none; }
+  .ctable tr:nth-child(even) td { background: rgba(240,241,244,0.5); }
+  .steps { }
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--black); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-body { flex: 1; }
+  .step-body strong { font-size: 13.5px; display: block; margin-bottom: 2px; }
+  .step-body span { font-size: 12.5px; color: #666; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .tag.gold { background: var(--gold); color: var(--black); }
+  .tag.blue { background: var(--ocean); color: #fff; }
+  .tag.orange { background: var(--sunset); color: #fff; }
+  .tag.green { background: var(--lime); color: var(--black); }
+  .tag.pink { background: var(--cosmo); color: var(--black); }
+  .warning { background: #fff3e0; border: 2px solid var(--sunset); border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; }
+  .warning .w-title { font-weight: 800; color: var(--sunset); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .warning p, .warning li { font-size: 13px; line-height: 1.65; }
+  .warning ul { padding-left: 16px; }
+  .warning li { margin-bottom: 3px; }
+  .win-banner { background: var(--sunset-tint); border: 2px solid var(--sunset); border-radius: 14px; padding: 18px 22px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; }
+  .win-banner .win-icon { font-size: 32px; flex-shrink: 0; }
+  .win-banner .win-body strong { font-size: 15px; font-weight: 800; display: block; margin-bottom: 4px; }
+  .win-banner .win-body p { font-size: 13px; color: #5c2a00; }
+  .code-block { background: var(--black); border-radius: 12px; padding: 16px 18px; margin: 10px 0; }
+  .code-block .code-label { font-size: 11px; color: var(--sunset); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 6px; font-family: 'Mulish', sans-serif; }
+  .code-block p { font-size: 13px; color: rgba(240,241,244,0.85); font-family: monospace; line-height: 1.9; }
+  .bottom-nav { border-top: 2px solid rgba(15,12,12,0.08); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 900px; margin: 0 auto; }
+  .bottom-nav a { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--black); text-decoration: none; padding: 10px 20px; border: 2px solid rgba(15,12,12,0.15); border-radius: 30px; transition: all 0.15s; }
+  .bottom-nav a:hover { background: var(--black); color: var(--sunset); border-color: var(--black); }
+  .bottom-nav .disabled { opacity: 0.35; pointer-events: none; }
+  @media (max-width: 600px) {
+    .topnav, .tab-nav { padding-left: 20px; padding-right: 20px; }
+    .page-body { padding: 24px 20px 60px; }
+    .bottom-nav { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html">Training Hub</a>
+  <span class="sep">&#8250;</span>
+  <span class="current">Day 10 &mdash; Graduation Week</span>
+</nav>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="show('kickoff',this)">Day Kickoff</button>
+  <button class="tab-btn" onclick="show('disputes',this)">Live Dispute Counter</button>
+  <button class="tab-btn" onclick="show('dulci',this)">Dulci Check-In</button>
+  <button class="tab-btn" onclick="show('newhires',this)">New Hire Prep</button>
+  <button class="tab-btn" onclick="show('production',this)">Full Production Mode</button>
+  <button class="tab-btn" onclick="show('assessment',this)">Training Assessment</button>
+  <button class="tab-btn" onclick="show('timetracking',this)">Time Tracking &amp; NeoWork</button>
+  <button class="tab-btn" onclick="show('corrections',this)">Corrections &amp; Clarifications</button>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Day 10 &middot; May 8, 2026</div>
+    <h1>Graduation: Disputes,<br>New Hires &amp; Full Production</h1>
+    <p class="hero-sub">10-day training complete. First solo dispute counter submitted. Verbal assessment passed. Two new teammates starting Monday. Rick moves to full production while Cliff trains the incoming hires.</p>
+    <div class="hero-chips">
+      <div class="chip">Training complete</div>
+      <div class="chip">Solo dispute countered</div>
+      <div class="chip">Assessment passed</div>
+      <div class="chip">Full production Monday</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- KICKOFF -->
+  <div class="section visible" id="sec-kickoff">
+    <div class="sec-head" style="border-color:var(--sunset);">
+      <div class="sec-dot" style="background:var(--sunset);"></div>
+      <h2>Day 10 Kickoff</h2>
+    </div>
+
+    <div class="win-banner">
+      <div class="win-icon">&#127891;</div>
+      <div class="win-body">
+        <strong>10-Day Training Complete &mdash; Welcome to Batch, Rick</strong>
+        <p>Rick completed the full 10-day onboarding covering platform fundamentals, partner engagement, churn calls, listing QA, disputes, Airtable, Stripe, Intercom, reporting, and supervisory responsibilities. Cliff: "Congratulations for passing the super duper cramped training. Welcome to Batch."</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Today's Agenda</h3>
+      <ul>
+        <li><strong>Part 1:</strong> Quick morning sync &mdash; Felix timesheet issue, Dulci meeting prep, Daniel Conn customer dispute update</li>
+        <li><strong>Part 2:</strong> Dulci check-in meeting &mdash; training plan confirmation, new hire briefing, coaching access, CSAT follow-up</li>
+        <li><strong>Part 3:</strong> Post-Dulci debrief, transition plan sent to Stefan, production mode prep</li>
+        <li><strong>Part 4:</strong> Churn calls debriefed, MBR prep discussed, Monday transition confirmed</li>
+        <li><strong>Part 5:</strong> Verbal training assessment + full NeoWork timesheet walkthrough for all teammates</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Monday Transition Plan</h3>
+      <table class="ctable" style="margin:8px 0 0;">
+        <tr><th>Who</th><th>Focus Next Week</th></tr>
+        <tr><td>Rick</td><td>Full production &mdash; churn/retention calls, disputes (1 per day), listing QA, proactive outreach, past due calls. Touch at least one task from each category daily.</td></tr>
+        <tr><td>Cliff</td><td>Training Gabby and Aljon (new 10-day curriculum). 6&ndash;7 PM CST daily blocked for Rick &mdash; member support handoff, MBR prep, clarifications.</td></tr>
+        <tr><td>Kring</td><td>Churn calls via phone. Senior team member available for escalations and coverage.</td></tr>
+      </table>
+    </div>
+
+    <div class="callout gold">
+      <strong>Training Hub Confirmed as Onboarding Resource</strong>
+      <p>Cliff confirmed he will share Rick's training hub with the two incoming teammates as their reference tool during training. The search bar is already in place. Cliff asked about it specifically during the morning check-in &mdash; it was already done.</p>
+    </div>
+
+    <div class="card">
+      <h3>Stefan's Message &mdash; How to Respond</h3>
+      <p style="margin-bottom:10px;font-size:13.5px;color:#555;">Stefan posted in the NeoWork Batch Leadership channel noting the team is still seeing 174+ listing QA items outstanding. The correct response:</p>
+      <div class="code-block">
+        <span class="code-label">Response Template</span>
+        <p>Hi Stefan &mdash; we completed the 10-day training today. During training Rick focused on touching a few tickets from each task type daily, including disputes, QA, and calls. Starting Monday he moves to full production and will work through the listing QA backlog alongside churn calls, disputes, and outreach. Cliff will also begin training the two new teammates next week with daily 1-hour handoff sessions continuing with Rick. Will keep you updated on progress.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE DISPUTE COUNTER -->
+  <div class="section" id="sec-disputes">
+    <div class="sec-head" style="border-color:var(--sunset);">
+      <div class="sec-dot" style="background:var(--sunset);"></div>
+      <h2>Live Dispute Counter &mdash; Parker Beach</h2>
+    </div>
+
+    <div class="win-banner">
+      <div class="win-icon">&#9878;&#65039;</div>
+      <div class="win-body">
+        <strong>First Solo Dispute Counter Submitted &mdash; Parker Beach</strong>
+        <p>Rick independently handled the full dispute process for the first time: identified the partner, gathered all evidence, built the Google Docs package across three tabs, and submitted through Stripe. Dispute reason: "product not received." Strong counter case built.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Case Summary &mdash; Parker Beach</h3>
+      <table class="ctable" style="margin:8px 0 0;">
+        <tr><th>Field</th><th>Detail</th></tr>
+        <tr><td>Dispute type</td><td>Partner subscription (Basic, $150/month, 3-month commitment)</td></tr>
+        <tr><td>Reason filed</td><td>Product not received</td></tr>
+        <tr><td>Subscription start</td><td>February 19 (first payment March 1 after initial cancellation)</td></tr>
+        <tr><td>Listing go-live</td><td>March 27 &mdash; 41 days before dispute filed</td></tr>
+        <tr><td>Commitment period end</td><td>May 31</td></tr>
+        <tr><td>Analytics (41 days)</td><td>402 impressions, 15 page views, 1 save/favorite</td></tr>
+        <tr><td>Cancellation request</td><td>None submitted</td></tr>
+        <tr><td>HubSpot evidence</td><td>Email from Batch on March 11: "It looks like the listings are both complete and under review." Listing went live March 27 &mdash; proving service was delivered before the dispute.</td></tr>
+        <tr><td>Deadline</td><td>May 12 (5 days remaining &mdash; counter immediately per SOP)</td></tr>
+        <tr><td>Decision</td><td><span class="tag orange">Countered</span> &mdash; listing active, analytics confirmed, signed TNC, no cancellation request</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>What Is Actually Included in a Basic/Core Subscription</h3>
+      <div class="callout orange" style="margin-bottom:12px;">
+        <strong>Clarification Confirmed by Cliff</strong>
+        <p>Listing optimization (SEO rewrite, keywords, CoStar) is NOT a contractual part of the Basic or Core subscription. It is a value-add the team provides for retention and churn saves &mdash; not a default deliverable. Partners cannot dispute on grounds that optimization was not done.</p>
+      </div>
+      <ul>
+        <li><strong>Listing creation access</strong> &mdash; partner builds their listing using platform tools</li>
+        <li><strong>Basic analytics dashboard</strong> &mdash; impressions, page views, saves (Batch Insights is Boost/Party Pro only)</li>
+        <li><strong>UGC collection tool</strong> &mdash; QR code system for collecting customer photos and videos</li>
+        <li><strong>Partner support access</strong> &mdash; support team available for questions and issues</li>
+        <li><strong>Up to 3 listings</strong> (Basic) or <strong>up to 5 listings</strong> (Core)</li>
+      </ul>
+      <p style="font-size:12.5px;color:#888;margin-top:10px;">The Netflix analogy: if you subscribe to Netflix and don't watch anything, Netflix is not obligated to watch it for you. Platform access is the product. The listing being live and generating impressions is proof of delivery.</p>
+    </div>
+
+    <div class="card">
+      <h3>Evidence Package Structure (3-Tab Google Doc)</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Tab 1 &mdash; Dispute Response Letter</strong><span>Generated from the evidence builder. Key dates updated: onboarding Feb 19, listing go-live March 27, commitment end May 31. Added 402 impressions + 15 page views + 1 save as platform engagement proof. Download as PDF titled "Dispute Response Letter."</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Tab 2 &mdash; Service Documentation</strong><span>Exhibit A: Analytics dashboard (March 27 to today). Exhibit B: Listing dashboard. Exhibit C1: Internal active listing view. Exhibit C2: Published live listing (public-facing). Download as PDF.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Tab 3 &mdash; Signed TNC + Commitment Period</strong><span>Screenshot of the "Your Commitment Period" acceptance page from Admin showing the onboarding agreement date. Batch partner policies NOT uploaded directly to Stripe &mdash; exceeds 19-page PDF limit. Link it via URL in the response letter instead.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Stripe Submission Steps</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Counter Dispute &rarr; Why you should win: "Customer received the product or service"</strong><span>Product type: Digital product.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Product Description field &mdash; use Claude</strong><span>Screenshot the description field + the receipt, paste into Claude, ask it to generate the description. Result: "Batch Basic Subscription &mdash; $150/month, 3-month commitment. Includes listing creation, UGC collection tool, basic analytics dashboard, support access, up to 3 listings."</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Additional Information &mdash; use Claude again</strong><span>Screenshot the field info icon, paste your dispute letter into Claude, ask it to write a concise summary for this field.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Upload evidence by category</strong><span>Customer communication &rarr; HubSpot thread screenshot. Customer signature &rarr; Signed TNC tab PDF. Service documentation &rarr; Exhibits PDF. Receipt &rarr; Stripe receipt PDF. Other &rarr; Dispute response letter PDF.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Submit, then call the partner</strong><span>Per SOP, call the partner after submitting. Frame it as helpful: "I wanted to reach out because I saw the dispute and want to help clarify what happened." Inform them of the submission and ask if they'd like to withdraw and resolve directly.</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Log in dispute tracker</strong><span>Record: dispute Stripe link, partner name, month/date reviewed, reviewer name, response date, outcome. Store Google Doc in a "Disputes" folder in the Batch Google Drive named "[Partner Name] &mdash; [Month Year]."</span></div></div>
+      </div>
+    </div>
+
+    <div class="callout gold">
+      <strong>Dispute Withdrawal Status in Stripe</strong>
+      <p>When a partner successfully withdraws their dispute, Stripe shows: "Inquiry Closed" or "Cardholder's bank chose not to pursue this dispute. No funds or fees were withdrawn from your account." You do not need proof from the partner &mdash; verify directly in Stripe. Only mark a dispute resolved once you see this status.</p>
+    </div>
+
+    <div class="card">
+      <h3>Daniel Conn Customer Dispute &mdash; Update</h3>
+      <ul>
+        <li>Daniel replied to Rick's email: "I'm a little confused. What dispute are you referring to?" &mdash; suggesting possible genuine fraud (someone else used the card)</li>
+        <li>Next step: call Daniel to clarify whether they placed the booking</li>
+        <li><strong>If they did NOT place the booking:</strong> Accept the dispute &mdash; genuine fraud, do not counter</li>
+        <li><strong>If they DID place the booking but want to cancel:</strong> Ask them to withdraw the dispute. Explain Stripe holds funds while it's open. Once withdrawn, process the full refund (event is August, well within cancellation policy)</li>
+        <li>A customer-specific dispute response letter tool still needs to be built &mdash; on Rick's to-do list. For now, build manually in Google Docs using Claude to draft the letter.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DULCI CHECK-IN -->
+  <div class="section" id="sec-dulci">
+    <div class="sec-head" style="border-color:var(--cosmo);">
+      <div class="sec-dot" style="background:var(--cosmo);"></div>
+      <h2>Dulci Check-In &mdash; Key Outcomes</h2>
+    </div>
+
+    <div class="card">
+      <h3>Confirmed in Today's Meeting</h3>
+      <table class="ctable" style="margin:8px 0 0;">
+        <tr><th>Item</th><th>Outcome</th></tr>
+        <tr><td>Training plan sent to Stefan</td><td>Cliff sent to leadership Slack channel today. Covers: 10-day training complete, handoff of partner support, 1-hour daily member support handoff, full production for Rick Monday.</td></tr>
+        <tr><td>Intercom full access</td><td>Dulci confirmed admin access granted to both Cliff and Rick. Note: access should have been provided much earlier &mdash; this is now confirmed and in place for the long term.</td></tr>
+        <tr><td>Claude + Intercom integration idea</td><td>Dulci shared that the NeoWork Servo team has integrated Claude into their Intercom knowledge base &mdash; Claude reads the knowledge base and adds context via a widget on each ticket. Goal: more accurate answers, full coverage of multi-question tickets. Potential future improvement for the Batch Intercom setup.</td></tr>
+        <tr><td>CSAT activation</td><td>Rick to follow up with Luis in the leadership Slack channel (not DM). Tag Luis publicly so Stefan has visibility. Approved at April MBR but not yet turned on.</td></tr>
+        <tr><td>Coaching and temp check visibility</td><td>Dulci shared the coaching compliance dashboard. April had 0 coaching observations submitted. Going forward, all coaching recordings and temp checks must be submitted. Form links to be shared by Dulci.</td></tr>
+        <tr><td>Cliff's last day</td><td>Tentatively May 22 if the new hire 10-day training stays on track. Cliff willing to extend if needed for member support handoff.</td></tr>
+      </table>
+    </div>
+
+    <div class="callout pink">
+      <strong>Always Use the Leadership Channel, Not DMs</strong>
+      <p>When following up on pending system requests, always post in the leadership Slack channel and tag Luis publicly. Stefan has visibility there and will unblock requests when he sees them. DMs to Luis tend to result in delays. This is the pattern that works: public tag + Stefan visibility = action.</p>
+    </div>
+
+    <div class="card">
+      <h3>Kring &mdash; Dulci's Guidance</h3>
+      <ul>
+        <li>Kring is a strong, knowledgeable senior team member who is highly dependable</li>
+        <li>Her main growth area is taking ownership and making decisions without waiting for explicit permission</li>
+        <li>As her supervisor, make it clear she has the authority to act. Once that's communicated, she's fully effective</li>
+        <li>Start involving her in temp checks and coaching conversations &mdash; she's ready for that responsibility</li>
+        <li>Lean on her for coverage and quality checks, especially during the new hire training period</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- NEW HIRE PREP -->
+  <div class="section" id="sec-newhires">
+    <div class="sec-head" style="border-color:var(--lime);">
+      <div class="sec-dot" style="background:var(--lime);"></div>
+      <h2>New Hire Preparation &mdash; Gabby &amp; Aljon</h2>
+    </div>
+
+    <div class="win-banner">
+      <div class="win-icon">&#128101;</div>
+      <div class="win-body">
+        <strong>Two New Teammates Starting Monday</strong>
+        <p>Maria Gabriela Acevedo (Gabby) &mdash; Colombian, previously supervised Batch Sales, then SDR at NeoWork. Has prior Batch platform knowledge. Aljon &mdash; previously a NeoWork teammate. Both starting Monday with Cliff leading the 10-day training curriculum.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Working with Gabby &mdash; What to Know</h3>
+      <ul>
+        <li><strong>Add more context than usual.</strong> Do not assume she will infer the logic behind a task. Explain the why, the background, and the step-by-step process explicitly.</li>
+        <li><strong>Show, then have her demonstrate.</strong> After explaining, ask her to practice: "Can you share your screen and walk me through where to find it?" Move on only once she can do it independently.</li>
+        <li><strong>Itemize all expectations in writing upfront.</strong> Day 1 should include an overview of all tasks she will eventually handle, even if they don't start immediately. Adding tasks later without prior notice creates friction.</li>
+        <li><strong>She has a leadership mindset.</strong> Gabby was a supervisor at Batch Sales before the team was dissolved. Treat her as an experienced professional &mdash; she responds well to autonomy and ownership once she has context.</li>
+        <li><strong>Scope tasks clearly before expanding.</strong> Colombian work culture tends to favor focused, well-scoped tasks over juggling multiple streams at once. Build her workload incrementally.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Training Plan for the New Hires</h3>
+      <ul>
+        <li>Same 10-day task-by-task structure used for Rick's training &mdash; one task area per day with hands-on practice</li>
+        <li>Rick's training hub shared with both as their reference resource during and after training</li>
+        <li>Cliff will update the Intercom knowledge base for member support before Monday to reduce the time Rick spends answering basic questions</li>
+        <li>Verbal assessment (like Rick's today) will be used at the end of their 10-day training &mdash; open-book is fine, the goal is knowing where to find answers</li>
+        <li>Written SOPs being prepared by Cliff: itemized expectations, visuals, step-by-step guides &mdash; especially important for Gabby given the context-clarity expectation</li>
+      </ul>
+    </div>
+
+    <div class="callout orange">
+      <strong>Converting Partners to Web Partners &mdash; Luis's Direction</strong>
+      <p>Luis confirmed the intention to convert most or all Core partners to web partners (not email partners as previously assumed). This is a shift from the current Batch Direct focus. Rick should be aware of this direction when advising partners on booking methods, but no action needed yet &mdash; the conversion process is still being defined.</p>
+    </div>
+  </div>
+
+  <!-- FULL PRODUCTION MODE -->
+  <div class="section" id="sec-production">
+    <div class="sec-head" style="border-color:var(--ocean);">
+      <div class="sec-dot" style="background:var(--ocean);"></div>
+      <h2>Full Production Mode &mdash; Starting Monday</h2>
+    </div>
+
+    <div class="callout blue">
+      <strong>The Approach from Monday Onward</strong>
+      <p>You do not need to complete everything at once. The rule is: touch at least one item from each task type every day. Disputes, QA, churn calls, proactive outreach, past due calls &mdash; one from each. This keeps all task types active and prevents any single backlog from growing unchecked while you build speed and confidence.</p>
+    </div>
+
+    <div class="card">
+      <h3>Daily Task Rotation &mdash; Full Production</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Intercom inbox (morning)</strong><span>Check replies, update conversation notes, close resolved threads</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Scheduled churn/retention calls</strong><span>10:30 AM &ndash; 2:00 PM and 3:00 &ndash; 5:00 PM CST blocks. 10 min prep before each call.</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>One dispute</strong><span>Pick from the backlog daily. Investigate, build evidence, counter or accept. Don't skip this.</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Listing QA</strong><span>Work from NW Listing QA Tracking view &mdash; oldest unreviewed first. Stefan is watching the 174-listing backlog.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Past due calls</strong><span>One call, voicemail + email if no answer, follow up 48 hours later</span></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Proactive outreach (1&ndash;2 partners)</strong><span>Core engagement backlog &mdash; partners 60+ days with weak/medium signal</span></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-body"><strong>6&ndash;7 PM CST: Cliff debrief / member support handoff</strong><span>One member support task per day: order fulfillment, dispute handling, calendar management, Intercom QA, refund approvals</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Member Support &mdash; Coming in Handoff Sessions</h3>
+      <ul>
+        <li>Approving refunds is part of the member support scope &mdash; access needs to be granted before Rick can action these</li>
+        <li>Order fulfillment (web partner bookings that need manual confirmation), calendar management, dispute handling for customers, and Intercom QA are the core member support tasks</li>
+        <li>Cliff will teach one task per day at 6&ndash;7 PM CST over the next two weeks alongside the new hire training</li>
+        <li>MBR prep also begins this week &mdash; Cliff and Rick will start building it together during these daily sessions</li>
+        <li>Cliff is also updating the Intercom knowledge base for member support SOPs &mdash; this will reduce time spent on basic questions once the new teammates start</li>
+      </ul>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">&#9888; Remove Duplicate Calendar Slots</div>
+      <p>The training block calendar entries (which blocked call bookings during the 10-day training) need to be removed today. The Round Robin booking link should be open from Monday so partners can book calls. Also clean up any duplicate calendar entries that were created during the HubSpot scheduler setup earlier in training.</p>
+    </div>
+  </div>
+
+  <!-- TRAINING ASSESSMENT -->
+  <div class="section" id="sec-assessment">
+    <div class="sec-head" style="border-color:var(--gold);">
+      <div class="sec-dot" style="background:var(--gold);"></div>
+      <h2>Training Assessment &mdash; Verbal Q&amp;A Results</h2>
+    </div>
+
+    <div class="callout gold">
+      <strong>Open-Book Format</strong>
+      <p>The assessment was verbal and open-book &mdash; tools and notes were available. Cliff: "As long as you know where to find the answer, that's totally fine. That's how it should be." The goal is demonstrating understanding, not memorization. Everything else will be learned through experience.</p>
+    </div>
+
+    <div class="card">
+      <h3>Questions Asked &amp; Key Clarifications</h3>
+      <table class="ctable" style="margin:8px 0 0;">
+        <tr><th>Topic</th><th>Key Clarification from Cliff</th></tr>
+        <tr><td>Booking methods</td><td>Currently focusing on Batch Direct. Luis confirmed the goal is to convert Core partners to web partners going forward &mdash; not email partners as previously assumed.</td></tr>
+        <tr><td>Listing QA</td><td>Two corrections: (1) Location is not always set to partner's location &mdash; mobile/delivery experiences (IV drips, bracelets, bar hopping) should be set to customer's location or "at home." (2) Recently live QA covers only the specific experience in that Airtable entry. Proactive outreach QA covers ALL listings for that partner.</td></tr>
+        <tr><td>Retention levers / offers</td><td>Good coverage of all 4 levers. Confirmed: no free month without Stefan approval. $99/month is the floor &mdash; never offer lower.</td></tr>
+        <tr><td>What's included in Basic/Core subscription</td><td>Listing creation, basic analytics dashboard, UGC collection tool, support access. Basic = up to 3 listings. Core = up to 5 listings. Optimization is NOT included &mdash; it's a team value-add, not a contractual deliverable.</td></tr>
+        <tr><td>What partners are paying for</td><td>They pay for platform access, visibility, and SEO traction &mdash; not guaranteed bookings. The subscription gives them the tools and the traffic. Cancelling early makes all previous months' SEO investment compound for nothing &mdash; this is the core retention message.</td></tr>
+        <tr><td>Proactive outreach &mdash; when and why</td><td>Partners with weak or medium signals within 30&ndash;90 days. Goal: shift from reactive churn management to proactive engagement so partners feel their account is being taken care of.</td></tr>
+        <tr><td>Pre-call mindset</td><td>Cliff's addition: the right mindset is wanting to help the partner take advantage of what they paid for. SEO results are compounding &mdash; cancelling now wastes all previous months. Come in as an educator and advocate, not just someone following a script.</td></tr>
+        <tr><td>Disputes &mdash; counter vs. accept</td><td>Counter when service was delivered (listing live, impressions generated, signed TNC, no cancellation request). Accept when there are genuine lapses on Batch's side or the evidence doesn't support countering.</td></tr>
+        <tr><td>Commitment periods</td><td>Partners within a commitment period can only cancel at the end of the billing cycle. No pro-rated refunds unless Stefan approves. Always re-educate &mdash; they signed up for SEO, not bookings. Don't frame it as "you owe us more" &mdash; frame it as helping them get value from what they already paid for.</td></tr>
+        <tr><td>Three types of phone calls</td><td>Churn/retention calls, past due calls, and dispute calls. Past due: call once, voicemail + email if no answer, follow up 48 hours later. Cancel after 30+ days of non-payment or 8+ failed attempts.</td></tr>
+      </table>
+    </div>
+
+    <div class="callout orange">
+      <strong>What Comes Next After Training</strong>
+      <p>Cliff: "The things you are going to learn now are going to be through experience. Keep reviewing, keep learning as you proceed with your role. The supervisory tasks, I will continue to teach you over the next few weeks." Training was compressed to 2 weeks when it should have been 2 months &mdash; be patient with yourself as the experience fills in the gaps.</p>
+    </div>
+  </div>
+
+  <!-- TIME TRACKING & NEOWORK -->
+  <div class="section" id="sec-timetracking">
+    <div class="sec-head" style="border-color:var(--ocean);">
+      <div class="sec-dot" style="background:var(--ocean);"></div>
+      <h2>NeoWork Time Tracking &amp; Infraction Handling</h2>
+    </div>
+
+    <div class="callout blue">
+      <strong>Why This Matters</strong>
+      <p>The NeoWork timesheet is how teammates get paid and how attendance is verified. As supervisor, you are responsible for ensuring all teammate hours are accurate every week. Infractions appear in the NeoWork Slack bot and must be resolved promptly. Inaccurate records lead to payroll errors and incorrect attendance percentages in the MBR.</p>
+    </div>
+
+    <div class="card">
+      <h3>The Two Ways to Fix an Infraction</h3>
+      <table class="ctable" style="margin:8px 0 0;">
+        <tr><th>Method</th><th>When to Use</th><th>Limitation</th></tr>
+        <tr><td><strong>NeoWork Bot (Slack)</strong></td><td>Preferred for fixing clock-in/clock-out issues. Select the infraction type, add comment if needed, enter hour override, submit.</td><td>Clock in/out fields become editable. Bot must send the infraction first before you can resolve it.</td></tr>
+        <tr><td><strong>Airtable (direct edit)</strong></td><td>For fixing shift length, shift start/end times, adding external comments, and leave/day-off corrections.</td><td>Cannot fix the "absent" status caused by missing clock in/out &mdash; that requires the NeoWork bot.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Common Scenarios &amp; How to Fix Them</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Teammate shows as "Absent" but actually worked (logged in outside grace period)</strong><span>Open infraction in NeoWork bot &rarr; select "Outside Grace Period, Default to Scheduled Shift" &rarr; this fixes the absent status and restores the correct clock in/out.</span></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Teammate did coverage (extended shift)</strong><span>NeoWork bot &rarr; select "Activity" (not Overtime) &rarr; add comment: "Extended shift for X hours to cover for [teammate]" &rarr; enter total hours worked as the override (e.g., if regular shift 8 hrs + 4 hrs coverage = enter 12).</span></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Teammate on approved leave but still showing a shift length</strong><span>Open the record in Airtable &rarr; set shift start time to OFF and shift end time to OFF &rarr; set shift length to 0 &rarr; close. The external comment should already say "on leave vacation" or "mental health day."</span></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Day off showing as shift with 8 hours</strong><span>Open the record in Airtable &rarr; shift start = OFF, shift end = OFF, shift length = 0. Remove any incorrect external comment. The record should show zero shift length for a day off.</span></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Your own hours are wrong</strong><span>Do NOT edit your own hours in Airtable. Send the issue to Jelly at NeoWork to fix. Same rule for Cliff's hours.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Activity vs. Overtime &mdash; Key Difference</h3>
+      <ul>
+        <li><strong>Activity (Coverage):</strong> A teammate voluntarily covers another's shift during their own working hours. Select "Activity" in the NeoWork bot. No premium pay &mdash; treated as regular hours. Add a comment explaining who was covered.</li>
+        <li><strong>Overtime:</strong> Batch explicitly requests the team to work beyond contracted hours. Select "Overtime" in the bot. Triggers premium pay (typically 20&ndash;30% per hour, depending on the contract).</li>
+        <li><strong>Key rule:</strong> Never select Overtime for coverage situations. Only use Overtime when Batch directly requests extra hours.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Felix's Timesheet &mdash; What Was Fixed Today</h3>
+      <table class="ctable" style="margin:8px 0 0;">
+        <tr><th>Date</th><th>Issue</th><th>Fix Applied</th></tr>
+        <tr><td>May 3</td><td>Showed as "on leave" but was a regular day off</td><td>Shift start/end set to OFF, shift length set to 0, external comment removed</td></tr>
+        <tr><td>May 4</td><td>Mental Health Day showing 8-hour shift length</td><td>Shift start/end set to OFF, shift length set to 0</td></tr>
+        <tr><td>May 5</td><td>Vacation leave showing 8-hour shift length</td><td>Shift start/end set to OFF, shift length set to 0</td></tr>
+        <tr><td>May 8</td><td>Coverage for Kring &mdash; 12 hours total (8 regular + 4 coverage) showing as absent</td><td>NeoWork bot &rarr; Activity &rarr; comment added &rarr; 12 hours override entered. Infraction status updated to resolved.</td></tr>
+      </table>
+      <p style="font-size:12px;color:#888;margin-top:8px;">After all fixes: Felix's shift length for the week = 36 hours, total final hours = 36 hours = 100% attendance. Ervene: 40/40 = 100%. Kring: corrected to 32/32 after removing the May 7 mental health day shift length.</p>
+    </div>
+
+    <div class="card">
+      <h3>How to Calculate Attendance Percentage</h3>
+      <ul>
+        <li>Formula: <strong>Total Final Hours &divide; Shift Length = Attendance %</strong></li>
+        <li>Quick tip: type the formula directly into the browser URL bar as a calculator (e.g., "36/36") and press Enter</li>
+        <li>A teammate showing 0 regular hours with a shift length present will show as "absent" &mdash; even if they actually worked. Always check both fields together.</li>
+        <li>Log-in grace period: teammates should log in within 15 minutes before their shift starts and log out within 15 minutes after shift end. Outside this window triggers an infraction.</li>
+        <li>If a teammate logs in and out twice (e.g., regular shift + coverage), NeoWork only tracks the first log in and first log out. Subsequent log in/out pairs are not tracked. This is why coverage is logged via the NeoWork bot override, not a second log in/out.</li>
+      </ul>
+    </div>
+
+    <div class="warning">
+      <div class="w-title">&#9888; Your Own Infraction &mdash; What Happened Today</div>
+      <p>Rick's own timesheet showed an infraction today (reporting to self instead of Dulci, clock-out time issue). Fixed via NeoWork bot: selected "Outside Grace Period, Default to Scheduled Shift" &rarr; no comment needed &rarr; 8 hours &rarr; submit. Result: clock in/out corrected and shift confirmed at 8 hours. The NeoWork bot notification goes to Dulci &mdash; she sees all infraction resolutions. Make sure log-in/log-out is within the grace period daily to avoid repeat infractions.</p>
+    </div>
+  </div>
+
+  <!-- CORRECTIONS & CLARIFICATIONS -->
+  <div class="section" id="sec-corrections">
+    <div class="sec-head" style="border-color:var(--cosmo);">
+      <div class="sec-dot" style="background:var(--cosmo);"></div>
+      <h2>Corrections &amp; Clarifications from Training</h2>
+    </div>
+
+    <div class="callout pink">
+      <strong>These Correct Earlier Notes in the Training Hub</strong>
+      <p>Several clarifications were made in today's assessment that update or correct earlier training notes. Review the relevant day files in conjunction with these corrections.</p>
+    </div>
+
+    <div class="card">
+      <h3>Correction 1 &mdash; Listing QA: Location Setting</h3>
+      <p style="font-size:13.5px;color:#555;margin-bottom:10px;"><strong>Earlier notes said:</strong> "Location is always set to the partner's location."</p>
+      <p style="font-size:13.5px;color:#555;"><strong>Correct:</strong> Location depends on the experience type:</p>
+      <ul style="margin-top:8px;">
+        <li><strong>Fixed venue (bar, restaurant, activity space, boat):</strong> Set to partner's location with partner's address</li>
+        <li><strong>Mobile or delivery experience (IV drips, custom bracelet-making, mobile bar):</strong> Set to "at home" or customer's location &mdash; the experience comes to the customer</li>
+        <li><strong>Bar hopping / roving experience:</strong> Partner may define a meeting point &mdash; confirm with them before setting</li>
+        <li>When in doubt, check the experience description or ask the partner. Never assume &mdash; wrong location settings lead to customer complaints.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Correction 2 &mdash; Listing QA: Recently Live vs. Proactive Outreach Scope</h3>
+      <p style="font-size:13.5px;color:#555;margin-bottom:10px;"><strong>Clarification:</strong> There are two different scopes depending on how you got the task:</p>
+      <ul>
+        <li><strong>Recently Live QA (from Airtable NW Listing QA Tracking view):</strong> QA only the specific experience listed in that Airtable entry. Do not proactively check the partner's other listings unless flagged.</li>
+        <li><strong>Proactive Outreach (from Core Engagement Google Sheet):</strong> Check and optimize ALL listings that partner has &mdash; not just one. Do a full audit of their entire presence.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Correction 3 &mdash; Basic vs. Core Subscription Listing Limits</h3>
+      <ul>
+        <li><strong>Basic:</strong> Up to 3 listings</li>
+        <li><strong>Core:</strong> Up to 5 listings</li>
+        <li>Earlier notes did not clearly distinguish between the two. When handling a dispute or explaining the subscription to a partner, confirm their tier and state the correct listing limit.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Correction 4 &mdash; Booking Method Direction</h3>
+      <ul>
+        <li><strong>Earlier notes said:</strong> Converting partners to email partners is the direction</li>
+        <li><strong>Correct per Luis (Day 10):</strong> The direction is to convert Core partners to <strong>web partners</strong>, not email partners. Batch Direct is the current focus. The web partner conversion plan is still being defined &mdash; no action needed yet.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Correction 5 &mdash; What's Included in the Subscription</h3>
+      <ul>
+        <li><strong>Earlier notes implied:</strong> Optimization and blog posts are included in the subscription as standard deliverables</li>
+        <li><strong>Correct:</strong> Optimization (CoStar SEO, keyword rewrites, title/description changes) and blog posts are team-initiated value-adds done for retention purposes &mdash; NOT contractual deliverables in the Basic or Core subscription</li>
+        <li>The actual subscription includes: listing creation access, basic analytics dashboard, UGC collection tool, partner support access, and the listing limit (3 for Basic, 5 for Core)</li>
+        <li>This matters most in disputes: partners cannot claim "product not received" on the basis that their listing was not optimized</li>
+      </ul>
+    </div>
+
+    <div class="callout green">
+      <strong>How to Think About the Subscription When Handling Disputes or Churn Calls</strong>
+      <p>The partner paid for platform access, SEO visibility, and traction tools &mdash; not guaranteed bookings, not done-for-you optimization. When they say "I'm not getting bookings," the right response is education: explain what SEO does, how the compounding effect works, and what the team can do as a value-add (optimize, blog post, UGC) to strengthen their presence. This reframe turns a cancellation conversation into a partnership conversation.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <a href="day9.html">&#8592; Day 9</a>
+  <a href="index.html">Training Hub</a>
+  <a href="#" class="disabled">&#127891; Training Complete</a>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('visible'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('sec-' + id).classList.add('visible');
+  btn.classList.add('active');
+  window.scrollTo({ top: document.querySelector('.page-body').offsetTop - 100, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
