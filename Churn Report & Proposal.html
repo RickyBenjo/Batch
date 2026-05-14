@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Churn Report & Proactive Strategy Proposal · Batch Retention</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --black: #0F0C0C;
+    --white: #F0F1F4;
+    --sunset: #FF5F00;
+    --ocean: #4F97FC;
+    --cosmo: #FF93D3;
+    --lime: #00DF00;
+    --gold: #FFCA00;
+    --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF;
+    --cosmo-tint: #FFE0F3;
+    --lime-tint: #C8FFB0;
+    --sunset-tint: #FFD9C0;
+    --red: #e03a3a;
+    --red-tint: #FFE0E0;
+    --green: #00aa55;
+    --green-tint: #C8FFE0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Mulish', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* TOP NAV */
+  .topnav {
+    background: var(--black);
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--gold);
+  }
+  .topnav a {
+    color: rgba(240,241,244,0.5);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: color 0.15s;
+  }
+  .topnav a:hover { color: var(--gold); }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--gold); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+
+  /* TAB NAV */
+  .tab-nav {
+    position: sticky;
+    top: 46px;
+    z-index: 99;
+    background: var(--black);
+    padding: 0 40px;
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .tab-btn {
+    padding: 12px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(240,241,244,0.45);
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    font-family: 'Mulish', sans-serif;
+    letter-spacing: 0.3px;
+  }
+  .tab-btn:hover { color: rgba(240,241,244,0.8); }
+  .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* HERO */
+  .hero {
+    background: var(--black);
+    padding: 52px 40px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.08;
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--black);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    padding: 5px 14px;
+    border-radius: 30px;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); margin-bottom: 24px; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    font-size: 11px; font-weight: 700;
+    padding: 5px 14px; border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(240,241,244,0.7);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* LAYOUT */
+  .page-body { max-width: 900px; margin: 0 auto; padding: 36px 40px 80px; }
+  .section { display: none; }
+  .section.visible { display: block; }
+
+  /* SECTION HEADING */
+  .sec-head {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    border-bottom: 3px solid;
+  }
+  .sec-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .sec-head h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+
+  /* METRIC CARDS */
+  .metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .metric-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid rgba(15,12,12,0.09);
+    padding: 18px 20px;
+  }
+  .metric-card.green { background: var(--green-tint); border-color: var(--green); }
+  .metric-card.red { background: var(--red-tint); border-color: var(--red); }
+  .metric-card.amber { background: var(--gold-tint); border-color: var(--gold); }
+  .m-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 8px; }
+  .m-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 34px; font-weight: 900; line-height: 1; margin-bottom: 5px;
+  }
+  .metric-card.green .m-val { color: var(--green); }
+  .metric-card.red .m-val { color: var(--red); }
+  .metric-card.amber .m-val { color: #a07800; }
+  .m-sub { font-size: 11.5px; color: #777; }
+
+  /* CARDS */
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid rgba(15,12,12,0.09);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 13.5px; color: #555; line-height: 1.65; }
+  .card ul { padding-left: 18px; }
+  .card li { margin-bottom: 4px; }
+
+  /* CALLOUTS */
+  .callout { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; border-left: 4px solid; }
+  .callout.gold { background: var(--gold-tint); border-color: var(--gold); }
+  .callout.blue { background: var(--ocean-tint); border-color: var(--ocean); }
+  .callout.green { background: var(--green-tint); border-color: var(--green); }
+  .callout.orange { background: var(--sunset-tint); border-color: var(--sunset); }
+  .callout.red { background: var(--red-tint); border-color: var(--red); }
+  .callout strong { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+  .callout p, .callout li { font-size: 13.5px; line-height: 1.6; }
+  .callout ul { padding-left: 16px; }
+  .callout li { margin-bottom: 3px; }
+
+  /* GRID */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .two-col, .three-col, .metric-row { grid-template-columns: 1fr 1fr; } }
+
+  /* CHART CARDS */
+  .chart-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid rgba(15,12,12,0.09);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+  .chart-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 14px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #666; font-weight: 600; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  /* TABLES */
+  .ctable { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; border-radius: 12px; overflow: hidden; }
+  .ctable th { background: var(--black); color: var(--white); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .ctable td { padding: 9px 14px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+  .ctable tr:last-child td { border-bottom: none; }
+  .ctable tr:nth-child(even) td { background: rgba(240,241,244,0.5); }
+
+  /* TAGS */
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin: 2px; }
+  .tag.gold { background: var(--gold); color: var(--black); }
+  .tag.green { background: var(--green); color: #fff; }
+  .tag.red { background: var(--red); color: #fff; }
+  .tag.orange { background: var(--sunset); color: #fff; }
+  .tag.blue { background: var(--ocean); color: #fff; }
+  .tag.gray { background: #e0e0e0; color: #555; }
+
+  /* REASON ITEMS */
+  .reason-item { padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+  .reason-item:last-child { border-bottom: none; }
+  .reason-title { font-size: 13.5px; font-weight: 700; margin-bottom: 3px; }
+  .reason-desc { font-size: 12.5px; color: #666; line-height: 1.5; }
+
+  /* TIMELINE */
+  .timeline { display: grid; grid-template-columns: repeat(4, 1fr); margin-bottom: 14px; border-radius: 12px; overflow: hidden; border: 1.5px solid rgba(0,0,0,0.09); }
+  .tl-step { padding: 18px; border-right: 1px solid rgba(0,0,0,0.08); }
+  .tl-step:last-child { border-right: none; }
+  .tl-step.safe { background: var(--green-tint); }
+  .tl-step.danger { background: var(--red-tint); }
+  .tl-num { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .tl-step.safe .tl-num { color: var(--green); }
+  .tl-step.danger .tl-num { color: var(--red); }
+  .tl-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; color: var(--black); }
+  .tl-desc { font-size: 12px; color: #666; line-height: 1.5; }
+
+  /* PHASE CARDS */
+  .phase-card {
+    border-radius: 14px;
+    border: 1.5px solid rgba(15,12,12,0.09);
+    padding: 22px;
+    margin-bottom: 14px;
+    background: #fff;
+  }
+  .phase-card.target { background: var(--green-tint); border-color: var(--green); }
+  .phase-badge {
+    display: inline-block;
+    font-size: 10px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 4px 12px; border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .badge-current { background: var(--gold); color: var(--black); }
+  .badge-target { background: var(--green); color: #fff; }
+  .phase-sub { font-size: 13px; color: #666; margin-bottom: 16px; }
+  .role-row { display: flex; gap: 12px; align-items: flex-start; padding: 11px 0; border-bottom: 1px solid rgba(0,0,0,0.07); }
+  .role-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Mulish', sans-serif; font-size: 11px; font-weight: 800;
+    flex-shrink: 0; border: 2px solid;
+  }
+  .av-gold { background: var(--gold-tint); color: #8a6800; border-color: var(--gold); }
+  .av-gray { background: #f0f0f0; color: #888; border-color: #ddd; }
+  .av-green { background: var(--green-tint); color: var(--green); border-color: var(--green); }
+  .role-name { font-size: 13.5px; font-weight: 700; margin-bottom: 2px; }
+  .role-desc { font-size: 12px; color: #666; line-height: 1.5; }
+
+  /* TALKING POINTS */
+  .tp-item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+  .tp-item:last-child { border-bottom: none; }
+  .tp-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 900;
+    color: rgba(15,12,12,0.12);
+    min-width: 34px; line-height: 1; padding-top: 2px;
+  }
+  .tp-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .tp-sub { font-size: 13px; color: #666; line-height: 1.6; }
+
+  hr { border: none; border-top: 2px dashed rgba(0,0,0,0.07); margin: 28px 0; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    border-top: 2px solid rgba(15,12,12,0.08);
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .bottom-nav span { font-size: 12px; color: #aaa; font-weight: 600; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <span class="current">Retention Team — Internal</span>
+  <span class="sep">›</span>
+  <span style="color:rgba(240,241,244,0.5); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px;">Churn Report & Strategy Proposal</span>
+</nav>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="show('report', this)">Churn Report</button>
+  <button class="tab-btn" onclick="show('firm', this)">Firm Cancellations</button>
+  <button class="tab-btn" onclick="show('problem', this)">The Problem</button>
+  <button class="tab-btn" onclick="show('proposal', this)">Strategy Proposal</button>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Retention Team · May 14, 2026</div>
+    <h1>Churn Analysis &<br>Proactive Strategy Proposal</h1>
+    <p class="hero-sub">Apr 13 – May 13, 2026 · Prepared by Rick Cruz · For Dulci (Manager Review)</p>
+    <div class="hero-chips">
+      <div class="chip">109 calls handled</div>
+      <div class="chip">24.8% save rate</div>
+      <div class="chip">70% firm cancellations</div>
+      <div class="chip">Proactive shift proposed</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- TAB 1: CHURN REPORT -->
+  <div id="report" class="section visible">
+
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Churn Call Report</h2>
+    </div>
+
+    <div class="metric-row">
+      <div class="metric-card">
+        <p class="m-label">Total calls</p>
+        <p class="m-val">109</p>
+        <p class="m-sub">Apr 13 – May 13</p>
+      </div>
+      <div class="metric-card green">
+        <p class="m-label">Save rate</p>
+        <p class="m-val">24.8%</p>
+        <p class="m-sub">27 of 109 retained</p>
+      </div>
+      <div class="metric-card red">
+        <p class="m-label">Churn lost</p>
+        <p class="m-val">54</p>
+        <p class="m-sub">49.5% of all calls</p>
+      </div>
+      <div class="metric-card amber">
+        <p class="m-label">Delayed / follow-up</p>
+        <p class="m-val">28</p>
+        <p class="m-sub">25.7% of calls</p>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="chart-card">
+        <p class="chart-title">Outcomes breakdown</p>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#00aa55"></span>Retained/Saved</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#5dcaa5"></span>Retained/Paused</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#e03a3a"></span>Lost</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#d4920a"></span>Delayed</span>
+        </div>
+        <div style="position:relative; height:200px;">
+          <canvas id="outcomeChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <p class="chart-title">Outcomes by week</p>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#00aa55"></span>Retained</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#e03a3a"></span>Lost</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#d4920a"></span>Delayed</span>
+        </div>
+        <div style="position:relative; height:200px;">
+          <canvas id="weekChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="chart-card">
+        <p class="chart-title">Signal strength vs outcome</p>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#00aa55"></span>Saved/Retained</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#e03a3a"></span>Lost</span>
+        </div>
+        <div style="position:relative; height:190px;">
+          <canvas id="signalChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <p class="chart-title">Top accepted offers</p>
+        <div style="position:relative; height:220px;">
+          <canvas id="offersChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <p class="chart-title">Performance by rep</p>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#00aa55"></span>Retained</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#e03a3a"></span>Lost</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#d4920a"></span>Delayed</span>
+      </div>
+      <div style="position:relative; height:160px;">
+        <canvas id="repChart"></canvas>
+      </div>
+    </div>
+
+    <div class="callout gold">
+      <strong>Save rate trend</strong>
+      <p>WO 4/13 had the best ratio this period — 8 retained vs 5 lost. By WO 5/11 it was 3 retained vs 11 lost. The trend is declining week over week and more reactive calls alone won't reverse it.</p>
+    </div>
+
+  </div>
+
+  <!-- TAB 2: FIRM CANCELLATIONS -->
+  <div id="firm" class="section">
+
+    <div class="sec-head" style="border-color: var(--red);">
+      <div class="sec-dot" style="background: var(--red);"></div>
+      <h2>Firm Cancellations Deep Dive</h2>
+    </div>
+
+    <div class="metric-row">
+      <div class="metric-card red">
+        <p class="m-label">Firm cancellations</p>
+        <p class="m-val">38</p>
+        <p class="m-sub">declined all offers</p>
+      </div>
+      <div class="metric-card red">
+        <p class="m-label">% of lost calls</p>
+        <p class="m-val">70%</p>
+        <p class="m-sub">unwinnable on arrival</p>
+      </div>
+      <div class="metric-card amber">
+        <p class="m-label">No-answer / unreachable</p>
+        <p class="m-val">11</p>
+        <p class="m-sub">of 54 lost calls</p>
+      </div>
+      <div class="metric-card">
+        <p class="m-label">Other (already cancelled)</p>
+        <p class="m-val">5</p>
+        <p class="m-sub">of 54 lost calls</p>
+      </div>
+    </div>
+
+    <div class="callout red">
+      <strong>No post-onboarding contact</strong>
+      <p>Multiple partners explicitly said that after signing up, nobody from Batch ever reached out to check in, offer support, or help optimize their listing. For several, the cancellation call was the <em>first time</em> they spoke to anyone on the team.</p>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Primary reasons</h3>
+        <div class="reason-item">
+          <div><span class="tag red">18 partners</span></div>
+          <p class="reason-title">No ROI / no bookings</p>
+          <p class="reason-desc">Visible in the data weeks early. Zero itinerary ads, no booking activity — trackable signals that went unaddressed.</p>
+        </div>
+        <div class="reason-item">
+          <div><span class="tag red">12 partners</span></div>
+          <p class="reason-title">Don't see the value</p>
+          <p class="reason-desc">Never had a meaningful touchpoint after joining. A single proactive check-in would have changed this entirely.</p>
+        </div>
+        <div class="reason-item">
+          <div><span class="tag orange">8 partners</span></div>
+          <p class="reason-title">Budget / pricing</p>
+          <p class="reason-desc">Easier to address before frustration builds. Partners are far more open when they haven't already decided to leave.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Secondary reasons</h3>
+        <div class="reason-item">
+          <div><span class="tag orange">5 partners</span></div>
+          <p class="reason-title">Tried to cancel before</p>
+          <p class="reason-desc">Previous requests went unanswered. Direct result of no post-onboarding contact or follow-up system.</p>
+        </div>
+        <div class="reason-item">
+          <div><span class="tag gray">3 partners</span></div>
+          <p class="reason-title">Misled at onboarding</p>
+          <p class="reason-desc">Unclear billing expectations set before the retention team ever touched them. Upstream fix needed.</p>
+        </div>
+        <div class="reason-item">
+          <div><span class="tag gray">3 partners</span></div>
+          <p class="reason-title">Switching platforms / no market</p>
+          <p class="reason-desc">Genuinely unwinnable. Batch has no coverage or they've already moved on.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <p class="chart-title">Firm cancellations by week</p>
+      <div style="position:relative; height:200px;">
+        <canvas id="firmWeekChart"></canvas>
+      </div>
+    </div>
+
+    <div class="callout orange">
+      <strong>Key insight</strong>
+      <p>79% of firm cancellations cite no ROI or no value — problems that exist weeks before the cancellation call. These are not retention failures. They are engagement gaps that started at onboarding.</p>
+    </div>
+
+  </div>
+
+  <!-- TAB 3: THE PROBLEM -->
+  <div id="problem" class="section">
+
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>Why Reactive Calls Can't Fix This</h2>
+    </div>
+
+    <div class="callout blue">
+      <strong>How partners reach us</strong>
+      <p>Partners don't receive outbound calls from the team. They book us through the chatbot when they want to cancel. By the time we hear from them, the decision is already made.</p>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-step safe">
+        <p class="tl-num">Step 1</p>
+        <p class="tl-title">Partner joins Batch</p>
+        <p class="tl-desc">Onboarded, listing created. No follow-up contact after sign-up.</p>
+      </div>
+      <div class="tl-step safe">
+        <p class="tl-num">Step 2</p>
+        <p class="tl-title">Partner goes quiet</p>
+        <p class="tl-desc">Weak signal, no bookings, incomplete listing. Still no one reaches out.</p>
+      </div>
+      <div class="tl-step danger">
+        <p class="tl-num">Step 3</p>
+        <p class="tl-title">Decision is made</p>
+        <p class="tl-desc">Frustration builds. Partner decides to leave. Mind already made up.</p>
+      </div>
+      <div class="tl-step danger">
+        <p class="tl-num">Step 4 — Now</p>
+        <p class="tl-title">We get the call</p>
+        <p class="tl-desc">Partner books through chatbot to cancel. 70% are unwinnable at this point.</p>
+      </div>
+    </div>
+
+    <div class="callout orange">
+      <strong>The real issue</strong>
+      <p>Partners book the call to cancel, not to be convinced. We're not losing them on the call — we're losing them in the silence after onboarding. The intervention window closes long before the chatbot opens.</p>
+    </div>
+
+    <div class="card">
+      <h3>What proactive outreach looks like</h3>
+      <p style="margin-bottom:12px;">Target partners before they've made up their minds. At-risk signals we can act on:</p>
+      <ul>
+        <li>0 itinerary ads — no visibility, no traffic</li>
+        <li>No bookings in 60+ days — platform not working for them</li>
+        <li>Incomplete listing — partner page, no media, no reviews</li>
+        <li>No login activity — disengaged and drifting toward churn</li>
+        <li>Previous unanswered cancellation request</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- TAB 4: STRATEGY PROPOSAL -->
+  <div id="proposal" class="section">
+
+    <div class="sec-head" style="border-color: var(--lime);">
+      <div class="sec-dot" style="background: var(--lime);"></div>
+      <h2>Proposed Team Structure</h2>
+    </div>
+
+    <div class="callout green">
+      <strong>The goal</strong>
+      <p>As Gaby and Aljun ramp up and take ownership of the cancellation queue, Rick and Kring transition to proactive outreach — reaching at-risk partners before they ever reach the chatbot.</p>
+    </div>
+
+    <div class="phase-card">
+      <span class="phase-badge badge-current">Phase 1 — Now</span>
+      <p class="phase-sub">Gaby & Aljun ramping. Rick and Kring still covering cancellation calls.</p>
+      <div class="role-row">
+        <div class="avatar av-gold">RC</div>
+        <div>
+          <p class="role-name">Rick — Supervisor (transitioning)</p>
+          <p class="role-desc">Building the proactive strategy, coaching Gaby & Aljun, running calls in parallel</p>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="avatar av-gray">KR</div>
+        <div>
+          <p class="role-name">Kring — Cancellation calls</p>
+          <p class="role-desc">Handles booked calls alongside Rick while new specialists ramp up</p>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="avatar av-gray">GA</div>
+        <div>
+          <p class="role-name">Gaby & Aljun — Ramping</p>
+          <p class="role-desc">Shadowing calls, learning the playbook, building to full production</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-card target">
+      <span class="phase-badge badge-target">Phase 2 — Gaby & Aljun fully ramped</span>
+      <p class="phase-sub" style="color:#007a3d;">Cancellation queue handed off. Senior team shifts to proactive outreach.</p>
+      <div class="role-row">
+        <div class="avatar av-gold">RC</div>
+        <div>
+          <p class="role-name">Rick — Supervisor + Proactive lead</p>
+          <p class="role-desc">Identifies at-risk partners, leads proactive strategy, oversees the team</p>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="avatar av-green">KR</div>
+        <div>
+          <p class="role-name">Kring — Proactive outreach support</p>
+          <p class="role-desc">Assists Rick on proactive outreach, catches at-risk partners before they cancel</p>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="avatar av-gray">GA</div>
+        <div>
+          <p class="role-name">Gaby & Aljun — Own the cancellation queue</p>
+          <p class="role-desc">Handle all booked cancellation calls using the established playbook</p>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="card">
+      <h3>Why this works for Gaby & Aljun's development</h3>
+      <p>Cancellation calls are structured, repeatable, and have clear outcomes — the best kind of ramp activity. They build confidence on real calls, get direct feedback, and own meaningful work from day one. The queue stays covered while senior capacity moves to where it actually improves the save rate.</p>
+    </div>
+
+  </div>
+
+
+
+</div>
+
+<div class="bottom-nav">
+  <span>BATCH RETENTION TEAM</span>
+  <span>Confidential · Internal use only · May 2026</span>
+</div>
+
+<script>
+Chart.defaults.font.family = "'Mulish', sans-serif";
+Chart.defaults.color = '#888';
+
+new Chart(document.getElementById('outcomeChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Lost','Retained/Saved','Delayed','Retained/Paused','Other'],
+    datasets: [{ data: [54,20,28,7,3], backgroundColor: ['#e03a3a','#00aa55','#d4920a','#5dcaa5','#ccc'], borderWidth: 2, borderColor: '#F0F1F4' }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+});
+
+new Chart(document.getElementById('weekChart'), {
+  type: 'bar',
+  data: {
+    labels: ['WO 4/13','WO 4/20','WO 4/27','WO 5/4','WO 5/11'],
+    datasets: [
+      { label: 'Retained', data: [8,6,6,4,3], backgroundColor: '#00aa55' },
+      { label: 'Lost', data: [5,14,8,10,11], backgroundColor: '#e03a3a' },
+      { label: 'Delayed', data: [6,8,5,2,7], backgroundColor: '#d4920a' }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: { x: { stacked: true, ticks: { font: { size: 10 } } }, y: { stacked: true } },
+    plugins: { legend: { display: false } }
+  }
+});
+
+new Chart(document.getElementById('signalChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Weak','Medium','Strong'],
+    datasets: [
+      { label: 'Saved', data: [15,10,2], backgroundColor: '#00aa55' },
+      { label: 'Lost', data: [37,14,3], backgroundColor: '#e03a3a' }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: { x: { ticks: { font: { size: 11 } } } },
+    plugins: { legend: { display: false } }
+  }
+});
+
+new Chart(document.getElementById('offersChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Blog Post','Listing Opt.','Ratings & Reviews','Add Media','UGC Tool','Discount/Rate','Pause'],
+    datasets: [{ data: [27,26,24,15,14,13,10], backgroundColor: '#4F97FC', borderWidth: 0 }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    scales: { y: { ticks: { font: { size: 10 } } } },
+    plugins: { legend: { display: false } }
+  }
+});
+
+new Chart(document.getElementById('repChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Cliffy','Kring','Rick'],
+    datasets: [
+      { label: 'Retained', data: [19,8,0], backgroundColor: '#00aa55' },
+      { label: 'Lost', data: [29,18,7], backgroundColor: '#e03a3a' },
+      { label: 'Delayed', data: [16,8,4], backgroundColor: '#d4920a' }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: { x: { stacked: true }, y: { stacked: true } },
+    plugins: { legend: { display: false } }
+  }
+});
+
+new Chart(document.getElementById('firmWeekChart'), {
+  type: 'bar',
+  data: {
+    labels: ['WO 4/13','WO 4/20','WO 4/27','WO 5/4','WO 5/11'],
+    datasets: [{ data: [4,10,7,8,9], backgroundColor: '#e03a3a', borderWidth: 0 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: { x: { ticks: { autoSkip: false, font: { size: 11 } } }, y: { ticks: { stepSize: 2 } } },
+    plugins: { legend: { display: false } }
+  }
+});
+
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
