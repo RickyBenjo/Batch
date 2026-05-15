@@ -110,12 +110,13 @@
   .phase-sub{font-size:12.5px;color:#666;padding:0 20px 14px;border-bottom:1px solid var(--border);}
   .role-row{display:flex;gap:12px;align-items:flex-start;padding:12px 20px;border-bottom:1px solid var(--border);}
   .role-row:last-child{border-bottom:none;}
-  .avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;border:2px solid;}
+  .role-info{display:flex;flex-direction:column;justify-content:center;min-width:0;flex:1;}
+  .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;border:2px solid;margin-top:2px;}
   .av-gold{background:var(--gold-tint);color:#8a6800;border-color:var(--gold);}
   .av-gray{background:#f0f0f0;color:#888;border-color:#ddd;}
   .av-green{background:var(--green-tint);color:var(--green);border-color:var(--green);}
   .av-blue{background:var(--blue-tint);color:var(--blue);border-color:var(--blue);}
-  .role-name{font-size:13.5px;font-weight:700;margin-bottom:2px;}
+  .role-name{font-size:13.5px;font-weight:700;margin-bottom:2px;line-height:1.3;}
   .role-desc{font-size:12px;color:#777;line-height:1.5;}
   .footer strong{color:#555;}
 </style>
@@ -316,7 +317,6 @@
     <div class="chart-full"><div class="chart-label">Firm cancellations by week — trending up</div><div style="position:relative;height:160px;"><canvas id="firmWeek"></canvas></div></div>
   </div>
 
-</div>
 
   <hr class="divider">
 
@@ -338,9 +338,9 @@
         <span class="phase-badge" style="background:var(--gold);color:var(--black);">Phase 1 — Now (Week 1)</span>
       </div>
       <p class="phase-sub">Gaby &amp; Aljun in first week — handling new listing QA and underperforming partner engagement. Rick and Kring on full production churn calls.</p>
-      <div class="role-row"><div class="avatar av-gold">RC</div><div><div class="role-name">Rick — Supervisor + Full production churn calls</div><div class="role-desc">Handling all booked cancellation calls, overseeing training, laying groundwork for proactive strategy</div></div></div>
-      <div class="role-row"><div class="avatar av-gray">KR</div><div><div class="role-name">Kring — Full production churn calls</div><div class="role-desc">Full production on booked cancellation calls alongside Rick</div></div></div>
-      <div class="role-row"><div class="avatar av-gray">GA</div><div><div class="role-name">Gaby &amp; Aljun — Training (Week 1)</div><div class="role-desc">New listing QA and engagement for underperforming partners — building product knowledge before taking calls</div></div></div>
+      <div class="role-row"><div class="avatar av-gold">RC</div><div class="role-info"><div class="role-name">Rick — Supervisor + Full production churn calls</div><div class="role-desc">Handling all booked cancellation calls, overseeing training, laying groundwork for proactive strategy</div></div></div>
+      <div class="role-row"><div class="avatar av-gray">KR</div><div class="role-info"><div class="role-name">Kring — Full production churn calls</div><div class="role-desc">Full production on booked cancellation calls alongside Rick</div></div></div>
+      <div class="role-row"><div class="avatar av-gray">GA</div><div class="role-info"><div class="role-name">Gaby &amp; Aljun — Training (Week 1)</div><div class="role-desc">New listing QA and engagement for underperforming partners — building product knowledge before taking calls</div></div></div>
     </div>
 
     <!-- Phase 2 -->
@@ -349,9 +349,9 @@
         <span class="phase-badge" style="background:var(--blue);color:#fff;">Phase 2 — Next Week (Mid-week start, Wed or Thu)</span>
       </div>
       <p class="phase-sub" style="color:#1a4a80;">Gaby &amp; Aljun begin handling calls partially. Rick and Kring transition to admin, proactive outreach, disputes, and past dues.</p>
-      <div class="role-row"><div class="avatar av-gold">RC</div><div><div class="role-name">Rick — Supervisor + Admin + Proactive outreach + Disputes &amp; past dues</div><div class="role-desc">Shifts off the churn queue to focus on proactive partner outreach, dispute handling, and past due follow-ups</div></div></div>
-      <div class="role-row"><div class="avatar av-blue">KR</div><div><div class="role-name">Kring — Admin + Proactive outreach + Disputes &amp; past dues</div><div class="role-desc">Transitions alongside Rick — supporting proactive outreach and admin tasks</div></div></div>
-      <div class="role-row"><div class="avatar av-gray">GA</div><div><div class="role-name">Gaby &amp; Aljun — Partial churn calls (Wed/Thu start) + QA &amp; engagement</div><div class="role-desc">Easing into the cancellation queue mid-week while continuing their QA and underperforming partner work</div></div></div>
+      <div class="role-row"><div class="avatar av-gold">RC</div><div class="role-info"><div class="role-name">Rick — Supervisor + Admin + Proactive outreach + Disputes &amp; past dues</div><div class="role-desc">Shifts off the churn queue to focus on proactive partner outreach, dispute handling, and past due follow-ups</div></div></div>
+      <div class="role-row"><div class="avatar av-blue">KR</div><div class="role-info"><div class="role-name">Kring — Admin + Proactive outreach + Disputes &amp; past dues</div><div class="role-desc">Transitions alongside Rick — supporting proactive outreach and admin tasks</div></div></div>
+      <div class="role-row"><div class="avatar av-gray">GA</div><div class="role-info"><div class="role-name">Gaby &amp; Aljun — Partial churn calls (Wed/Thu start) + QA &amp; engagement</div><div class="role-desc">Easing into the cancellation queue mid-week while continuing their QA and underperforming partner work</div></div></div>
     </div>
 
     <!-- Phase 3 -->
@@ -360,9 +360,9 @@
         <span class="phase-badge" style="background:var(--green);color:#fff;">Phase 3 — Gaby &amp; Aljun Full Production</span>
       </div>
       <p class="phase-sub" style="color:#007a3d;">Gaby &amp; Aljun own the churn queue and take on some proactive outreach. Rick and Kring focus fully on admin, disputes, past dues, and proactive strategy.</p>
-      <div class="role-row"><div class="avatar av-gold">RC</div><div><div class="role-name">Rick — Supervisor + Admin + Disputes &amp; past dues + Proactive lead</div><div class="role-desc">Fully focused on catching at-risk partners early, dispute resolution, past dues, and team oversight</div></div></div>
-      <div class="role-row"><div class="avatar av-green">KR</div><div><div class="role-name">Kring — Admin + Disputes &amp; past dues + Proactive outreach</div><div class="role-desc">Supports Rick across admin tasks, proactive outreach, and dispute/past due follow-ups</div></div></div>
-      <div class="role-row"><div class="avatar av-gray">GA</div><div><div class="role-name">Gaby &amp; Aljun — Full churn queue + Some proactive outreach</div><div class="role-desc">Own all booked cancellation calls and handle proactive outreach for new listings and underperforming partners during first part of their day</div></div></div>
+      <div class="role-row"><div class="avatar av-gold">RC</div><div class="role-info"><div class="role-name">Rick — Supervisor + Admin + Disputes &amp; past dues + Proactive lead</div><div class="role-desc">Fully focused on catching at-risk partners early, dispute resolution, past dues, and team oversight</div></div></div>
+      <div class="role-row"><div class="avatar av-green">KR</div><div class="role-info"><div class="role-name">Kring — Admin + Disputes &amp; past dues + Proactive outreach</div><div class="role-desc">Supports Rick across admin tasks, proactive outreach, and dispute/past due follow-ups</div></div></div>
+      <div class="role-row"><div class="avatar av-gray">GA</div><div class="role-info"><div class="role-name">Gaby &amp; Aljun — Full churn queue + Some proactive outreach</div><div class="role-desc">Own all booked cancellation calls and handle proactive outreach for new listings and underperforming partners during first part of their day</div></div></div>
     </div>
 
     <div class="callout green">
