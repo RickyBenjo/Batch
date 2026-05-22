@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pre-Renewal Notification Proposal · Batch</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0F0C0C;
+    --white: #F0F1F4;
+    --sunset: #FF5F00;
+    --ocean: #4F97FC;
+    --cosmo: #FF93D3;
+    --lime: #00DF00;
+    --gold: #FFCA00;
+    --gold-tint: #FFF3B0;
+    --ocean-tint: #D6E9FF;
+    --cosmo-tint: #FFE0F3;
+    --lime-tint: #C8FFB0;
+    --sunset-tint: #FFD9C0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Mulish', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .topnav {
+    background: var(--black);
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--gold);
+  }
+  .topnav .sep { color: rgba(240,241,244,0.2); font-size: 12px; }
+  .topnav .current { color: var(--gold); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+  .topnav .back { color: rgba(240,241,244,0.5); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+
+  .hero {
+    background: var(--black);
+    padding: 52px 40px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: var(--sunset);
+    opacity: 0.1;
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-badge {
+    display: inline-block;
+    background: var(--sunset);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    padding: 5px 14px;
+    border-radius: 30px;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .hero-sub { font-size: 14px; color: rgba(240,241,244,0.55); margin-bottom: 24px; }
+  .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    font-size: 11px; font-weight: 700;
+    padding: 5px 14px; border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(240,241,244,0.7);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .page-body { max-width: 900px; margin: 0 auto; padding: 36px 40px 80px; }
+
+  .sec-head {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    border-bottom: 3px solid;
+  }
+  .sec-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .sec-head h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid rgba(15,12,12,0.09);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+  .card h3 { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 13.5px; color: #555; line-height: 1.65; }
+  .card ul { padding-left: 18px; }
+  .card li { margin-bottom: 4px; }
+
+  .callout { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; border-left: 4px solid; }
+  .callout.gold { background: var(--gold-tint); border-color: var(--gold); }
+  .callout.blue { background: var(--ocean-tint); border-color: var(--ocean); }
+  .callout.green { background: var(--lime-tint); border-color: #00b800; }
+  .callout.orange { background: var(--sunset-tint); border-color: var(--sunset); }
+  .callout strong { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+  .callout p, .callout li { font-size: 13.5px; line-height: 1.6; }
+  .callout ul { padding-left: 16px; }
+  .callout li { margin-bottom: 3px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+
+  .stat-card {
+    background: var(--black);
+    border-radius: 14px;
+    padding: 20px 22px;
+    color: #fff;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label { font-size: 12px; color: rgba(240,241,244,0.55); line-height: 1.4; }
+
+  .steps {}
+  .step { display: flex; gap: 14px; margin-bottom: 12px; align-items: flex-start; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--black); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-body { flex: 1; }
+  .step-body strong { font-size: 13.5px; display: block; margin-bottom: 2px; }
+  .step-body span { font-size: 12.5px; color: #666; }
+
+  .example-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid rgba(15,12,12,0.09);
+    border-top: 4px solid var(--sunset);
+    padding: 18px 20px;
+  }
+  .example-card .partner-name {
+    font-size: 11px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--sunset); margin-bottom: 8px;
+  }
+  .example-card p { font-size: 13px; color: #555; }
+
+  .ask-card {
+    background: #fff;
+    border-radius: 14px;
+    border: 1.5px solid rgba(15,12,12,0.09);
+    border-top: 4px solid var(--ocean);
+    padding: 18px 20px;
+  }
+  .ask-card .ask-label {
+    font-size: 11px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--ocean); margin-bottom: 8px;
+  }
+  .ask-card p { font-size: 13px; color: #555; }
+
+  .section-gap { margin-bottom: 40px; }
+
+  hr { border: none; border-top: 2px dashed rgba(0,0,0,0.07); margin: 32px 0; }
+
+  .footer-note {
+    background: var(--black);
+    color: rgba(240,241,244,0.45);
+    font-size: 12px;
+    text-align: center;
+    padding: 20px 40px;
+    margin-top: 40px;
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <span class="back">Batch Internal</span>
+  <span class="sep">›</span>
+  <span class="current">Pre-Renewal Notification Proposal</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Proposal · May 2026</div>
+    <h1>Pre-Renewal Notification System</h1>
+    <p class="hero-sub">A low-effort fix to reduce surprise cancellations and refund exposure on longer-term plans.</p>
+    <div class="hero-chips">
+      <div class="chip">Submitted by Rick</div>
+      <div class="chip">For Stefan & Luis</div>
+      <div class="chip">Action Required</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- PROBLEM -->
+  <div class="section-gap">
+    <div class="sec-head" style="border-color: var(--sunset);">
+      <div class="sec-dot" style="background: var(--sunset);"></div>
+      <h2>The Problem</h2>
+    </div>
+
+    <div class="card">
+      <p>We're getting more calls from partners on annual, 6-month, and 3-month plans who are surprised by renewal charges. Some were told they'd be notified before renewal. When that doesn't happen, they come to us already frustrated and in full cancel mode — making retention significantly harder and refund exposure much higher on larger commitments.</p>
+    </div>
+
+    <div class="two-col">
+      <div class="example-card">
+        <div class="partner-name">Revive Well Tahoe</div>
+        <p>Partner on a 12-month plan was assured by sales it wouldn't renew automatically. By the time they reached us, they just wanted out.</p>
+      </div>
+      <div class="example-card">
+        <div class="partner-name">Lost Cat & Black Wood</div>
+        <p>Partner on a 6-month plan had no idea she'd be charged again at renewal on May 10. Now requesting cancellation and a refund for the remaining months.</p>
+      </div>
+    </div>
+
+    <div class="callout orange">
+      <strong>Why This Matters</strong>
+      <p>These aren't isolated cases. This pattern appears consistently in our churn call logs. Partners on longer commitments represent larger refund amounts at risk — and these situations are almost always avoidable with a simple heads-up.</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- CONTEXT -->
+  <div class="section-gap">
+    <div class="sec-head" style="border-color: var(--gold);">
+      <div class="sec-dot" style="background: var(--gold);"></div>
+      <h2>Context: Churn Performance</h2>
+    </div>
+
+    <div class="three-col">
+      <div class="stat-card">
+        <div class="stat-num">24%</div>
+        <div class="stat-label">Save rate MTD<br>May 2026</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">38</div>
+        <div class="stat-label">Firm cancellations<br>MTD May 2026</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">12</div>
+        <div class="stat-label">Partners retained<br>MTD May 2026</div>
+      </div>
+    </div>
+
+    <div class="callout gold">
+      <strong>Key Insight</strong>
+      <p>Top churn reasons — no bookings/ROI, no perceived value, budget — are largely detectable before the call happens, with no post-onboarding contact. A pre-renewal touchpoint is one of the few interventions we can make <strong>before</strong> a partner reaches cancel mode.</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- THE FIX -->
+  <div class="section-gap">
+    <div class="sec-head" style="border-color: var(--lime);">
+      <div class="sec-dot" style="background: var(--lime);"></div>
+      <h2>The Fix</h2>
+    </div>
+
+    <div class="card">
+      <h3>Automated Notification 14 Days Before Renewal</h3>
+      <p style="margin-bottom: 14px;">Send partners on annual, 6-month, and 3-month plans a notification 14 days before their renewal date. This aligns with our existing 14-day cancellation policy and gives partners a path to connect with us while they're still in a good headspace.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body"><strong>14 Days Before Renewal</strong><span>Partner receives automated heads-up with a link to connect with the team</span></div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body"><strong>Partner Reaches Out (if needed)</strong><span>Engagement specialist handles the conversation before frustration sets in</span></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body"><strong>Outcome</strong><span>Fewer surprise cancellations, fewer refund requests, better retention leverage</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="callout green" style="margin-bottom: 0;">
+        <strong>Near-Term Fix</strong>
+        <p>Manual check-ins 7–14 days before renewal using a Stripe report already pulled to identify upcoming renewals by plan type.</p>
+      </div>
+      <div class="callout blue" style="margin-bottom: 0;">
+        <strong>Long-Term Goal</strong>
+        <p>Automated notification system that runs without team intervention — reducing refund exposure on annual and 6-month plans at scale.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- THE ASK -->
+  <div class="section-gap">
+    <div class="sec-head" style="border-color: var(--ocean);">
+      <div class="sec-dot" style="background: var(--ocean);"></div>
+      <h2>What We Need From You</h2>
+    </div>
+
+    <div class="two-col">
+      <div class="ask-card">
+        <div class="ask-label">Data Source</div>
+        <p>A Stripe report has been pulled to identify partners by plan type and upcoming renewal date. Happy to defer to a cleaner source on your end if one exists — Airtable, HubSpot, etc.</p>
+      </div>
+      <div class="ask-card">
+        <div class="ask-label">Automation Tool</div>
+        <p>Looking for your guidance on the right tool to trigger these notifications — whether that's through Intercom, an existing workflow, or something else entirely.</p>
+      </div>
+    </div>
+
+    <div class="callout gold">
+      <strong>Bottom Line</strong>
+      <p>Your go-ahead and a decision on tooling is all we need to get this moving. The partner list is ready on our end.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer-note">
+  Submitted by Rick · May 2026 · Questions? Reach out via Slack.
+</div>
+
+</body>
+</html>
